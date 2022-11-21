@@ -1,13 +1,13 @@
 {
-    "name": "fioru/lasntgadmin-plugin_template",
-    "version": "1.0.0",
+    "name": "fioru/lasntgadmin-orders",
+    "version": "0.0.1",
     "type": "wordpress-plugin",
     "extra": {
-        "installer-name": "lasntgadmin-plugin_template"
+        "installer-name": "lasntgadmin-orders"
     },
     "autoload": {
         "psr-4": {
-            "Lasntg\\Admin\\": "lib"
+            "Lasntg\\Admin\\Order\\": "lib"
         }
     },
     "autoload-dev": {
@@ -23,8 +23,20 @@
       "secure": "security-checker security:check composer.lock",
       "all": [ "@lint", "@check", "@test", "@secure" ]
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:fioru-software/lasntgadmin-grant-funded-payment-gateway.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@github.com:fioru-software/lasntgadmin-attendees.git"
+        }
+    ],
     "require": {
-        "composer/installers": "~2.0"
+        "composer/installers": "~2.0",
+        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.0",
+        "fioru/lasntgadmin-attendees": "^1.0.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.19",
