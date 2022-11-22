@@ -35,13 +35,13 @@ RUN wp core download --skip-content --version=$WP_VERSION --locale=$WP_LOCALE --
     mkdir -p /var/www/html/wp-content/plugins /var/www/html/wp-content/themes
 
 # composer
-RUN composer config --auth github-oauth.github.com ${GITHUB_TOKEN}; \
-    composer config --no-plugins allow-plugins.composer/installers true
+RUN composer config --global --auth github-oauth.github.com ${GITHUB_TOKEN}; \
+    composer config --global --no-plugins allow-plugins.composer/installers true
 
 # plugins
 RUN mkdir /tmp/plugins
 COPY --chown=www-data:www-data plugins/* /tmp/plugins/
-RUN for plugin in /tmp/plugins/*.zip; do unzip $plugin -d /var/www/html/wp-content/plugins/; done;
+RUN for plugin in /tmp/plugins/*.zip; do unzip -q $plugin -d /var/www/html/wp-content/plugins/; done;
 
 # default groups
 COPY --chown=www-data:www-data exports/groups.sql /tmp/groups.sql

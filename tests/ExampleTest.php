@@ -1,6 +1,6 @@
 <?php
 
-use Lasntg\Admin\Example;
+use Lasntg\Admin\Order\Example;
 
 /**
  * Class SampleTest
