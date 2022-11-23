@@ -11,5 +11,8 @@ if runuser -s /bin/sh -c 'wp core is-installed' www-data; then
     if ! runuser -s /bin/sh -c 'wp role exists training_officer' www-data; then
         runuser -s /bin/sh -c 'wp role create training_officer "Training Officer"' www-data
     fi
+    if ! runuser -s /bin/sh -c 'wp role exists fire_training_officer' www-data; then
+        runuser -s /bin/sh -c 'wp role create fire_training_officer "Fire Training Officer"' www-data
+    fi
 
 fi

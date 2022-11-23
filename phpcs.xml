@@ -6,6 +6,7 @@
 	<file>.</file>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/wp-content/*</exclude-pattern>
 	<exclude-pattern>tests/*</exclude-pattern>
 	<exclude-pattern>config/*</exclude-pattern>
 	<exclude-pattern>build/*</exclude-pattern>
@@ -45,6 +46,9 @@
         <exclude name="Squiz.Commenting.FileComment.Missing"/>
         <exclude name="Squiz.Commenting.VariableComment.Missing"/>
         <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="Generic.Commenting.DocComment.MissingShort"/>
+        <exclude name="Squiz.Commenting.ClassComment.Missing"/>
     </rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">

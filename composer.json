@@ -1,13 +1,13 @@
 {
     "name": "fioru/lasntgadmin-orders",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-orders"
     },
     "autoload": {
         "psr-4": {
-            "Lasntg\\Admin\\Order\\": "lib"
+            "Lasntg\\Admin\\Orders\\": "lib"
         }
     },
     "autoload-dev": {
@@ -30,13 +30,23 @@
         },
         {
             "type": "vcs",
+            "url":  "git@github.com:fioru-software/lasntgadmin-groups.git"
+        },
+        {
+            "type": "vcs",
             "url":  "git@github.com:fioru-software/lasntgadmin-attendees.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@github.com:fioru-software/lasntgadmin-products.git"
         }
     ],
     "require": {
         "composer/installers": "~2.0",
-        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.0",
-        "fioru/lasntgadmin-attendees": "^1.0.0"
+        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.7",
+        "fioru/lasntgadmin-attendees": "^3.1.0",
+        "fioru/lasntgadmin-products": "^5.0.4",
+        "fioru/lasntgadmin-groups": "^1.0.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.19",

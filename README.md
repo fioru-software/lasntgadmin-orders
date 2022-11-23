@@ -54,6 +54,13 @@ npm start
 npm build
 ```
 
+```sh
+# create key and secret in WooCommerce > Settings > Advanced > REST API
+CONSUMER_KEY=
+CONSUMER_SECRET=
+curl -k -u $CONSUMER_KEY:$CONSUMER_SECRET https://localhost:8443/wp-json/wc/v3/orders | jq
+```
+
 ## Release a version
 
 Update `composer.json` file with appropriate `name`, `version` and `installer-name`.
@@ -75,6 +82,9 @@ git push -u origin 0.1.4
 
 ## Plugins
 
+- [WooCommerce REST API docs](https://woocommerce.github.io/woocommerce-rest-api-docs/)
+- [WordPress components](https://wordpress.github.io/gutenberg/)
+- [WooCommerce components](https://woocommerce.github.io/woocommerce-admin/#/components/)
 - [Creating your first WooCommerce extension](https://developer.woocommerce.com/extension-developer-guide/creating-your-first-extension/)
 - [Create your first app with Gutenberg data](https://developer.wordpress.org/block-editor/how-to-guides/data-basics/1-data-basics-setup/)
 - [Introduction to WordPress Plugin Development](https://developer.wordpress.org/plugins/intro/)

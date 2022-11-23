@@ -1,0 +1,19 @@
+
+#post-body-content, #titlediv { display:none }
+
+
+#poststuff #post-body.columns-2 {
+    margin-right: unset;
+}
+
+#postbox-container-1 {
+    display:none;
+}
+
+#lasntgadmin-orders-component select, .form-field input[type=email], .form-field input[type=number], .form-field input[type=password], .form-field input[type=search], .form-field input[type=tel], .form-field input[type=text], .form-field input[type=url], .form-field textarea {
+    width: 100%;
+}
+
+.form-field select {
+    max-width: unset;
+}
