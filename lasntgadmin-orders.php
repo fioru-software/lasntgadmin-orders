@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       LASNTG Orders Plugin
+ * Plugin Name:       LASNTG Orders
  * Plugin URI:        https://github.com/fioru-software/lasntgadmin-orders
- * Description:       An example plugin.
- * Version:           0.0.1
+ * Description:       Orders plugin
+ * Version:           1.0.0
  * Requires PHP:      7.2
  * Text Domain:       lasntgadmin
  * Domain Path:       /languages
@@ -11,14 +11,21 @@
 
 defined( 'ABSPATH' ) || exit;
 
-require_once getenv('COMPOSER_AUTOLOAD_FILEPATH');
+require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
-use Lasntg\Admin\PaymentGateway\GrantFunded\GroupApi;
-use Lasntg\Admin\Order\Example;
+use Lasntg\Admin\Orders\{ PageUtils, PluginUtils, OrderUtils };
 
-error_log("==== GROUPS =====");
-error_log(print_r(GroupApi::get(), true));
+PageUtils::add_actions();
+PageUtils::add_filters();
+OrderUtils::add_filters();
+OrderUtils::add_actions();
 
-error_log("==== EXAMPLE =====");
-error_log(print_r(Example::get_instance(), true));
+/**
+ * Plugin activation
+ */
+register_activation_hook( __FILE__, [ PluginUtils::class, 'activate' ] );
 
+/**
+ * Plugin deactivation
+ */
+register_deactivation_hook( __FILE__, [ PluginUtils::class, 'deactivate' ] );
