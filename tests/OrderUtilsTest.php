@@ -15,14 +15,14 @@ use Lasntg\Admin\Orders\OrderUtils;
  */
 class OrderUtilsTest extends WP_UnitTestCase {
 
-    public function set_up() {
-        parent::set_up();
-    }
+	public function set_up() {
+		parent::set_up();
+	}
 
 	/**
 	 * A single example test.
 	 */
 	public function testGetStatuses() {
-        $this->markTestSkipped();
+		$this->markTestSkipped();
 	}
 }
