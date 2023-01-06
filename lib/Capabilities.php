@@ -25,6 +25,7 @@ class Capabilities {
 			'delete_published_shop_orders',
 			'delete_shop_order',
 			'delete_others_shop_orders',
+			'view_others_shop_orders',
 		);
 	}
 
@@ -46,6 +47,7 @@ class Capabilities {
 			'delete_published_shop_orders',
 			'delete_shop_order',
 			'delete_others_shop_orders',
+			'view_others_shop_orders',
 		);
 	}
 
@@ -67,6 +69,7 @@ class Capabilities {
 			'delete_published_shop_orders',
 			'delete_shop_order',
 			'delete_others_shop_orders',
+			'view_others_shop_orders',
 		];
 	}
 
