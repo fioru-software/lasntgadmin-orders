@@ -8,8 +8,10 @@ use Lasntg\Admin\Orders\{
 	OrderData
 };
 
+use Lasntg\Admin\Group\GroupUtils;
+
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
-use WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request;
+use WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query;
 
 use function wc_get_order_statuses;
 
@@ -23,6 +25,7 @@ class OrderUtils {
 		add_filter( 'woocommerce_register_shop_order_post_statuses', [ self::class, 'register_shop_order_post_statuses' ] );
 		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
 		add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
+		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
 	}
 
 	public static function add_actions() {
@@ -34,6 +37,24 @@ class OrderUtils {
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 	}
 
+	/**
+	 *
+	 * By default WC saves all orders with author id = 1, so we need to look at the customer_id stored as order meta data
+	 *
+	 * @see woocommerce_new_order_data filter
+	 * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/data-stores/abstract-wc-order-data-store-cpt.php#L74
+	 */
+	public static function filter_order_list( string $where, WP_Query $query ) {
+		if ( $query->is_admin && $query->get( 'post_type' ) === 'shop_order' ) {
+			$screen = get_current_screen();
+
+			if ( 'edit-shop_order' === $screen->id && ! current_user_can( 'view_others_shop_orders' ) ) {
+				$where .= sprintf( " AND wp_posts.ID IN ( select post_id from wp_postmeta pm where pm.meta_key = '_customer_user' AND pm.meta_value = %d )", get_current_user_id() );
+			}
+		}
+
+		return $where;
+	}
 
 	/**
 	 * Update user meta when order is created

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9684c0aa93dfbae8377c7839cccbcbf",
+    "content-hash": "51b040c646eb6a00143d73cae2e38964",
     "packages": [
         {
             "name": "composer/installers",
@@ -154,16 +154,16 @@
         },
         {
             "name": "fioru/lasntgadmin-attendees",
-            "version": "3.1.0",
+            "version": "3.1.4",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-attendees.git",
-                "reference": "78c8b145ebd839a825d316a3f3c758f4acaf39ac"
+                "reference": "047cb137a33699fb5b09db292754bbd2619c875a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/78c8b145ebd839a825d316a3f3c758f4acaf39ac",
-                "reference": "78c8b145ebd839a825d316a3f3c758f4acaf39ac",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/047cb137a33699fb5b09db292754bbd2619c875a",
+                "reference": "047cb137a33699fb5b09db292754bbd2619c875a",
                 "shasum": ""
             },
             "require": {
@@ -219,10 +219,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.1.0",
+                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.1.4",
                 "issues": "https://github.com/fioru-software/lasntgadmin-attendees/issues"
             },
-            "time": "2022-12-09T07:39:32+00:00"
+            "time": "2023-01-05T15:59:36+00:00"
         },
         {
             "name": "fioru/lasntgadmin-grant-funded-payment-gateway",
@@ -371,16 +371,16 @@
         },
         {
             "name": "fioru/lasntgadmin-products",
-            "version": "5.0.6",
+            "version": "5.0.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-products.git",
-                "reference": "5aa3cdd76d2da6843ee0d3440c6a6fb84c0aef7c"
+                "reference": "e08c03ffee8d68a9f4ff3d2128653deef57193d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/5aa3cdd76d2da6843ee0d3440c6a6fb84c0aef7c",
-                "reference": "5aa3cdd76d2da6843ee0d3440c6a6fb84c0aef7c",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/e08c03ffee8d68a9f4ff3d2128653deef57193d3",
+                "reference": "e08c03ffee8d68a9f4ff3d2128653deef57193d3",
                 "shasum": ""
             },
             "require": {
@@ -437,10 +437,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.0.6",
+                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.0.7",
                 "issues": "https://github.com/fioru-software/lasntgadmin-products/issues"
             },
-            "time": "2023-01-03T14:32:31+00:00"
+            "time": "2023-01-06T11:58:27+00:00"
         }
     ],
     "packages-dev": [
@@ -663,12 +663,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FakerPHP/Faker.git",
-                "reference": "515eea9fdf9e3550196e8d8b13d66904bb2fce8c"
+                "reference": "b47968eca3f1b81a7eedc82ee8741eee2af721a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FakerPHP/Faker/zipball/515eea9fdf9e3550196e8d8b13d66904bb2fce8c",
-                "reference": "515eea9fdf9e3550196e8d8b13d66904bb2fce8c",
+                "url": "https://api.github.com/repos/FakerPHP/Faker/zipball/b47968eca3f1b81a7eedc82ee8741eee2af721a6",
+                "reference": "b47968eca3f1b81a7eedc82ee8741eee2af721a6",
                 "shasum": ""
             },
             "require": {
@@ -724,7 +724,7 @@
                 "issues": "https://github.com/FakerPHP/Faker/issues",
                 "source": "https://github.com/FakerPHP/Faker/tree/main"
             },
-            "time": "2023-01-01T20:28:29+00:00"
+            "time": "2023-01-05T14:50:10+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1662,12 +1662,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCompatibility/PHPCompatibilityWP.git",
-                "reference": "cebd8669ee769432dbf00a352af5c7782c4a5618"
+                "reference": "262f9d81273932315d15d704f69b9d678b939cb3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityWP/zipball/cebd8669ee769432dbf00a352af5c7782c4a5618",
-                "reference": "cebd8669ee769432dbf00a352af5c7782c4a5618",
+                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityWP/zipball/262f9d81273932315d15d704f69b9d678b939cb3",
+                "reference": "262f9d81273932315d15d704f69b9d678b939cb3",
                 "shasum": ""
             },
             "require": {
@@ -1675,10 +1675,10 @@
                 "phpcompatibility/phpcompatibility-paragonie": "^1.0"
             },
             "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7"
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
             },
             "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7 || This Composer plugin will sort out the PHP_CodeSniffer 'installed_paths' automatically.",
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0 || This Composer plugin will sort out the PHP_CodeSniffer 'installed_paths' automatically.",
                 "roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
             },
             "default-branch": true,
@@ -1710,7 +1710,7 @@
                 "issues": "https://github.com/PHPCompatibility/PHPCompatibilityWP/issues",
                 "source": "https://github.com/PHPCompatibility/PHPCompatibilityWP"
             },
-            "time": "2022-12-08T22:06:25+00:00"
+            "time": "2023-01-05T13:34:27+00:00"
         },
         {
             "name": "phpcsstandards/phpcsextra",
@@ -1718,18 +1718,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "0ce07ffe7b3832104a419f387402794873c40c3e"
+                "reference": "0f55c12dc6a81c7728794b01a4aea44f11c83991"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/0ce07ffe7b3832104a419f387402794873c40c3e",
-                "reference": "0ce07ffe7b3832104a419f387402794873c40c3e",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/0f55c12dc6a81c7728794b01a4aea44f11c83991",
+                "reference": "0f55c12dc6a81c7728794b01a4aea44f11c83991",
                 "shasum": ""
             },
             "require": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7",
                 "php": ">=5.4",
-                "phpcsstandards/phpcsutils": "^1.0 || dev-develop",
+                "phpcsstandards/phpcsutils": "^1.0",
                 "squizlabs/php_codesniffer": "^3.7.1"
             },
             "require-dev": {
@@ -1775,7 +1774,7 @@
                 "issues": "https://github.com/PHPCSStandards/PHPCSExtra/issues",
                 "source": "https://github.com/PHPCSStandards/PHPCSExtra"
             },
-            "time": "2022-12-29T02:38:10+00:00"
+            "time": "2023-01-05T12:35:58+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -1783,16 +1782,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "caf53797ba99775647ab9d1f5a6b6c50b73b8181"
+                "reference": "4fd2e30c7465112ca2e3646037bfb9e6f0f4d4f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/caf53797ba99775647ab9d1f5a6b6c50b73b8181",
-                "reference": "caf53797ba99775647ab9d1f5a6b6c50b73b8181",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/4fd2e30c7465112ca2e3646037bfb9e6f0f4d4f3",
+                "reference": "4fd2e30c7465112ca2e3646037bfb9e6f0f4d4f3",
                 "shasum": ""
             },
             "require": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7",
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7 || ^1.0",
                 "php": ">=5.4",
                 "squizlabs/php_codesniffer": "^3.7.1 || 4.0.x-dev@dev"
             },
@@ -1850,7 +1849,7 @@
                 "issues": "https://github.com/PHPCSStandards/PHPCSUtils/issues",
                 "source": "https://github.com/PHPCSStandards/PHPCSUtils"
             },
-            "time": "2023-01-03T10:03:25+00:00"
+            "time": "2023-01-05T12:08:37+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2176,12 +2175,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "9af616c4aae748a7cc83a9836d9f302011b79dd4"
+                "reference": "0b91f6c65ddd492a57c738947110458ce20b0734"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9af616c4aae748a7cc83a9836d9f302011b79dd4",
-                "reference": "9af616c4aae748a7cc83a9836d9f302011b79dd4",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0b91f6c65ddd492a57c738947110458ce20b0734",
+                "reference": "0b91f6c65ddd492a57c738947110458ce20b0734",
                 "shasum": ""
             },
             "require": {
@@ -2270,7 +2269,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-02T08:33:27+00:00"
+            "time": "2023-01-04T07:20:58+00:00"
         },
         {
             "name": "psr/container",
@@ -4691,12 +4690,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
-                "reference": "227e89b9fadb9beb408d5d833d18d2117d51eb16"
+                "reference": "dcbb3ec50911a554c9a4a7876dccb11419dda4e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/227e89b9fadb9beb408d5d833d18d2117d51eb16",
-                "reference": "227e89b9fadb9beb408d5d833d18d2117d51eb16",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/dcbb3ec50911a554c9a4a7876dccb11419dda4e9",
+                "reference": "dcbb3ec50911a554c9a4a7876dccb11419dda4e9",
                 "shasum": ""
             },
             "require": {
@@ -4736,7 +4735,7 @@
                 "source": "https://github.com/WordPress/WordPress-Coding-Standards",
                 "wiki": "https://github.com/WordPress/WordPress-Coding-Standards/wiki"
             },
-            "time": "2022-12-28T10:27:27+00:00"
+            "time": "2023-01-04T10:26:16+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",
