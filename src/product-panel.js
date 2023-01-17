@@ -12,6 +12,7 @@ const ProductPanel = props => {
   const [ quantity, setQuantity ] = useState(0);
   const [ total, setTotal ] = useState(0);
   const [ products, setProducts ] = useState([]);
+  const [ spaces, setSpaces ] = useState(0);
 
   useEffect( () => {
     setNotice(null);
@@ -37,6 +38,11 @@ const ProductPanel = props => {
   function handleProductChange(e) {
     const option = e.target.querySelector(`option[value="${e.target.value}"]`);
     setPrice( parseInt(option.dataset.price) );
+    setSpaces( parseInt(option.dataset.spaces ) );
+    setNotice({
+      status: parseInt(option.dataset.spaces) > 0 ? "info" : "warning",
+      message: `${ option.dataset.spaces} spaces available.`
+    });
   }
 
   function handleQuantityChange(e) {
@@ -56,7 +62,7 @@ const ProductPanel = props => {
         </div>
         { props?.lineItem?.id && <input type="hidden" name="line_item_id" value={ props.lineItem.id } /> }
 
-        { !!price && products.length > 0 && 
+        { !!price && products.length > 0 && spaces > 0 &&  
         <>
           <div class="form-field">
             <label for="price">Price</label>
@@ -65,7 +71,7 @@ const ProductPanel = props => {
           </div>
           <div class="form-field">
             <label for="quantity">Quantity</label>
-            <input id="quantity" name="quantity" type="number" step="1" min="1" autocomplete="off" placeholder="0" onChange={ handleQuantityChange } value={ quantity } required />
+            <input id="quantity" name="quantity" type="number" step="1" min="1" max={ spaces } autocomplete="off" placeholder="0" onChange={ handleQuantityChange } value={ quantity } required />
           </div>
           <div class="form-field">
             <label for="total">Total</label>
@@ -73,6 +79,9 @@ const ProductPanel = props => {
             <input type="hidden" name="total" value={ total } />
           </div>
         </>
+        }
+        { !!price && products.length > 0 && spaces < 1 &&  
+            
         }
 
       </div> 
