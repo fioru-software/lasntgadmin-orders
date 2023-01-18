@@ -20,7 +20,7 @@ class WaitingListActionsFilters {
 		add_filter( 'wc_order_statuses', [ self::class, 'custom_order_status' ] );
 		add_filter( 'woocommerce_product_meta_start', [ self::class, '_form' ], 10 );
 
-		add_action( 'init', [ self::class, 'register_whishlist_order_status' ], 1 );
+		add_action( 'init', [ self::class, 'register_waitinglist_order_status' ], 1 );
 		add_action( 'wp_enqueue_scripts', [ self::class, '_enqueue_scripts' ], 500 );
 		add_action( 'wp_ajax_lasntgadmin_wl', [ self::class, 'create_wl_order' ] );
 		add_action( 'wp_ajax_nopriv_lasntgadmin_wl', [ self::class, 'create_wl_order' ] );
@@ -52,9 +52,9 @@ class WaitingListActionsFilters {
 	 *
 	 * @return void
 	 */
-	public static function register_whishlist_order_status(): void {
+	public static function register_waitinglist_order_status(): void {
 		register_post_status(
-			'wc-waiting_list',
+			'wc-waiting-list',
 			array(
 				'label'                     => 'Waiting list',
 				'public'                    => false,
@@ -74,7 +74,7 @@ class WaitingListActionsFilters {
 	 * @return array Order Statuses.
 	 */
 	public static function custom_order_status( $order_statuses ): array {
-		$order_statuses['wc-waiting_list'] = _x( 'Waiting list', 'Order status', 'lasntgadmin' );
+		$order_statuses['wc-waiting-list'] = _x( 'Waiting list', 'Order status', 'lasntgadmin' );
 		return $order_statuses;
 	}
 
@@ -91,7 +91,7 @@ class WaitingListActionsFilters {
 		if ( $orders > 0 ) {
 			return;
 		}
-		$check = WaitingListUtils::check_already_in_whishlist( $product_id );
+		$check = WaitingListUtils::check_already_in_waitinglist( $product_id );
 
 		echo '<div class="lasntgadmin-wl-info">';
 		if ( $check ) {
@@ -126,7 +126,7 @@ class WaitingListActionsFilters {
 		$confirmed  = isset( $_POST['confirmed'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmed'] ) ) : '';
 		$email      = isset( $_POST['email'] ) ? sanitize_text_field( wp_unslash( $_POST['email'] ) ) : false;
 
-		$check = ! $email ? WaitingListUtils::check_already_in_whishlist( $product_id, true ) : false;
+		$check = ! $email ? WaitingListUtils::check_already_in_waitinglist( $product_id, true ) : false;
 		if ( $check ) {
 			// product already in the wishlist.
 			wp_send_json(
@@ -179,7 +179,7 @@ class WaitingListActionsFilters {
 		QuotaUtils::lasntgadmin_add_group( $order->get_id() );
 		// add product and update status.
 		$order->add_product( wc_get_product( $product_id ), 1 );
-		$order->update_status( 'wc-waiting_list' );
+		$order->update_status( 'wc-waiting-list' );
 		$order->save();
 		wp_send_json(
 			[
@@ -191,7 +191,7 @@ class WaitingListActionsFilters {
 	}
 
 	/**
-	 * Associate previous whishlist orders to new customer.
+	 * Associate previous waitinglist orders to new customer.
 	 *
 	 * @param  integer $user_id User ID.
 	 * @return void

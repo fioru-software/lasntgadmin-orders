@@ -16,10 +16,10 @@ class WaitingListUtils {
 	 * Check if already in whitelist
 	 *
 	 * @param  int  $current_product_id product id to check.
-	 * @param  bool $delete should the whishlist be deleted.
+	 * @param  bool $delete should the waitinglist be deleted.
 	 * @return bool
 	 */
-	public static function check_already_in_whishlist( int $current_product_id, bool $delete = false ): bool {
+	public static function check_already_in_waitinglist( int $current_product_id, bool $delete = false ): bool {
 		if ( ! get_current_user_id() ) {
 			return false;
 		}
@@ -28,7 +28,7 @@ class WaitingListUtils {
 			[
 				'limit'       => -1,
 				'customer_id' => get_current_user_id(),
-				'status'      => 'wc-waiting_list',
+				'status'      => 'wc-waiting-list',
 			]
 		);
 		$removed = false;

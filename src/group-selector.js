@@ -63,14 +63,10 @@ const GroupSelector = props => {
     <>
       { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ handleChange }>
+      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ handleChange } value={ groupId } >
         { ! groupId && <option selected disabled value="">Please select</option> }
         { groups.map( (group) => {
-          if(groupId == group.group_id ) {
-            return <option selected key={ group.group_id.toString() } value={ group.group_id } >{ group.name }</option>
-          } else {
-            return <option key={ group.group_id.toString() } value={ group.group_id } >{ group.name }</option>
-          }
+          return <option key={ group.group_id.toString() } value={ group.group_id } >{ group.name }</option>
         })}
       </select> }
       <input type="hidden" name={ props.name } value={ groupId } />

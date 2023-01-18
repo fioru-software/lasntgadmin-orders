@@ -12,6 +12,24 @@ const StatusSelector = props => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
 
+  /**
+   * Default order status
+   */
+  useEffect( () => {
+    if( props?.order?.status !== 'auto-draft' && props?.user?.allcaps?.view_others_shop_orders ) {
+      setIsDisabled(false);
+    }
+  }, [ props?.order?.status ] );
+
+  /**
+   * User changed the order status
+   */
+  useEffect( () => {
+  }, [ props.status ]);
+
+  /**
+   * Fetch list of statuses
+   */
   useEffect( async () => {
     try {
       setIsLoading(true);
@@ -26,7 +44,7 @@ const StatusSelector = props => {
           message: 'Failed fetching order statuses.'
         });
       }
-      setStatuses(statuses);
+      setStatuses( statuses );
     } catch (e) {
       setNotice({
         status: 'error',
@@ -37,16 +55,28 @@ const StatusSelector = props => {
     setIsLoading(false);
   }, []);
 
+  function handleChange(e) {
+    props.setStatus(e.target.value);
+  }
+
   return (
     <>
       { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } name={ props.name } disabled={ isDisabled } required >
+      { !isLoading && <select id={ props.id } disabled={ isDisabled } required value={ props.status } onChange={ handleChange } >
+        { props.status === 'auto-draft' &&
+        <option selected value="auto-draft">Draft</option>
+        }
+        { props.status !== 'auto-draft' && 
         <option selected disabled value="">Please select</option>
+        }
         { statuses.map( status => 
-          <Option value={ status.id } selected={ props.status }>{ status.name }</Option>
+          <Option value={ status.id }>{ status.name }</Option>
         )}
       </select> }
+      { props.status !== 'auto-draft' &&
+        <input type="hidden" name={ props.name } value={ props?.status } />
+      }
     </>
   );
 
