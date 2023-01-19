@@ -48,6 +48,14 @@ pipeline {
 
             steps {
                 setBuildStatus("Pending", "PENDING", env.REPO_NAME)
+                container('node') {
+                    script {
+                        sh "npm set @fioru-software:registry https://npm.pkg.github.com"
+                        sh "npm set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN"
+                        sh "npm install"
+                        sh "npm run test:unit"
+                    }
+                }
                 container('docker-compose') {
                     script {
                         sh "touch .env"
