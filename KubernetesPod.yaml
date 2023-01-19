@@ -6,6 +6,12 @@ labels:
 spec:
   # Use service account that can deploy to all namespaces
   containers:
+  - name: node
+    image: node:lts-alpine
+    command:
+      - sleep
+    args:
+      - infinity
   - name: docker-compose
     image: eu.gcr.io/veri-cluster/docker-compose
     command:

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from '@wordpress/element';
-import { Notice } from '@wordpress/components';
+import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
 import { GroupSelector } from './group-selector';
@@ -14,12 +14,39 @@ const OrderForm = props => {
   const [ notice, setNotice ] = useState(null);
   const [ groupId, setGroupId ] = useState(null);
   const [ lineItem, setLineItem ] = useState({});
-  const [ isLoading, setIsLoading ] = useState(true);
+  const [ isLoading, setIsLoading ] = useState(false);
   const [ isDisabled, setIsDisabled ] = useState(false);
+  const [ status, setStatus ] = useState("");
+  const [ buttonText, setButtonText ] = useState("Create");
 
   useEffect( () => {
     setGroupId(props.groupId);
   }, [props.groupId]);
+
+  /**
+   * Set initial button text
+   */
+  useEffect( () => {
+    setStatus(props.status);
+    if(props.status !== 'auto-draft') {
+      setButtonText('Update');
+    }
+  }, [props.status]);
+
+  /**
+   * Change button text
+   */
+  useEffect( () => {
+    if( status === 'waiting-list' ) {
+      setButtonText("Add to waiting list");
+    } else {
+      if(props?.status === 'auto-draft') {
+        setButtonText("Create");
+      } else {
+        setButtonText("Update");
+      }
+    }
+  }, [ status ]);
 
   /**
    * Only a single product line item per order
@@ -33,8 +60,7 @@ const OrderForm = props => {
    * @see https://woocommerce.github.io/woocommerce-rest-api-docs/?php#retrieve-an-order
    */
   useEffect( async () => {
-  }, [props.order.id]);
-
+  }, [props?.order?.id]);
 
   /**
    * @todo Fetch user and meta via WP REST API
@@ -42,8 +68,21 @@ const OrderForm = props => {
    * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/modifying-responses/
    */
   useEffect( async () => {
-  }, [props.user.id]);
+  }, [props?.user?.id]);
 
+  useEffect( () => {
+    if( props?.user) {
+      //console.log('user');
+      //console.log(props.user);
+    }
+  }, [ props?.user]);
+
+  useEffect( () => {
+    if(props?.userMeta) {
+      //console.log('user meta');
+      //console.log(props.userMeta);
+    }
+  }, [ props?.userMeta]);
 
   function parseFormData(formData) {
     const body = {
@@ -117,7 +156,7 @@ const OrderForm = props => {
       );
       setNotice({
         status: 'success',
-        message: 'Order created'
+        message: props?.status === 'auto-draft' ? 'Order created. Redirecting...' : 'Order updated. Redirecting...'
       });
       document.location.assign("/wp-admin/edit.php?post_type=shop_order");
     } catch (e) {
@@ -163,25 +202,26 @@ const OrderForm = props => {
 
         <div class="form-wrap">
           <h3>Order</h3>
+
+          <div class="form-field">
+            <label for="order_status">Status</label>
+            <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+          </div>
+
           <div class="form-field">
             <label for="order_group">Order group</label>
             <GroupSelector groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
           </div>
 
-          { props.order.status !== 'auto-draft' && 
-            <div class="form-field">
-              <label for="order_status">Status</label>
-              <StatusSelector id="order_status" name="order_status" order={ props.order } status={ props.status } apiPath={ props.orderApiPath} nonce={ props.nonce } />
-          </div>
-          }
         </div>
 
-        { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } apiPath={ props.productApiPath } lineItem={ lineItem } groupId={ groupId } /></> }
+        { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } groupId={ groupId } setStatus={ setStatus } /></> }
 
 
         <div class="form-wrap">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ isDisabled } type="submit" class="button save_order button-primary" name="save" value="Create">{ props.order.status === 'auto-draft' ? 'Create' : 'Update' }</button>
+          <button disabled={ isDisabled } type="submit" class="button save_order button-primary" name="save" value="Create">{ buttonText }</button>
+          { isLoading && <Spinner/> }
         </div>
       </div>
 
