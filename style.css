@@ -1,7 +1,6 @@
 
 #post-body-content, #titlediv { display:none }
 
-
 #poststuff #post-body.columns-2 {
     margin-right: unset;
 }
@@ -16,4 +15,19 @@
 
 .form-field select {
     max-width: unset;
+}
+
+div#woocommerce-order-data {
+    background: unset;
+    border: unset;
+    box-shadow: unset;
+}
+
+div#woocommerce-order-data nav.woo-nav-tab-wrapper {
+    margin: unset;
+}
+
+div#order_data {
+    padding: 0 12px;
+    margin: unset;
 }

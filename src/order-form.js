@@ -6,7 +6,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { GroupSelector } from './group-selector';
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { TextInput } from './text-input';
 import { BillingAddress } from './billing-address';
 
 const OrderForm = props => {
@@ -71,17 +70,9 @@ const OrderForm = props => {
   }, [props?.user?.id]);
 
   useEffect( () => {
-    if( props?.user) {
-      //console.log('user');
-      //console.log(props.user);
-    }
   }, [ props?.user]);
 
   useEffect( () => {
-    if(props?.userMeta) {
-      //console.log('user meta');
-      //console.log(props.userMeta);
-    }
   }, [ props?.userMeta]);
 
   function parseFormData(formData) {
@@ -142,6 +133,7 @@ const OrderForm = props => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = parseFormData(formData);
+    const method = props.order.date_created ? 'PUT' : 'POST';
     try {
       setNotice(null);
       setIsLoading(true);
@@ -150,15 +142,15 @@ const OrderForm = props => {
       props.order = await apiFetch( 
         {
           path: props.order.date_created ? `/wc/v3/orders/${ props.order.id }` : `/wc/v3/orders`,
-          method: props.order.date_created ? 'PUT' : 'POST',
+          method,
           data
         } 
       );
       setNotice({
         status: 'success',
-        message: props?.status === 'auto-draft' ? 'Order created. Redirecting...' : 'Order updated. Redirecting...'
+        message: props?.status === 'auto-draft' ? 'Order created. Please wait to be redirected...' : 'Please wait to be redirected...'
       });
-      document.location.assign("/wp-admin/edit.php?post_type=shop_order");
+      document.location.assign(  method === 'POST' ? `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` : '/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=order' );
     } catch (e) {
       setNotice({
         status: 'error',
@@ -182,16 +174,16 @@ const OrderForm = props => {
         <div class="form-wrap">
           <h3>Personal</h3>
           <div class="form-field">
-            <label for="first_name">First name</label>
-            <TextInput name="first_name" id="first_name" default={ props.order.billing.first_name || props.userMeta.first_name } required /> 
+            <label for="first_name">First name<span class="required"> *</span></label>
+            <input type="text" name="first_name" id="first_name" defaultValue={ props.order.billing.first_name || props.userMeta.first_name } required /> 
           </div>
           <div class="form-field">
-            <label for="last_name">Last name</label>
-            <TextInput name="last_name" id="last_name" default={ props.order.billing.last_name || props.userMeta.last_name } required /> 
+            <label for="last_name">Last name<span class="required"> *</span></label>
+            <input type="text" name="last_name" id="last_name" defaultValue={ props.order.billing.last_name || props.userMeta.last_name } required /> 
           </div>
           <div class="form-field">
-            <label for="phone">Phone</label>
-            <TextInput name="phone" id="phone" default={ props.order.billing.phone || props.userMeta.billing_phone } required /> 
+            <label for="phone">Phone<span class="required"> *</span></label>
+            <input type="tel" name="phone" id="phone" defaultValue={ props.order.billing.phone || props.userMeta.billing_phone } required /> 
           </div>
         </div>
 
@@ -201,15 +193,16 @@ const OrderForm = props => {
         </div>
 
         <div class="form-wrap">
+
           <h3>Order</h3>
 
           <div class="form-field">
-            <label for="order_status">Status</label>
+            <label for="order_status">Status<span class="required"> *</span></label>
             <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
           </div>
 
           <div class="form-field">
-            <label for="order_group">Order group</label>
+            <label for="order_group">Order group<span class="required"> *</span></label>
             <GroupSelector groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
           </div>
 
@@ -217,11 +210,12 @@ const OrderForm = props => {
 
         { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } groupId={ groupId } setStatus={ setStatus } /></> }
 
-
         <div class="form-wrap">
+          <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
           <button disabled={ isDisabled } type="submit" class="button save_order button-primary" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
+          </div>
         </div>
       </div>
 

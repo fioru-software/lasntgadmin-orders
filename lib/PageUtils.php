@@ -5,13 +5,15 @@ namespace Lasntg\Admin\Orders;
 use Lasntg\Admin\Orders\{ PluginUtils, OrderData };
 use Lasntg\Admin\Group\GroupApi;
 use Lasntg\Admin\Products\ProductApi;
+use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
 
 use Groups_Access_Meta_Boxes;
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
 use Automattic\WooCommerce\Admin\Overrides\Order;
+use Automattic\WooCommerce\Internal\Admin\Loader;
 
-use WP_Post;
+use WP_Post, WC_Order;
 
 class PageUtils {
 
@@ -33,9 +35,13 @@ class PageUtils {
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
 	}
 
-	public static function add_filters(): void {
+	public static function add_filters() {
+		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
 	}
 
+	public static function is_order_editable( bool $is_editable, WC_Order $order ) {
+		return in_array( $order->get_status(), array( 'pending', 'on-hold', 'auto-draft', 'attendees', 'waiting-list' ), true );
+	}
 
 	/**
 	 * Remove default WooCommerce metaboxes on new order page.
@@ -64,11 +70,10 @@ class PageUtils {
 	public static function add_metaboxes( string $screen_id, WP_Post $post ): void {
 		if ( 'shop_order' === $screen_id ) {
 			$order = wc_get_order( $post->ID );
-
 			add_meta_box(
 				'woocommerce-order-data',
 				sprintf( 'Order #%d', $order->get_order_number() ),
-				[ self::class, 'output_order_form' ],
+				[ self::class, 'output_admin_order_markup' ],
 				$screen_id,
 				'advanced',
 				'high'
@@ -76,18 +81,97 @@ class PageUtils {
 		}
 	}
 
+	public static function output_admin_order_markup( WP_Post $post ): void {
+		echo '<div class="wrap woocommerce">';
+		$tab = isset($_GET['tab']) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
+		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
+
+		switch ( $tab ) {
+			case 'attendees':
+				echo wp_kses( self::attendees( $post ), 'post' );
+				break;
+
+			case 'payment':
+				echo wp_kses( self::payment( $post ), 'post' );
+				break;
+
+			default:
+				echo wp_kses( self::order_form( $post ), 'post' );
+		}
+
+		echo '</div>';
+	}
+
+	public static function order_menu( WP_Post $post, string $tab ): string {
+		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
+		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>Order</a>";
+		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>Attendees</a>";
+		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>Payment</a>";
+		$markup .= '</nav>';
+		return $markup;
+	}
+
+	public static function get_class_attribute( string $tab, string $name ) {
+		return $tab === $name ? ' nav-tab-active' : '';
+	}
+
+	public static function attendees( WP_Post $post ) {
+
+		$order = wc_get_order( $post->ID );
+        $items = $order->get_items();
+        $product = reset( $items );
+        $product_id = $product->get_product_id();
+        $awarding_body = AttendeeActionsFilters::get_additional_group_awarding( $product_id );
+        $acf_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+        $acf_additional_fields = acf_get_fields( $awarding_body );
+
+		echo sprintf(
+			'<div
+                id="%s-attendees"
+                data-nonce="%s"
+                data-quantity="%d"
+                data-fields="%s"
+                data-order="%s"
+                data-group-id="%s"
+                data-attendees="%s"
+            ><p>Loading attendees...</p></div>',
+			esc_attr( PluginUtils::get_kebab_case_name() ),
+			esc_attr( wp_create_nonce( 'wp_rest' ) ),
+			esc_attr( self::get_order_quantity( $order ) ),
+            esc_attr( 
+                json_encode( 
+                    array_merge(
+                        $acf_fields,
+                        $acf_additional_fields
+                    )
+                ) 
+            ),
+			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
+			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
+            esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) )
+		);
+	}
+
+	private static function get_order_quantity( WC_Order $order ): int {
+		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
+	}
+
+	public static function payment( WP_Post $post ) {
+		return '<div><p>Loading payment...</p></div>';
+	}
+
 	/**
 	 * Creates root element for admin order component
 	 *
 	 * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/admin/meta-boxes/views/html-order-items.php
 	 */
-	public static function output_order_form( $post ): void {
+	public static function order_form( WP_Post $post ): string {
 		$order = wc_get_order( $post->ID );
 		$user  = wp_get_current_user();
 
-		echo sprintf(
+		return sprintf(
 			'<div 
-                id="%s-component" 
+                id="%s-form" 
                 data-nonce="%s" 
                 data-group-api-path="%s" 
                 data-order-api-path="%s"
@@ -101,7 +185,7 @@ class PageUtils {
                 data-user="%s"
                 data-user-meta="%s"
                 data-currency="%s"
-            ><p>Loading order component...</p></div>',
+            ><p>Loading order...</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( GroupApi::get_api_path() ),
