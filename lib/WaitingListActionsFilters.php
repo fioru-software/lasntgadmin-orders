@@ -5,6 +5,8 @@
 
 namespace Lasntg\Admin\Orders;
 
+use Lasntg\Admin\Products\QuotaUtils;
+
 use wc_order;
 /**
  * Handle all Filters and actions for Waiting List
