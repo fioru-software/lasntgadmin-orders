@@ -83,7 +83,7 @@ class PageUtils {
 
 	public static function output_admin_order_markup( WP_Post $post ): void {
 		echo '<div class="wrap woocommerce">';
-		$tab = isset($_GET['tab']) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
+		$tab = isset( $_GET['tab'] ) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
 		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
 
 		switch ( $tab ) {
@@ -116,14 +116,13 @@ class PageUtils {
 	}
 
 	public static function attendees( WP_Post $post ) {
-
-		$order = wc_get_order( $post->ID );
-        $items = $order->get_items();
-        $product = reset( $items );
-        $product_id = $product->get_product_id();
-        $awarding_body = AttendeeActionsFilters::get_additional_group_awarding( $product_id );
-        $acf_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
-        $acf_additional_fields = acf_get_fields( $awarding_body );
+		$order                 = wc_get_order( $post->ID );
+		$items                 = $order->get_items();
+		$product               = reset( $items );
+		$product_id            = $product->get_product_id();
+		$awarding_body         = AttendeeActionsFilters::get_additional_group_awarding( $product_id );
+		$acf_fields            = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+		$acf_additional_fields = acf_get_fields( $awarding_body );
 
 		echo sprintf(
 			'<div
@@ -138,17 +137,17 @@ class PageUtils {
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( self::get_order_quantity( $order ) ),
-            esc_attr( 
-                json_encode( 
-                    array_merge(
-                        $acf_fields,
-                        $acf_additional_fields
-                    )
-                ) 
-            ),
+			esc_attr(
+				json_encode(
+					array_merge(
+						$acf_fields,
+						$acf_additional_fields
+					)
+				)
+			),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-            esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) )
+			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) )
 		);
 	}
 
