@@ -35,7 +35,8 @@ CREATE TABLE `wp_groups_group` (
   `name` varchar(100) COLLATE utf8mb4_unicode_520_ci NOT NULL,
   `description` longtext COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
   PRIMARY KEY (`group_id`),
-  UNIQUE KEY `group_n` (`name`)
+  UNIQUE KEY `group_name` (`name`),
+  UNIQUE KEY `group_local_authority_id` (`local_authority_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -82,7 +83,10 @@ INSERT INTO `wp_groups_group` VALUES
 (29,2,NULL,1,'2022-10-10 14:15:59','Cavan County Council',NULL),
 (30,6,NULL,1,'2022-10-10 14:15:59','Donegal County Council',NULL),
 (31,22,NULL,1,'2022-10-10 14:15:59','Monaghan County Council',NULL),
-(32,25,NULL,1,'2022-10-10 14:15:59','Sligo County Council',NULL);
+(32,25,NULL,1,'2022-10-10 14:15:59','Sligo County Council',NULL),
+
+-- Private Client
+(33,999,NULL,1,'2022-10-10 14:15:59','Private Client',NULL);
 
 /*!40000 ALTER TABLE `wp_groups_group` ENABLE KEYS */;
 UNLOCK TABLES;

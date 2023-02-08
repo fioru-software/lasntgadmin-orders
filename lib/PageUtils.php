@@ -119,7 +119,7 @@ class PageUtils {
 		$order                 = wc_get_order( $post->ID );
 		$items                 = $order->get_items();
 		$product               = reset( $items );
-		$product_id            = $product->get_product_id();
+		$product_id            = $product ? $product->get_product_id() : 0;
 		$awarding_body         = AttendeeActionsFilters::get_additional_group_awarding( $product_id );
 		$acf_fields            = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$acf_additional_fields = acf_get_fields( $awarding_body );
