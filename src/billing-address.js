@@ -11,7 +11,7 @@ const BillingAddress = props => {
       </div>
       <div class="form-field">
         <label for="address_2">Address line 2</label>
-        <input type="text" name="address_2" id="address_2" defaultValue={ props.order.billing.address_2 || props.userMeta.billing_address_2 } required /> 
+        <input type="text" name="address_2" id="address_2" defaultValue={ props.order.billing.address_2 || props.userMeta.billing_address_2 } /> 
       </div>
       <div class="form-field">
         <label for="city">City<span class="required"> *</span></label>
