@@ -35,7 +35,6 @@ class WaitingListActionsFilters {
 	 * @return void
 	 */
 	public static function _enqueue_scripts(): void {
-		wp_enqueue_script( 'lasntgadmin-add-to-wishlist' );
 		$wl_nonce   = wp_create_nonce( 'lasntgadmin-wl-nonce' );
 		$assets_dir = untrailingslashit( plugin_dir_url( __FILE__ ) ) . '/../assets/';
 		wp_enqueue_script( 'lasntgadmin-wl-js', ( $assets_dir . 'js/lasntgadmin-wl.js' ), array( 'jquery' ), '1.4', true );
@@ -130,7 +129,7 @@ class WaitingListActionsFilters {
 
 		$check = ! $email ? WaitingListUtils::check_already_in_waitinglist( $product_id, true ) : false;
 		if ( $check ) {
-			// product already in the wishlist.
+			// product already in the waiting list.
 			wp_send_json(
 				[
 					'status' => 2,

@@ -13,15 +13,6 @@ class OrderApi {
 	const PATH_PREFIX = 'lasntgadmin/orders/v1';
 
 	protected function __construct() {
-		register_meta(
-			'user',
-			'nickname',
-			array(
-				'type'         => 'string',
-				'show_in_rest' => true,
-			)
-		);
-
 		register_rest_route(
 			self::PATH_PREFIX,
 			'/statuses',

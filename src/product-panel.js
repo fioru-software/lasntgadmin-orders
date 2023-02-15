@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import { ProductSelector } from './product-selector';
-import { TextInput } from './text-input';
 import apiFetch from '@wordpress/api-fetch';
 
 const ProductPanel = props => {
@@ -87,7 +86,7 @@ const ProductPanel = props => {
       <div class="form-wrap">
         <h3>Product</h3>
         <div class="form-field">
-          <label for="product">Product</label>
+          <label for="product">Product<span class="required"> *</span></label>
           <ProductSelector id="product" name="product" disabled={ !! props?.lineItem?.id } groupId={ props.groupId } productId={ productId } apiPath={ props.apiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductChange } setProducts={ handleFetchedProducts } products={ products } />
         </div>
         { props?.lineItem?.id && <input type="hidden" name="line_item_id" value={ props.lineItem.id } /> }
@@ -96,19 +95,19 @@ const ProductPanel = props => {
         <>
           <div class="form-field">
             <label for="price">Price</label>
-            <input id="price" type="number" disabled placeholder="0" value={ price } />
+            <input type="number" id="price" disabled placeholder="0" value={ price } />
             <input type="hidden" name="price" value={ price } />
           </div>
 
           <div class="form-field">
-            <label for="quantity">Quantity</label>
-            <input id="quantity" type="number" disabled={ !! props?.lineItem?.id } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantityChange } value={ quantity } required />
+            <label for="quantity">Quantity<span class="required"> *</span></label>
+            <input type="number" id="quantity" disabled={ !! props?.lineItem?.id } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantityChange } value={ quantity } required />
             <input type="hidden" name="quantity" value={ quantity } />
           </div>
 
           <div class="form-field">
             <label for="total">Total</label>
-            <input id="total" type="number" disabled placeholder="0" value={ total } />
+            <input type="number" id="total" type="number" disabled placeholder="0" value={ total } />
             <input type="hidden" name="total" value={ total } />
           </div>
         </>
