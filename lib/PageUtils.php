@@ -115,16 +115,15 @@ class PageUtils {
 		return $tab === $name ? ' nav-tab-active' : '';
 	}
 
-    /**
-     * @todo get_product_id calls wc_get_order again, fix
-     */
+	/**
+	 * @todo get_product_id calls wc_get_order again, fix
+	 */
 	public static function attendees( WP_Post $post ) {
-
-        $order = wc_get_order($post->ID);
-        $product_id = OrderUtils::get_product_id($post->ID);
-		$acf_field_group_id    = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product_id );
-		$attendee_profile_fields            = acf_get_fields( AttendeeActionsFilters::$field_group_id );
-		$awarding_body_fields = acf_get_fields( $acf_field_group_id );
+		$order                   = wc_get_order( $post->ID );
+		$product_id              = OrderUtils::get_product_id( $post->ID );
+		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product_id );
+		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
 
 		echo sprintf(
 			'<div

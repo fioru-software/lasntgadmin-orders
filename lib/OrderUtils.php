@@ -177,25 +177,25 @@ class OrderUtils {
 		return $order_data;
 	}
 
-    /**
-     * @todo param should rather be WC_Order
-     */
-    public static function get_product_id( int $order_id ): int {
-        $order = wc_get_order( $order_id );
-        $items = $order->get_items();
-        $product = reset($items);
-        return $product->get_product_id();
-    }
+	/**
+	 * @todo param should rather be WC_Order
+	 */
+	public static function get_product_id( int $order_id ): int {
+		$order   = wc_get_order( $order_id );
+		$items   = $order->get_items();
+		$product = reset( $items );
+		return $product->get_product_id();
+	}
 
-    /**
-     * @todo param should rather be WC_Order's
-     */
-    public static function get_product_ids( array $order_ids ): array {
-        $product_ids = array_map(
-            fn( $order_id ) => self::get_product_id( $order_id ),
-            $order_ids
-        );
-        return $product_ids;
-    }
+	/**
+	 * @todo param should rather be WC_Order's
+	 */
+	public static function get_product_ids( array $order_ids ): array {
+		$product_ids = array_map(
+			fn( $order_id ) => self::get_product_id( $order_id ),
+			$order_ids
+		);
+		return $product_ids;
+	}
 
 }
