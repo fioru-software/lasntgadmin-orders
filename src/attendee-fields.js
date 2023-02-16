@@ -20,13 +20,13 @@ const AttendeeFields = props => {
 
             { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 
-            { field.type === 'textarea' && <textarea id={ field.key } disabled={ props.disabled } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } /> }
+            { field.type === 'textarea' && <textarea id={ field.key } disabled={ props.disabled } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } required={ !!field.required } /> }
 
-            { field.type === 'date_picker' && <DateInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } /> }
+            { field.type === 'date_picker' && <DateInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } required={ !!field.required } /> }
 
             { field.type === 'true_false' && <input type="checkbox" id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } required={ !!field.required } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } /> }
 
-            { field.type === 'number' && <NumberInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } /> }
+            { field.type === 'number' && <NumberInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } required={ !!field.required } /> }
 
             { field.type === 'select' && <SelectInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } required={ !!field.required } defaultValue={ props?.attendee?.acf[field.name] || field.default_value || "" }>
               { Object.keys(field.choices).map( ( key, index ) => {
