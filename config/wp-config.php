@@ -19,6 +19,13 @@
  * @package WordPress
  */
 
+define( 'AUTOMATIC_UPDATER_DISABLED', true );
+define( 'WP_AUTO_UPDATE_CORE', false );
+define( 'DISABLE_WP_CRON', true );
+
+define( 'WP_HTTP_BLOCK_EXTERNAL', TRUE );
+define( 'WP_ACCESSIBLE_HOSTS', '*.wordpress.org' );
+
 // ** Database settings - You can get this info from your web host ** //
 
 /** The name of the database for WordPress */

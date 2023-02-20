@@ -73,11 +73,11 @@ const Attendees = props => {
    */
   function createBatchRequestBody( quantity, form, groupId, orderId) {
     return range(quantity).map( ( index ) => {
-      return createRequestBody( index, form, groupId, orderId );
+      return createAttendeesRequestBody( index, form, groupId, orderId );
     });
   }
 
-  function createRequestBody( index, form, groupId, orderId ) {
+  function createAttendeesRequestBody( index, form, groupId, orderId ) {
     const formData = new FormData(form);
     const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
     return {
@@ -99,6 +99,26 @@ const Attendees = props => {
     };
   }
 
+  function createOrderUpdateRequestBody( orderId, status, attendeeIds ) {
+    return {
+      path: `/wc/v3/orders/${ orderId }`,
+      method: 'PUT',
+      data: {
+        status,
+        meta_data: [
+          {
+            key: 'attendee_ids',
+            value: attendeeIds
+          }
+        ]
+      }
+    };
+  }
+
+  function extractAttendeeIdsFromResponse( attendeeResponses ) {
+    return attendeeResponses.map( res => res.body.id );
+  }
+
   /**
    * @requires ACF Field group settings for additional groups: when post_type = 'post' and rest_api = true;
    * @see https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
@@ -112,9 +132,15 @@ const Attendees = props => {
       setNotice(null);
       setIsLoading(true);
       setIsDisabled(true);
+
+      setNotice({
+        status: 'info',
+        message: 'Updating attendees.'
+      });
+
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
-      const res = await apiFetch( 
+      const attendeesResponse = await apiFetch( 
         {
           path: `/batch/v1`,
           method: 'POST',
@@ -124,9 +150,20 @@ const Attendees = props => {
         } 
       );
 
+      const attendeeIds = extractAttendeeIdsFromResponse( attendeesResponse.responses );
+
+      setNotice({
+        status: 'info',
+        message: 'Updating order.'
+      });
+
+      const orderRes = await apiFetch( 
+        createOrderUpdateRequestBody( props.order.id, 'pending', attendeeIds )
+      );
+
       setNotice({
         status: 'success',
-        message: 'Attendees added. Please wait to be redirected...'
+        message: 'Updated order and attendees. Redirecting to payment...'
       });
 
       document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
@@ -145,7 +182,6 @@ const Attendees = props => {
     <>
       <div class="form-wrap">
         <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
-          { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
           <div id="order_data" class="panel woocommerce-order-data">
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
@@ -155,12 +191,12 @@ const Attendees = props => {
 
             { props?.quantity > 0 && 
             <div class="form-field">
+              { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
               <button disabled={ isDisabled } type="submit" class="button save_order button-primary" name="save" value="Create">{ buttonText }</button>
               { isLoading && <Spinner/> }
             </div>}
           </div>
         </form>
-
       </div> 
     </>
   );

@@ -64,18 +64,20 @@ class OrderUtils {
 	public static function insert_shop_order_meta( WC_Order $order, WP_REST_Request $req ) {
 		$params = $req->get_params();
 
-		update_user_meta( $params['customer_id'], 'billing_first_name', wc_clean( $params['billing']['first_name'] ) );
-		update_user_meta( $params['customer_id'], 'first_name', wc_clean( $params['billing']['first_name'] ) );
-		update_user_meta( $params['customer_id'], 'billing_last_name', wc_clean( $params['billing']['last_name'] ) );
-		update_user_meta( $params['customer_id'], 'last_name', wc_clean( $params['billing']['last_name'] ) );
+		if ( isset( $params['customer_id'] ) ) {
+			update_user_meta( $params['customer_id'], 'billing_first_name', wc_clean( $params['billing']['first_name'] ) );
+			update_user_meta( $params['customer_id'], 'first_name', wc_clean( $params['billing']['first_name'] ) );
+			update_user_meta( $params['customer_id'], 'billing_last_name', wc_clean( $params['billing']['last_name'] ) );
+			update_user_meta( $params['customer_id'], 'last_name', wc_clean( $params['billing']['last_name'] ) );
 
-		update_user_meta( $params['customer_id'], 'billing_address_1', wc_clean( $params['billing']['address_1'] ) );
-		update_user_meta( $params['customer_id'], 'billing_address_2', wc_clean( $params['billing']['address_2'] ) );
-		update_user_meta( $params['customer_id'], 'billing_city', wc_clean( $params['billing']['city'] ) );
-		update_user_meta( $params['customer_id'], 'billing_country', wc_clean( $params['billing']['country'] ) );
-		update_user_meta( $params['customer_id'], 'billing_state', wc_clean( $params['billing']['state'] ) );
-		update_user_meta( $params['customer_id'], 'billing_postcode', wc_clean( $params['billing']['postcode'] ) );
-		update_user_meta( $params['customer_id'], 'billing_phone', wc_clean( $params['billing']['phone'] ) );
+			update_user_meta( $params['customer_id'], 'billing_address_1', wc_clean( $params['billing']['address_1'] ) );
+			update_user_meta( $params['customer_id'], 'billing_address_2', wc_clean( $params['billing']['address_2'] ) );
+			update_user_meta( $params['customer_id'], 'billing_city', wc_clean( $params['billing']['city'] ) );
+			update_user_meta( $params['customer_id'], 'billing_country', wc_clean( $params['billing']['country'] ) );
+			update_user_meta( $params['customer_id'], 'billing_state', wc_clean( $params['billing']['state'] ) );
+			update_user_meta( $params['customer_id'], 'billing_postcode', wc_clean( $params['billing']['postcode'] ) );
+			update_user_meta( $params['customer_id'], 'billing_phone', wc_clean( $params['billing']['phone'] ) );
+		}
 	}
 
 	public static function get_statuses() {

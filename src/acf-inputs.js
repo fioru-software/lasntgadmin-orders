@@ -46,7 +46,7 @@ const DateInput = props => {
   const dateInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="date" ref={ dateInput } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^\d{4}-\d{2}-\d{2}$" } readonly={ props?.readonly || false } disabled={ props?.disabled || false } />
+    <input name={ props.name } id={ props.id } type="date" ref={ dateInput } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } />
   );
 
 };
