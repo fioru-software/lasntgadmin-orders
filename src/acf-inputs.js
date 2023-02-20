@@ -21,6 +21,26 @@ const SelectInput = props => {
 
 }
 
+const CheckBox = props => {
+
+  const [ checked, setChecked ] = useState(false);
+  const [ value, setValue ] = useState("");
+
+  useEffect( () => {
+    setChecked(props.defaultValue);
+    setValue( props.defaultValue ? "On" : "Off" );
+  }, [ props.defaultValue]);
+
+  function handleClick(e) {
+    setChecked(e.target.checked);
+    setValue( e.target.checked ? "On" : "Off" );
+  }
+
+  return (
+    <input type="checkbox" id={ props.id } name={ props.name} disabled={ props.disabled } required={ props?.required } onClick={ handleClick } checked={ checked } value={ checked } />
+  );
+};
+
 const TextInput = props => {
 
   const textInput = useRef(null);
@@ -77,5 +97,6 @@ export {
   EmailInput,
   DateInput,
   NumberInput,
-  TelInput
+  TelInput,
+  CheckBox
 };

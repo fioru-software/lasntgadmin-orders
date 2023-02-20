@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
-import { TextInput, SelectInput, EmailInput, DateInput, NumberInput } from './acf-inputs';
+import { TextInput, SelectInput, EmailInput, DateInput, NumberInput, CheckBox } from './acf-inputs';
 
 const AttendeeFields = props => {
 
@@ -24,7 +24,7 @@ const AttendeeFields = props => {
 
             { field.type === 'date_picker' && <DateInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } defaultValue={  props?.attendee?.meta[field.name][0] || field.default_value } required={ !!field.required } /> }
 
-            { field.type === 'true_false' && <input type="checkbox" id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } required={ !!field.required } checked={  props?.attendee?.acf[field.name] || field.default_value } /> }
+            { field.type === 'true_false' && <CheckBox id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } required={ !!field.required } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } /> }
 
             { field.type === 'number' && <NumberInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } defaultValue={  props?.attendee?.acf[field.name] || field.default_value } required={ !!field.required } /> }
 

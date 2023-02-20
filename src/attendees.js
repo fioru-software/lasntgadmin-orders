@@ -51,9 +51,16 @@ const Attendees = props => {
       form.querySelectorAll(`[name^="attendees[${index}][acf]"]`))
       .filter( input => input.value !== "" )
       .map( input => { 
-        return [ extractAcfInputs( input.getAttribute('name') ), input.value ]
+        return [ extractAcfInputs( input.getAttribute('name') ), determineAcfValue( input.value) ]
       }
     );
+  }
+
+  /**
+   * Checkboxes require boolean
+   */
+  function determineAcfValue( value ) {
+    return value === "true" ? true : value === "false" ? false : value
   }
 
   /**
