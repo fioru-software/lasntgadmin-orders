@@ -407,7 +407,7 @@ const Attendees = props => {
       const orderRes = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()(createOrderUpdateRequestBody(props.order.id, 'pending', attendeeIds));
       setNotice({
         status: 'success',
-        message: 'Updated order and attendees. Redirecting to payment...'
+        message: 'Updated attendees. Redirecting to payment tab...'
       });
       document.location.assign(`/wp-admin/post.php?post=${props.order.id}&action=edit&tab=payment`);
     } catch (e) {
@@ -976,7 +976,7 @@ const OrderForm = props => {
       });
       setNotice({
         status: 'success',
-        message: (props === null || props === void 0 ? void 0 : props.status) === 'auto-draft' ? 'Order created. Please wait to be redirected...' : 'Please wait to be redirected...'
+        message: 'Updated order. Redirecting to attendees tab...'
       });
       document.location.assign(method === 'POST' ? `/wp-admin/post.php?post=${props.order.id}&action=edit&tab=attendees` : '/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=order');
     } catch (e) {
@@ -1102,6 +1102,80 @@ const OrderForm = props => {
     name: "save",
     value: "Create"
   }, buttonText), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)))));
+};
+
+
+/***/ }),
+
+/***/ "./src/payment.js":
+/*!************************!*\
+  !*** ./src/payment.js ***!
+  \************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Payment": function() { return /* binding */ Payment; }
+/* harmony export */ });
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+
+
+
+/**
+ * @param { string } nonce 
+ * @param { object } order
+ * @param { string } groupId
+ */
+const Payment = props => {
+  const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [buttonText, setButtonText] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("Save");
+  const [paymentGateways, setPaymentGateways] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(async () => {
+    await fetchPaymentGateways();
+  }, []);
+  async function fetchPaymentGateways() {
+    try {
+      setNotice({
+        status: 'info',
+        message: 'Fetching payment gateways...'
+      });
+      setIsLoading(true);
+      setIsDisabled(true);
+      _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().createNonceMiddleware(props.nonce));
+      const paymentGateways = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
+        path: '/wc/v3/payment_gateways',
+        method: 'GET'
+      });
+      setPaymentGateways(paymentGateways);
+      setNotice({
+        status: 'success',
+        message: 'Fetched payment gateways.'
+      });
+    } catch (e) {
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      console.error(e);
+      setIsLoading(false);
+      setIsDisabled(false);
+    }
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
+    status: notice.status,
+    isDismissable: true,
+    onDismiss: () => setNotice(null)
+  }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "I am the payment gateway keeper"));
 };
 
 
@@ -1651,6 +1725,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _order_form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./order-form */ "./src/order-form.js");
 /* harmony import */ var _attendees__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attendees */ "./src/attendees.js");
+/* harmony import */ var _payment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./payment */ "./src/payment.js");
+
 
 
 
@@ -1687,6 +1763,14 @@ window.addEventListener('load', function (e) {
       groupId: JSON.parse(attendeesComponent.dataset.groupId),
       attendees: JSON.parse(attendeesComponent.dataset.attendees)
     }), attendeesComponent);
+  }
+  const paymentComponent = document.querySelector('#lasntgadmin-orders-payments');
+  if (paymentComponent) {
+    (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_payment__WEBPACK_IMPORTED_MODULE_3__.Payment, {
+      nonce: paymentComponent.dataset.nonce,
+      order: JSON.parse(paymentComponent.dataset.order),
+      groupId: JSON.parse(paymentComponent.dataset.groupId)
+    }), paymentComponent);
   }
 }, false);
 }();

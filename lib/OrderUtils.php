@@ -11,7 +11,7 @@ use Lasntg\Admin\Orders\{
 use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
-use WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query;
+use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Order_Item_Product;
 
 use function wc_get_order_statuses;
 
@@ -179,25 +179,32 @@ class OrderUtils {
 		return $order_data;
 	}
 
-	/**
-	 * @todo param should rather be WC_Order
-	 */
-	public static function get_product_id( int $order_id ): int {
-		$order   = wc_get_order( $order_id );
+    public static function get_product( WC_Order $order ): WC_Order_Item_Product {
 		$items   = $order->get_items();
-		$product = reset( $items );
+        error_log(print_r($items, true));
+		return reset( $items );
+    }
+
+	public static function get_product_id( WC_Order $order ): int {
+        $product = self::get_product( $order );
 		return $product->get_product_id();
 	}
 
-	/**
-	 * @todo param should rather be WC_Order's
-	 */
 	public static function get_product_ids( array $order_ids ): array {
-		$product_ids = array_map(
-			fn( $order_id ) => self::get_product_id( $order_id ),
-			$order_ids
+        $product_ids = array_map( 
+            fn( $order_id ) => self::get_product_id( wc_get_order( $order_id ) ),
+            $order_ids
 		);
 		return $product_ids;
 	}
+
+    /**
+     * @todo Remove if not used.
+     */
+    public static function get_supported_payment_gateways( WC_Order $order, WC_Order_Item_Product $product ): array {
+        $payment_gateways = WooCommerce::payment_gateways();
+        //error_log(print_r($payment_gateways, true));
+        return [];
+    }
 
 }

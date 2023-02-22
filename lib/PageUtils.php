@@ -13,6 +13,7 @@ use Automattic\WooCommerce\Utilities\OrderUtil;
 use Automattic\WooCommerce\Admin\Overrides\Order;
 use Automattic\WooCommerce\Internal\Admin\Loader;
 
+use WC_Order_Item_Product;
 use WP_Post, WC_Order;
 
 class PageUtils {
@@ -105,8 +106,18 @@ class PageUtils {
 	public static function order_menu( WP_Post $post, string $tab ): string {
 		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
 		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>Order</a>";
-		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>Attendees</a>";
-		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>Payment</a>";
+        /**
+         * only show attendees tab when order has been created
+         */
+        if( ! in_array( $post->post_status, [ 'auto-draft' ] ) ) {
+            $markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>Attendees</a>";
+            /**
+             * Only show payment tab when order and attendees have been created
+             */
+            if( ! in_array( $post->post_status, [ 'auto-draft', 'wc-attendees' ] ) ) {
+                $markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>Payment</a>";
+            }
+        }
 		$markup .= '</nav>';
 		return $markup;
 	}
@@ -120,7 +131,7 @@ class PageUtils {
 	 */
 	public static function attendees( WP_Post $post ) {
 		$order                   = wc_get_order( $post->ID );
-		$product_id              = OrderUtils::get_product_id( $post->ID );
+		$product_id              = OrderUtils::get_product_id( $order );
 		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product_id );
 		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
@@ -152,9 +163,12 @@ class PageUtils {
 		);
 	}
 
+    /**
+     * @todo Remove order and product if not being used
+     */
 	public static function payment( WP_Post $post ) {
 		$order                   = wc_get_order( $post->ID );
-		$product_id              = OrderUtils::get_product_id( $post->ID );
+		$product              = OrderUtils::get_product( $order );
 
         echo sprintf(
 			'<div
@@ -162,12 +176,11 @@ class PageUtils {
                 data-nonce="%s"
                 data-order="%s"
                 data-group-id="%s"
-                data-attendees="%s"
-            ><p>Loading attendees...</p></div>',
+            ><p>Loading payments...</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
-			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) )
+            esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) )
         );
 	}
 

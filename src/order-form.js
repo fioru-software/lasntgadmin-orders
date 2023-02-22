@@ -148,7 +148,7 @@ const OrderForm = props => {
       );
       setNotice({
         status: 'success',
-        message: props?.status === 'auto-draft' ? 'Order created. Please wait to be redirected...' : 'Please wait to be redirected...'
+        message: 'Updated order. Redirecting to attendees tab...'
       });
       document.location.assign(  method === 'POST' ? `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` : '/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=order' );
     } catch (e) {

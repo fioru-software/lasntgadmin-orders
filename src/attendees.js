@@ -170,7 +170,7 @@ const Attendees = props => {
 
       setNotice({
         status: 'success',
-        message: 'Updated order and attendees. Redirecting to payment...'
+        message: 'Updated attendees. Redirecting to payment tab...'
       });
 
       document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
