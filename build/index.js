@@ -1156,7 +1156,7 @@ const Payment = props => {
         path: '/wc/v3/payment_gateways',
         method: 'GET'
       });
-      setPaymentGateways(paymentGateways);
+      setPaymentGateways(paymentGateways.filter(pm => pm.enabled));
       setNotice({
         status: 'success',
         message: 'Fetched payment gateways.'
@@ -1175,7 +1175,9 @@ const Payment = props => {
     status: notice.status,
     isDismissable: true,
     onDismiss: () => setNotice(null)
-  }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "I am the payment gateway keeper"));
+  }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("ul", null, paymentGateways.map(pg => {
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, pg.title);
+  })));
 };
 
 

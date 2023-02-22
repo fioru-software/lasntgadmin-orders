@@ -37,7 +37,7 @@ const Payment = props => {
         } 
       );
       setPaymentGateways(
-        paymentGateways
+        paymentGateways.filter( pm => pm.enabled )
       );
       setNotice({
         status: 'success',
@@ -57,7 +57,11 @@ const Payment = props => {
   return (
     <>
       { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-      <p>I am the payment gateway keeper</p>
+      <ul>
+        { paymentGateways.map( pg => {
+          return <p>{ pg.title }</p>
+        })}
+      </ul>
     </>
   );
 
