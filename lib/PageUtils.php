@@ -152,12 +152,27 @@ class PageUtils {
 		);
 	}
 
-	private static function get_order_quantity( WC_Order $order ): int {
-		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
+	public static function payment( WP_Post $post ) {
+		$order                   = wc_get_order( $post->ID );
+		$product_id              = OrderUtils::get_product_id( $post->ID );
+
+        echo sprintf(
+			'<div
+                id="%s-payments"
+                data-nonce="%s"
+                data-order="%s"
+                data-group-id="%s"
+                data-attendees="%s"
+            ><p>Loading attendees...</p></div>',
+			esc_attr( PluginUtils::get_kebab_case_name() ),
+			esc_attr( wp_create_nonce( 'wp_rest' ) ),
+			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
+			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) )
+        );
 	}
 
-	public static function payment( WP_Post $post ) {
-		return '<div><p>Loading payment...</p></div>';
+	private static function get_order_quantity( WC_Order $order ): int {
+		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
 	}
 
 	/**
