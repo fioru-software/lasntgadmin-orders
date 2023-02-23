@@ -13,7 +13,9 @@ use Automattic\WooCommerce\Utilities\OrderUtil;
 use Automattic\WooCommerce\Admin\Overrides\Order;
 use Automattic\WooCommerce\Internal\Admin\Loader;
 
-use WC_Order_Item_Product;
+use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
+
+use WC_Order_Item_Product, WC_Payment_Gateways;
 use WP_Post, WC_Order;
 
 class PageUtils {
@@ -34,10 +36,36 @@ class PageUtils {
 		 * Enqueue admin order component
 		 */
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
+
+        /**
+         * @todo refactor globalpay
+         */
+		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_globalpay' ] );
 	}
+
+    /**
+     * @todo refactor globalpay
+     */
+    public static function enqueue_globalpay() {
+        wp_enqueue_script(
+            'globalpayments-secure-payment-fields',
+            Plugin::get_url( '/assets/frontend/js/globalpayments-secure-payment-fields.js' ),
+            [ 'globalpayments-secure-payment-fields-lib' ],
+            Plugin::VERSION,
+            true
+        );
+    }
 
 	public static function add_filters() {
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
+
+        /**
+         * @todo refactor globalpay
+         */
+        add_filter( 'admin_body_class', function( $classes ) {
+            $classes .= " woocommerce-order-pay ";
+            return $classes;
+        } );
 	}
 
 	public static function is_order_editable( bool $is_editable, WC_Order $order ) {
@@ -164,12 +192,74 @@ class PageUtils {
 	}
 
     /**
-     * @todo Remove order and product if not being used
+     * @todo Fix problem of two form elements on the same page
+     *
+     *
+     * POST
+     * URL: http://localhost:8080/checkout/order-pay/13/?pay_for_order=true&key=wc_order_eShR9n8HpfRoB
+     * BODY: payment_method=woocommerce_gateway_purchase_order&po_number_field=12345&woocommerce_pay=1&woocommerce-pay-nonce=179d33f984&_wp_http_referer=%2Fcheckout%2Forder-pay%2F13%2F%3Fpay_for_order%3Dtrue%26key%3Dwc_order_eShR9n8HpfRoB
+     *
+     * GET
+     * URL: http://localhost:8080/checkout/order-received/13/?key=wc_order_eShR9n8HpfRoB
      */
 	public static function payment( WP_Post $post ) {
 		$order                   = wc_get_order( $post->ID );
 		$product              = OrderUtils::get_product( $order );
 
+        $gateways = PaymentUtils::get_supported_admin_payment_gateways();
+
+        $checkout_url = $order->get_checkout_payment_url(true);
+        $order_key = parse_str(
+            parse_url( 
+                $checkout_url,
+                PHP_URL_QUERY
+            ),
+            $query
+        );
+        error_log(print_r($query, true));
+        $order_key = $query['key'];
+        error_log("order key is: $order_key");
+
+        echo "<form action='/checkout/order-pay/{ $post->ID }/?pay_for_order=true&key={ $order_key }' id='order_review' method='post'>";
+        echo '<input type="hidden" name="woocommerce_pay" value="1">';
+        echo wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' );
+        echo "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/{ $post->ID }/?pay_for_order=true&key={ $order_key }'>";
+        echo '<div id="payment">';
+        echo '<ul class="wc_payment_methods payment_methods methods">';
+
+        foreach( $gateways as $gateway) {
+            /**
+             * @todo refactor globalpay
+             */
+            if( 'globalpayments_gpapi' === $gateway->id ) {
+                define('WOOCOMMERCE_CHECKOUT', true);
+                set_query_var('order-pay', $post->ID );
+                $gateway->tokenization_script();
+
+            }
+            //$gateway->payment_fields();
+            PaymentUtils::render_gateway( $gateway );
+        }
+
+        echo '<input type="submit" class="button alt wp-element-button" id="place_order" value="Pay for order" />';
+
+        echo '</ul>';
+        echo '</div>';
+        echo '</form>';
+
+        //$order->set_payment_method($gateway);
+        error_log("does order need payment?: {$order->needs_payment()}");
+        $order_total = $order->calculate_totals();
+        error_log("order total is: $order_total");
+        error_log("order key is: {$order->get_order_key()}");
+        $order_currency = $order->get_currency();
+        error_log("order currency is: $order_currency");
+        error_log("order checkout url: {$order->get_checkout_payment_url(true) }");
+        error_log("order checkout url2: {$order->get_checkout_payment_url() }");
+
+        //global-payments-woocommerce/assets/frontend/js/globalpayments-helper.js
+
+        /*
         echo sprintf(
 			'<div
                 id="%s-payments"
@@ -182,6 +272,7 @@ class PageUtils {
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
             esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) )
         );
+         */
 	}
 
 	private static function get_order_quantity( WC_Order $order ): int {

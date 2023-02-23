@@ -1143,6 +1143,11 @@ const Payment = props => {
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(async () => {
     await fetchPaymentGateways();
   }, []);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (paymentGateways.length) {
+      console.log(paymentGateways);
+    }
+  }, [paymentGateways]);
   async function fetchPaymentGateways() {
     try {
       setNotice({

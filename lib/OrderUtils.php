@@ -181,7 +181,6 @@ class OrderUtils {
 
     public static function get_product( WC_Order $order ): WC_Order_Item_Product {
 		$items   = $order->get_items();
-        error_log(print_r($items, true));
 		return reset( $items );
     }
 

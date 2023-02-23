@@ -21,6 +21,12 @@ const Payment = props => {
     await fetchPaymentGateways() 
   }, []);
 
+  useEffect( () => {
+    if(paymentGateways.length) {
+      console.log(paymentGateways);
+    }
+  }, [ paymentGateways] );
+
   async function fetchPaymentGateways() {
     try {
       setNotice({
