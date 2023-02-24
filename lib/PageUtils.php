@@ -15,7 +15,7 @@ use Automattic\WooCommerce\Internal\Admin\Loader;
 
 use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 
-use WC_Order_Item_Product, WC_Payment_Gateways;
+use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout;
 use WP_Post, WC_Order;
 
 class PageUtils {
@@ -36,6 +36,30 @@ class PageUtils {
 		 * Enqueue admin order component
 		 */
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
+
+        add_action( 'admin_notices', function() {
+            echo "<h1>HELLO</h1>";
+        });
+
+        add_action('completed_shop_order', function() {
+            $adminnotice = new WC_Admin_Notices();
+            $adminnotice->add_custom_notice("Hello","<div>Error</div>");
+            $adminnotice->output_custom_notices();
+        });
+
+        add_action('woocommerce_after_pay_action', function( $order ) {
+
+            if( ! is_null( WC()->session )) {
+                //error_log(print_r(wc_admin_notices(), true));
+                error_log(get_class(WC()));
+                error_log("=== session ===");
+                error_log(print_r(WC()->session, true));
+                error_log("=== notices ===");
+                error_log(print_r(WC()->session->get( 'wc_notices', array() ), true));
+                $adminnotice = new WC_Admin_Notices();
+                $adminnotice->output_custom_notices();
+            }
+        });
 
 	}
 
@@ -99,9 +123,18 @@ class PageUtils {
 				'high'
 			);
 		}
+
+
 	}
 
 	public static function output_admin_order_markup( WP_Post $post ): void {
+
+
+        WC_Admin_Notices::init();
+        WC_Admin_Notices::add_notices();
+        WC_Admin_Notices::output_custom_notices();
+
+
 		echo '<div class="wrap woocommerce">';
 		$tab = isset( $_GET['tab'] ) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
 		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
@@ -196,6 +229,8 @@ class PageUtils {
 
         $gateways = PaymentUtils::get_supported_admin_payment_gateways();
         //error_log(print_r($gateways, true));
+        //WC_Admin_Notices::init();
+        //error_log(print_r(WC_Admin_Notices::get_notices(), true));
 
         $checkout_url = $order->get_checkout_payment_url(true);
         $order_key = parse_str(

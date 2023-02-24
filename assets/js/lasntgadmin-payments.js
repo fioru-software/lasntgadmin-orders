@@ -71,6 +71,7 @@ jQuery(document).ready(function ($) {
             alert('paid');
         } else {
             alert('not paid');
+            window.location.reload();
         }
         enableInputs();
 
