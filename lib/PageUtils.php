@@ -37,27 +37,18 @@ class PageUtils {
 		 */
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
 
-        /**
-         * @todo refactor globalpay
-         */
-		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_globalpay' ] );
 	}
-
-    /**
-     * @todo refactor globalpay
-     */
-    public static function enqueue_globalpay() {
-        wp_enqueue_script(
-            'globalpayments-secure-payment-fields',
-            Plugin::get_url( '/assets/frontend/js/globalpayments-secure-payment-fields.js' ),
-            [ 'globalpayments-secure-payment-fields-lib' ],
-            Plugin::VERSION,
-            true
-        );
-    }
 
 	public static function add_filters() {
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
+
+        /**
+         * @todo will involve replacing edit-form-advanced.php
+         * @see https://core.trac.wordpress.org/browser/tags/5.3/src/wp-admin/edit-form-advanced.php
+         */
+        add_filter( 'replace_editor', function( bool $replace, WP_Post $post) {
+            return $replace;
+        }, 10, 2);
 
         /**
          * @todo refactor globalpay
@@ -192,9 +183,6 @@ class PageUtils {
 	}
 
     /**
-     * @todo Fix problem of two form elements on the same page
-     *
-     *
      * POST
      * URL: http://localhost:8080/checkout/order-pay/13/?pay_for_order=true&key=wc_order_eShR9n8HpfRoB
      * BODY: payment_method=woocommerce_gateway_purchase_order&po_number_field=12345&woocommerce_pay=1&woocommerce-pay-nonce=179d33f984&_wp_http_referer=%2Fcheckout%2Forder-pay%2F13%2F%3Fpay_for_order%3Dtrue%26key%3Dwc_order_eShR9n8HpfRoB
@@ -207,6 +195,7 @@ class PageUtils {
 		$product              = OrderUtils::get_product( $order );
 
         $gateways = PaymentUtils::get_supported_admin_payment_gateways();
+        //error_log(print_r($gateways, true));
 
         $checkout_url = $order->get_checkout_payment_url(true);
         $order_key = parse_str(
@@ -216,15 +205,17 @@ class PageUtils {
             ),
             $query
         );
-        error_log(print_r($query, true));
         $order_key = $query['key'];
-        error_log("order key is: $order_key");
 
-        echo "<form action='/checkout/order-pay/{ $post->ID }/?pay_for_order=true&key={ $order_key }' id='order_review' method='post'>";
+        echo "<div class='panel-wrap woocommerce' >";
+
+        echo "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>";
         echo '<input type="hidden" name="woocommerce_pay" value="1">';
         echo wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' );
-        echo "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/{ $post->ID }/?pay_for_order=true&key={ $order_key }'>";
-        echo '<div id="payment">';
+
+        echo "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>";
+        echo "<h3>Payment options</h3>";
+
         echo '<ul class="wc_payment_methods payment_methods methods">';
 
         foreach( $gateways as $gateway) {
@@ -241,11 +232,11 @@ class PageUtils {
             PaymentUtils::render_gateway( $gateway );
         }
 
-        echo '<input type="submit" class="button alt wp-element-button" id="place_order" value="Pay for order" />';
+        echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >Pay for order</button>';
 
         echo '</ul>';
         echo '</div>';
-        echo '</form>';
+        echo '</div>';
 
         //$order->set_payment_method($gateway);
         error_log("does order need payment?: {$order->needs_payment()}");
@@ -259,20 +250,6 @@ class PageUtils {
 
         //global-payments-woocommerce/assets/frontend/js/globalpayments-helper.js
 
-        /*
-        echo sprintf(
-			'<div
-                id="%s-payments"
-                data-nonce="%s"
-                data-order="%s"
-                data-group-id="%s"
-            ><p>Loading payments...</p></div>',
-			esc_attr( PluginUtils::get_kebab_case_name() ),
-			esc_attr( wp_create_nonce( 'wp_rest' ) ),
-			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
-            esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) )
-        );
-         */
 	}
 
 	private static function get_order_quantity( WC_Order $order ): int {
@@ -326,7 +303,7 @@ class PageUtils {
 	 * Enqueues admin order component
 	 */
 	public static function enqueue_components( string $hook ): void {
-		$name      = sprintf( '%s-component', PluginUtils::get_kebab_case_name() );
+
 		$post_type = property_exists( get_current_screen(), 'post_type' ) ? get_current_screen()->post_type : false;
 
 		// Load only on ?page=my-first-gutenberg-app.
@@ -334,6 +311,28 @@ class PageUtils {
 			return;
 		}
 
+        self::enqueue_order_and_attendee_tabs();
+        self::enqueue_payment_tab();
+
+	}
+
+    /**
+     * @see wp-content/plugins/woocommerce/includes/class-wc-frontend-scripts.php
+     */
+    private static function enqueue_payment_tab() {
+		$name = sprintf( '%s-payment-tab', PluginUtils::get_kebab_case_name() );
+        $result = wp_register_script(
+            $name,
+			plugins_url( sprintf( '%s/assets/js/lasntgadmin-payments.js', PluginUtils::get_kebab_case_name() ) ),
+            [ 'jquery'],
+            false,
+            true
+        );
+		wp_enqueue_script( $name );
+    }
+
+    private static function enqueue_order_and_attendee_tabs() {
+		$name      = sprintf( '%s-order-and-attendee-tabs', PluginUtils::get_kebab_case_name() );
 		// Automatically load imported dependencies and assets version.
 		$asset_file = include sprintf( '%s/build/index.asset.php', PluginUtils::get_absolute_plugin_path() );
 
@@ -359,7 +358,7 @@ class PageUtils {
 			$asset_file['version']
 		);
 		wp_enqueue_style( $name );
-	}
+    }
 
 	/**
 	 * Remove default title input on admin add order page.

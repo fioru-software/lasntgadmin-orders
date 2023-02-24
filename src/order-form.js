@@ -150,7 +150,7 @@ const OrderForm = props => {
         status: 'success',
         message: 'Updated order. Redirecting to attendees tab...'
       });
-      document.location.assign(  method === 'POST' ? `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` : '/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=order' );
+      document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` ); 
     } catch (e) {
       setNotice({
         status: 'error',

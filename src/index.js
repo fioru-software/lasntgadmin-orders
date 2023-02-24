@@ -3,7 +3,6 @@ import { render } from '@wordpress/element';
 
 import { OrderForm } from './order-form';
 import { Attendees } from './attendees';
-import { Payment } from './payment';
 
 /**
  * Render components
@@ -45,18 +44,6 @@ window.addEventListener(
           attendees={ JSON.parse(attendeesComponent.dataset.attendees) }
         />,
         attendeesComponent
-      );
-    }
-
-    const paymentComponent = document.querySelector( '#lasntgadmin-orders-payments' );
-    if( paymentComponent ) {
-      render(
-        <Payment 
-          nonce={ paymentComponent.dataset.nonce } 
-          order={ JSON.parse(paymentComponent.dataset.order) }
-          groupId={ JSON.parse(paymentComponent.dataset.groupId) }
-        />,
-        paymentComponent
       );
     }
 
