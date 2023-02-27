@@ -2,9 +2,23 @@
 
 namespace Lasntg\Admin\Orders;
 
+use Lasntg\Admin\Orders\PluginUtils;
+
 use WC_Payment_Gateway, WC_Payment_Gateways;
 
 class PaymentUtils {
+
+    const TRANSIENT_NAME = 'lasntgadmin_orders_payment_result_transient';
+    
+    public static function save_notices( array $notices ) {
+        if( $notices ) {
+            set_transient( self::TRANSIENT_NAME, $notices, 30);
+        }
+    }
+
+    public static function get_notices() {
+        return get_transient( self::TRANSIENT_NAME );
+    }
 
     public static function get_payment_gateway_by_id( string $gateway_id ): WC_Payment_Gateway {
         $payment_gateways = (WC_Payment_Gateways::instance())->get_available_payment_gateways();
@@ -22,6 +36,7 @@ class PaymentUtils {
 
     public static function render_gateway( WC_Payment_Gateway $gateway ) { ?>
         <li class="wc_payment_method payment_method_<?php echo esc_attr( $gateway->id ); ?>">
+
         <input id="payment_method_<?php echo esc_attr( $gateway->id ); ?>" type="radio" class="input-radio" name="payment_method" value="<?php echo esc_attr( $gateway->id ); ?>" <?php checked( $gateway->chosen, true ); ?> data-order_button_text="<?php echo esc_attr( $gateway->order_button_text ); ?>" required disabled />
 
         <label for="payment_method_<?php echo esc_attr( $gateway->id ); ?>">

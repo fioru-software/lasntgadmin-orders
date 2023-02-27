@@ -16,14 +16,21 @@ use Automattic\WooCommerce\Internal\Admin\Loader;
 use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 
 use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout;
-use WP_Post, WC_Order;
+use WC, WC_Session_Handler, WP_Post, WC_Order;
+
+require_once ABSPATH . "/wp-content/plugins/woocommerce/includes/wc-notice-functions.php";
 
 class PageUtils {
+
+    public static function init() {
+        self::add_actions();
+        self::add_filters();
+    }
 
 	/**
 	 * Add WordPress and WooCommerce actions.
 	 */
-	public static function add_actions(): void {
+	private static function add_actions(): void {
 
 		/**
 		 * Custom add order page for admin site
@@ -32,46 +39,26 @@ class PageUtils {
 		add_action( 'add_meta_boxes', [ self::class, 'add_metaboxes' ], 50, 2 );
 		add_action( 'admin_init', [ self::class, 'remove_title' ] );
 
+        add_action( 'admin_notices', [ self::class, 'show_notices' ] );
+
 		/**
 		 * Enqueue admin order component
 		 */
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
 
-        add_action( 'admin_notices', function() {
-            echo "<h1>HELLO</h1>";
-        });
-
         add_action('completed_shop_order', function() {
-            $adminnotice = new WC_Admin_Notices();
-            $adminnotice->add_custom_notice("Hello","<div>Error</div>");
-            $adminnotice->output_custom_notices();
+            error_log("=== completed shop order ===");
         });
 
-        add_action('woocommerce_after_pay_action', function( $order ) {
-
-            if( ! is_null( WC()->session )) {
-                //error_log(print_r(wc_admin_notices(), true));
-                error_log(get_class(WC()));
-                error_log("=== session ===");
-                error_log(print_r(WC()->session, true));
-                error_log("=== notices ===");
-                error_log(print_r(WC()->session->get( 'wc_notices', array() ), true));
-                $adminnotice = new WC_Admin_Notices();
-                $adminnotice->output_custom_notices();
-            }
-        });
+        add_action('woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
 
 	}
 
-	public static function add_filters() {
+	private static function add_filters() {
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
 
-        /**
-         * @todo will involve replacing edit-form-advanced.php
-         * @see https://core.trac.wordpress.org/browser/tags/5.3/src/wp-admin/edit-form-advanced.php
-         */
-        add_filter( 'replace_editor', function( bool $replace, WP_Post $post) {
-            return $replace;
+        add_filter( 'woocommerce_payment_successful_result', function( array $result, int $order_id ) {
+            error_log("=== payment result ===");
         }, 10, 2);
 
         /**
@@ -82,6 +69,36 @@ class PageUtils {
             return $classes;
         } );
 	}
+
+    /**
+     * Save wc notices for display
+     *
+     * @see self::show_notices()
+     */
+    public static function after_pay( WC_Order $order ) {
+        if( ! is_null( WC()->session )) {
+            $notices = wc_get_notices();
+            PaymentUtils::save_notices( $notices );
+        }
+    }
+
+    /**
+     * Shows admin notices for wc notices stored in transient
+     *
+     * @see self::after_pay()
+     */
+    public static function show_notices() {
+        $notices = PaymentUtils::get_notices();
+        error_log(print_r($notices, true));
+        if( isset($notices['error']) ) {
+            $errors = $notices['error'];
+            echo "<div class='notice notice-error is-dismissible'>";
+            foreach( $errors as $error) {
+                echo "<p>{$error['notice']}</p>";
+            }
+            echo "</div>";
+        }
+    }
 
 	public static function is_order_editable( bool $is_editable, WC_Order $order ) {
 		return in_array( $order->get_status(), array( 'pending', 'on-hold', 'auto-draft', 'attendees', 'waiting-list' ), true );
@@ -216,74 +233,69 @@ class PageUtils {
 	}
 
     /**
-     * POST
-     * URL: http://localhost:8080/checkout/order-pay/13/?pay_for_order=true&key=wc_order_eShR9n8HpfRoB
-     * BODY: payment_method=woocommerce_gateway_purchase_order&po_number_field=12345&woocommerce_pay=1&woocommerce-pay-nonce=179d33f984&_wp_http_referer=%2Fcheckout%2Forder-pay%2F13%2F%3Fpay_for_order%3Dtrue%26key%3Dwc_order_eShR9n8HpfRoB
-     *
-     * GET
-     * URL: http://localhost:8080/checkout/order-received/13/?key=wc_order_eShR9n8HpfRoB
+     * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/class-wc-form-handler.php#L378
+     * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/class-wc-checkout.php#L1039
      */
 	public static function payment( WP_Post $post ) {
 		$order                   = wc_get_order( $post->ID );
-		$product              = OrderUtils::get_product( $order );
-
-        $gateways = PaymentUtils::get_supported_admin_payment_gateways();
-        //error_log(print_r($gateways, true));
-        //WC_Admin_Notices::init();
-        //error_log(print_r(WC_Admin_Notices::get_notices(), true));
-
-        $checkout_url = $order->get_checkout_payment_url(true);
-        $order_key = parse_str(
-            parse_url( 
-                $checkout_url,
-                PHP_URL_QUERY
-            ),
-            $query
-        );
-        $order_key = $query['key'];
 
         echo "<div class='panel-wrap woocommerce' >";
 
-        echo "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>";
-        echo '<input type="hidden" name="woocommerce_pay" value="1">';
-        echo wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' );
+        if( ! $order->needs_payment() ) {
+            $date = $order->get_date_paid();
+            echo "<h3>Paid</h3>";
+            echo "<strong>payment method</strong>: {$order->get_payment_method_title()}<br/>";
+            echo "<strong>transaction id</strong>: {$order->get_transaction_id()}<br/>";
+            echo "<strong>total</strong>: {$order->get_currency()} {$order->get_total()}<br/>";
+            //echo "<strong>date</strong>: {$date->date_i18n()}<br/>";
+        } else {
+            $product              = OrderUtils::get_product( $order );
 
-        echo "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>";
-        echo "<h3>Payment options</h3>";
+            $gateways = PaymentUtils::get_supported_admin_payment_gateways();
+            //error_log(print_r($gateways, true));
+            //WC_Admin_Notices::init();
+            //error_log(print_r(WC_Admin_Notices::get_notices(), true));
 
-        echo '<ul class="wc_payment_methods payment_methods methods">';
+            $checkout_url = $order->get_checkout_payment_url(true);
+            $order_key = parse_str(
+                parse_url( 
+                    $checkout_url,
+                    PHP_URL_QUERY
+                ),
+                $query
+            );
+            $order_key = $query['key'];
 
-        foreach( $gateways as $gateway) {
-            /**
-             * @todo refactor globalpay
-             */
-            if( 'globalpayments_gpapi' === $gateway->id ) {
-                define('WOOCOMMERCE_CHECKOUT', true);
-                set_query_var('order-pay', $post->ID );
-                $gateway->tokenization_script();
+            echo "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>";
+            echo '<input type="hidden" name="woocommerce_pay" value="1">';
+            echo wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' );
 
+            echo "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>";
+            echo "<h3>Payment options</h3>";
+
+            echo '<ul class="wc_payment_methods payment_methods methods">';
+
+            foreach( $gateways as $gateway) {
+                /**
+                 * @todo refactor globalpay
+                 */
+                if( 'globalpayments_gpapi' === $gateway->id ) {
+                    define('WOOCOMMERCE_CHECKOUT', true);
+                    set_query_var('order-pay', $post->ID );
+                    $gateway->tokenization_script();
+
+                }
+                //$gateway->payment_fields();
+                PaymentUtils::render_gateway( $gateway );
             }
-            //$gateway->payment_fields();
-            PaymentUtils::render_gateway( $gateway );
+
+            echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >Pay for order</button>';
+
+            echo '</ul>';
+            echo '</div>';
         }
 
-        echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >Pay for order</button>';
-
-        echo '</ul>';
         echo '</div>';
-        echo '</div>';
-
-        //$order->set_payment_method($gateway);
-        error_log("does order need payment?: {$order->needs_payment()}");
-        $order_total = $order->calculate_totals();
-        error_log("order total is: $order_total");
-        error_log("order key is: {$order->get_order_key()}");
-        $order_currency = $order->get_currency();
-        error_log("order currency is: $order_currency");
-        error_log("order checkout url: {$order->get_checkout_payment_url(true) }");
-        error_log("order checkout url2: {$order->get_checkout_payment_url() }");
-
-        //global-payments-woocommerce/assets/frontend/js/globalpayments-helper.js
 
 	}
 

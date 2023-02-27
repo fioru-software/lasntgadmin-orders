@@ -67,13 +67,10 @@ jQuery(document).ready(function ($) {
             method: 'POST',
             body: formData
         } );
-        if( res.ok && res.redirected ) {
-            alert('paid');
-        } else {
-            alert('not paid');
+        if( res.ok && ! res.redirected ) {
             window.location.reload();
         }
-        enableInputs();
+        //enableInputs();
 
     });
 

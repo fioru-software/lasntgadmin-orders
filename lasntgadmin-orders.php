@@ -15,11 +15,8 @@ require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
 use Lasntg\Admin\Orders\{ PageUtils, PluginUtils, OrderUtils, WaitingListActionsFilters };
 
-PageUtils::add_actions();
-PageUtils::add_filters();
-OrderUtils::add_filters();
-OrderUtils::add_actions();
-
+PageUtils::init();
+OrderUtils::init();
 WaitingListActionsFilters::init();
 
 /**

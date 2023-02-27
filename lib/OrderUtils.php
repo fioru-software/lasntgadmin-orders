@@ -20,7 +20,12 @@ use function wc_get_order_statuses;
  */
 class OrderUtils {
 
-	public static function add_filters() {
+    public static function init() {
+        self::add_filters();
+        self::add_actions();
+    }
+
+	private static function add_filters() {
 		add_filter( 'wc_order_statuses', [ self::class, 'order_statuses' ] );
 		add_filter( 'woocommerce_register_shop_order_post_statuses', [ self::class, 'register_shop_order_post_statuses' ] );
 		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
@@ -28,7 +33,7 @@ class OrderUtils {
 		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
 	}
 
-	public static function add_actions() {
+	private static function add_actions() {
 		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 
