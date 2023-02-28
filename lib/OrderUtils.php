@@ -31,6 +31,7 @@ class OrderUtils {
 		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
 		add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
 		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
+        add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
 	}
 
 	private static function add_actions() {
@@ -41,6 +42,22 @@ class OrderUtils {
 
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 	}
+
+    /**
+     * Handle a custom 'customvar' query var to get orders with the 'customvar' meta.
+     * @param array $query - Args for WP_Query.
+     * @param array $query_vars - Query vars from WC_Order_Query.
+     * @return array modified $query
+     */
+    public static function handle_filter_orders_by_funding_source( $query, $query_vars ) {
+        if ( ! empty( $query_vars['funding_source'] ) ) {
+            $query['meta_query'][] = array(
+                'key' => 'funding_source',
+                'value' => esc_attr( $query_vars['funding_source'] ),
+            );
+        }
+        return $query;
+    }
 
 	/**
 	 *
@@ -201,14 +218,5 @@ class OrderUtils {
 		);
 		return $product_ids;
 	}
-
-    /**
-     * @todo Remove if not used.
-     */
-    public static function get_supported_payment_gateways( WC_Order $order, WC_Order_Item_Product $product ): array {
-        $payment_gateways = WooCommerce::payment_gateways();
-        //error_log(print_r($payment_gateways, true));
-        return [];
-    }
 
 }

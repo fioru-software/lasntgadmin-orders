@@ -79,6 +79,7 @@ class PageUtils {
         if( ! is_null( WC()->session )) {
             $notices = wc_get_notices();
             PaymentUtils::save_notices( $notices );
+            wc_clear_notices();
         }
     }
 
@@ -252,10 +253,6 @@ class PageUtils {
             $product              = OrderUtils::get_product( $order );
 
             $gateways = PaymentUtils::get_supported_admin_payment_gateways();
-            //error_log(print_r($gateways, true));
-            //WC_Admin_Notices::init();
-            //error_log(print_r(WC_Admin_Notices::get_notices(), true));
-
             $checkout_url = $order->get_checkout_payment_url(true);
             $order_key = parse_str(
                 parse_url( 
