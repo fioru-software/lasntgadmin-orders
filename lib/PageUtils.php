@@ -246,9 +246,10 @@ class PageUtils {
             $date = $order->get_date_paid();
             echo "<h3>Paid</h3>";
             echo "<strong>payment method</strong>: {$order->get_payment_method_title()}<br/>";
+            echo "<strong>funding source</strong>: {$order->get_meta('funding_source', true)}<br/>";
             echo "<strong>transaction id</strong>: {$order->get_transaction_id()}<br/>";
             echo "<strong>total</strong>: {$order->get_currency()} {$order->get_total()}<br/>";
-            //echo "<strong>date</strong>: {$date->date_i18n()}<br/>";
+            echo "<strong>date</strong>: {$date->date_i18n()}<br/>";
         } else {
             $product              = OrderUtils::get_product( $order );
 
