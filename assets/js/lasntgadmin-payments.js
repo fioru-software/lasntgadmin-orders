@@ -11,6 +11,7 @@ jQuery(document).ready(function ($) {
   $('input[name=payment_method]').click( e => {
     const id = e.target.id;
     enableSubmit();
+    addRemovedHiddenInputs();
     $('div.payment_box').hide();
     $(`div.payment_box.${id}`).show();
   });
@@ -56,14 +57,11 @@ jQuery(document).ready(function ($) {
     try {
       setNotice('Processing payment...');
       showSpinner();
-      disableInputs();
       const formData = new FormData( e.target );
+      disableInputs();
 
       // readd removed elements
-      $.each( hidden, ( index, el ) => {
-        const name = startsWith( 'payment_method_', $(el).get(0).classList.values() );
-        document.querySelector(`li.${name}`).append( el );
-      } );
+      addRemovedHiddenInputs();
 
       const action = $('div#order_data').data('action');
       const res = await fetch( action, {
@@ -112,9 +110,22 @@ jQuery(document).ready(function ($) {
     return `<div class="lasntgadmin-spinner"><img src="http://localhost:8080/wp-admin/images/spinner.gif" alt="loading..."/></div>`;
   }
 
-  $("button#place_order").click( async e => {
-    hidden = $('div.payment_box:hidden');
-    hidden.remove();
-  });
+  function removeHiddenInputs() {
+    $("button#place_order").click( async e => {
+      hidden = $('div.payment_box:hidden');
+      hidden.remove();
+    });
+  }
+
+  function addRemovedHiddenInputs() {
+    $.each( hidden, ( index, el ) => {
+      const name = startsWith( 'payment_method_', $(el).get(0).classList.values() );
+      document.querySelector(`li.${name}`).append( el );
+    } );
+  }
+
+
+  removeHiddenInputs();
+
 
 });

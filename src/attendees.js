@@ -22,7 +22,6 @@ const Attendees = props => {
   const [ quantity, setQuantity ] = useState(0);
   const [ isDisabled, setIsDisabled ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(false);
-  const [ buttonText, setButtonText ] = useState("Save");
 
   useEffect( () => {
     if( props?.quantity > 0) {
@@ -199,7 +198,7 @@ const Attendees = props => {
             { props?.quantity > 0 && 
             <div class="form-field">
               { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-              <button disabled={ isDisabled } type="submit" class="button save_order button-primary" name="save" value="Create">{ buttonText }</button>
+              <button disabled={ isDisabled } type="submit" class="button alt save_order wp-element-button" name="save" value="Create">Save attendees</button>
               { isLoading && <Spinner/> }
             </div>}
           </div>

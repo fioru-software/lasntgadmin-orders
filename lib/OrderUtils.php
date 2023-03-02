@@ -13,8 +13,6 @@ use Lasntg\Admin\Group\GroupUtils;
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Order_Item_Product;
 
-use function wc_get_order_statuses;
-
 /**
  * Order Utility Class
  */
@@ -38,7 +36,8 @@ class OrderUtils {
 		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 
-		add_action( 'woocommerce_rest_insert_shop_order_object', [ self::class, 'insert_shop_order_meta' ], 10, 2 );
+        // @deprecated
+		// add_action( 'woocommerce_rest_insert_shop_order_object', [ self::class, 'insert_shop_order_meta' ], 10, 2 );
 
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 	}
@@ -81,6 +80,7 @@ class OrderUtils {
 	/**
 	 * Update user meta when order is created
 	 *
+     * @deprecated
 	 * @see https://developer.wordpress.org/reference/classes/wp_rest_request/
 	 */
 	public static function insert_shop_order_meta( WC_Order $order, WP_REST_Request $req ) {

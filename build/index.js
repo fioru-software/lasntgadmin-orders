@@ -187,6 +187,8 @@ const AttendeeFields = props => {
     var _props$attendee3, _props$attendee4, _props$attendee5, _props$attendee6, _props$attendee7, _props$attendee8, _props$attendee9;
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
       class: "form-field"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+      class: "form-row"
     }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
       for: field.key
     }, field.label, !!field.required && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
@@ -242,7 +244,7 @@ const AttendeeFields = props => {
         key: key,
         value: field.name === 'local_authority' ? key : field.choices[key]
       }, field.choices[key]);
-    })));
+    })))));
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null));
 };
 
@@ -290,7 +292,6 @@ const Attendees = props => {
   const [quantity, setQuantity] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(0);
   const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [buttonText, setButtonText] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("Save");
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if ((props === null || props === void 0 ? void 0 : props.quantity) > 0) {
       setQuantity(parseInt(props.quantity));
@@ -444,10 +445,10 @@ const Attendees = props => {
   }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     disabled: isDisabled,
     type: "submit",
-    class: "button save_order button-primary",
+    class: "button alt save_order wp-element-button",
     name: "save",
     value: "Create"
-  }, buttonText), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null))))));
+  }, "Save attendees"), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null))))));
 };
 
 
@@ -861,7 +862,7 @@ const OrderForm = props => {
   const [groupId, setGroupId] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [lineItem, setLineItem] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)({});
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   const [status, setStatus] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const [buttonText, setButtonText] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("Create");
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -914,20 +915,27 @@ const OrderForm = props => {
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(async () => {}, [props === null || props === void 0 ? void 0 : (_props$user = props.user) === null || _props$user === void 0 ? void 0 : _props$user.id]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {}, [props === null || props === void 0 ? void 0 : props.user]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {}, [props === null || props === void 0 ? void 0 : props.userMeta]);
+
+  /**
+   * @deprecated
+   */
+  function parseBillingData(formData) {
+    return {
+      first_name: formData.get('first_name'),
+      last_name: formData.get('last_name'),
+      address_1: formData.get('address_1'),
+      address_2: formData.get('address_2'),
+      city: formData.get('city'),
+      state: formData.get('state'),
+      postcode: formData.get('postcode'),
+      country: formData.get('country'),
+      email: formData.get('email'),
+      phone: formData.get('phone')
+    };
+  }
   function parseFormData(formData) {
     const body = {
-      billing: {
-        first_name: formData.get('first_name'),
-        last_name: formData.get('last_name'),
-        address_1: formData.get('address_1'),
-        address_2: formData.get('address_2'),
-        city: formData.get('city'),
-        state: formData.get('state'),
-        postcode: formData.get('postcode'),
-        country: formData.get('country'),
-        email: formData.get('email'),
-        phone: formData.get('phone')
-      },
+      billing: {},
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
@@ -989,6 +997,56 @@ const OrderForm = props => {
       setIsDisabled(false);
     }
   }
+
+  /**
+   * @deprecated
+   */
+  function renderPersonalFormInputs() {
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      class: "form-wrap"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Personal"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      class: "form-field"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+      for: "first_name"
+    }, "First name", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+      class: "required"
+    }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+      type: "text",
+      name: "first_name",
+      id: "first_name",
+      defaultValue: props.order.billing.first_name || props.userMeta.first_name,
+      required: true
+    })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      class: "form-field"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+      for: "last_name"
+    }, "Last name", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+      class: "required"
+    }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+      type: "text",
+      name: "last_name",
+      id: "last_name",
+      defaultValue: props.order.billing.last_name || props.userMeta.last_name,
+      required: true
+    })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      class: "form-field"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
+      for: "phone"
+    }, "Phone", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+      class: "required"
+    }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+      type: "tel",
+      name: "phone",
+      id: "phone",
+      defaultValue: props.order.billing.phone || props.userMeta.billing_phone,
+      required: true
+    }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      class: "form-wrap"
+    }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Address"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_billing_address__WEBPACK_IMPORTED_MODULE_6__.BillingAddress, {
+      order: props.order,
+      userMeta: props.userMeta
+    })));
+  }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("form", {
     class: "panel-wrap woocommerce",
     onSubmit: handleSubmit
@@ -1009,51 +1067,10 @@ const OrderForm = props => {
     class: "panel woocommerce-order-data"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-wrap"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Personal"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-field"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
-    for: "first_name"
-  }, "First name", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
-    class: "required"
-  }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
-    type: "text",
-    name: "first_name",
-    id: "first_name",
-    defaultValue: props.order.billing.first_name || props.userMeta.first_name,
-    required: true
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-field"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
-    for: "last_name"
-  }, "Last name", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
-    class: "required"
-  }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
-    type: "text",
-    name: "last_name",
-    id: "last_name",
-    defaultValue: props.order.billing.last_name || props.userMeta.last_name,
-    required: true
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-field"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
-    for: "phone"
-  }, "Phone", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
-    class: "required"
-  }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
-    type: "tel",
-    name: "phone",
-    id: "phone",
-    defaultValue: props.order.billing.phone || props.userMeta.billing_phone,
-    required: true
-  }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-wrap"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Address"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_billing_address__WEBPACK_IMPORTED_MODULE_6__.BillingAddress, {
-    order: props.order,
-    userMeta: props.userMeta
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-wrap"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Order"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    class: "form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: "order_status"
   }, "Status", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
@@ -1067,8 +1084,10 @@ const OrderForm = props => {
     setStatus: setStatus,
     apiPath: props.orderApiPath,
     nonce: props.nonce
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    class: "form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: "order_group"
   }, "Order group", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
@@ -1080,8 +1099,9 @@ const OrderForm = props => {
     apiPath: props.groupApiPath,
     nonce: props.nonce,
     setGroupId: setGroupId
-  }))), !!groupId && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_product_panel__WEBPACK_IMPORTED_MODULE_4__.ProductPanel, {
+  }))))), !!groupId && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_product_panel__WEBPACK_IMPORTED_MODULE_4__.ProductPanel, {
     nonce: props.nonce,
+    setIsDisabled: setIsDisabled,
     apiPath: props.productApiPath,
     lineItem: lineItem,
     order: props.order,
@@ -1098,10 +1118,10 @@ const OrderForm = props => {
   }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     disabled: isDisabled,
     type: "submit",
-    class: "button save_order button-primary",
+    class: "button save_order wp-element-button",
     name: "save",
     value: "Create"
-  }, buttonText), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)))));
+  }, buttonText, " the order"), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)))));
 };
 
 
@@ -1151,6 +1171,7 @@ const ProductPanel = props => {
   }, [props === null || props === void 0 ? void 0 : (_props$lineItem2 = props.lineItem) === null || _props$lineItem2 === void 0 ? void 0 : _props$lineItem2.id]);
   function handleFetchedProducts(products) {
     setProducts(products);
+    props.setIsDisabled(false); // activate the order form submit button
 
     /**
      * When editing an existing order
@@ -1205,6 +1226,8 @@ const ProductPanel = props => {
     class: "form-wrap"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Product"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    class: "form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: "product"
   }, "Product", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
@@ -1221,12 +1244,14 @@ const ProductPanel = props => {
     onChange: handleProductChange,
     setProducts: handleFetchedProducts,
     products: products
-  })), (props === null || props === void 0 ? void 0 : (_props$lineItem4 = props.lineItem) === null || _props$lineItem4 === void 0 ? void 0 : _props$lineItem4.id) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  })))), (props === null || props === void 0 ? void 0 : (_props$lineItem4 = props.lineItem) === null || _props$lineItem4 === void 0 ? void 0 : _props$lineItem4.id) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: "line_item_id",
     value: props.lineItem.id
   }), !!price && products.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    class: "form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: "price"
   }, "Price"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
@@ -1239,8 +1264,10 @@ const ProductPanel = props => {
     type: "hidden",
     name: "price",
     value: price
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    class: "form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: "quantity"
   }, "Quantity", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
@@ -1261,8 +1288,10 @@ const ProductPanel = props => {
     type: "hidden",
     name: "quantity",
     value: quantity
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    class: "form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: "total"
   }, "Total"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
@@ -1276,7 +1305,7 @@ const ProductPanel = props => {
     type: "hidden",
     name: "total",
     value: total
-  })))));
+  })))))));
 };
 
 
@@ -1319,9 +1348,15 @@ __webpack_require__.r(__webpack_exports__);
 const ProductSelector = props => {
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [productId, setProductId] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setIsDisabled(props.disabled);
   }, [props.disabled]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (productId) {
+      setProductId(props.productId);
+    }
+  }, [props === null || props === void 0 ? void 0 : props.productId]);
   function setDisabled(disabled) {
     if (!props.disabled) {
       setIsDisabled(disabled);
@@ -1331,6 +1366,7 @@ const ProductSelector = props => {
     try {
       setIsLoading(true);
       setDisabled(true);
+      setProductId(null);
       _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().createNonceMiddleware(props.nonce));
       const result = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
         path: `${props.apiPath}/${props.groupId}`,
@@ -1358,7 +1394,7 @@ const ProductSelector = props => {
     disabled: isDisabled,
     required: true,
     onChange: props.onChange,
-    value: props === null || props === void 0 ? void 0 : props.productId
+    value: productId
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
     selected: true,
     disabled: true,
