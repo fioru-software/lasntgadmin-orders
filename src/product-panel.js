@@ -29,6 +29,7 @@ const ProductPanel = props => {
   function handleFetchedProducts( products ) {
 
     setProducts(products);
+    props.setIsDisabled(false); // activate the order form submit button
 
     /**
      * When editing an existing order
@@ -86,29 +87,45 @@ const ProductPanel = props => {
       <div class="form-wrap">
         <h3>Product</h3>
         <div class="form-field">
-          <label for="product">Product<span class="required"> *</span></label>
-          <ProductSelector id="product" name="product" disabled={ !! props?.lineItem?.id } groupId={ props.groupId } productId={ productId } apiPath={ props.apiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductChange } setProducts={ handleFetchedProducts } products={ products } />
+          <fieldset>
+            <p class="form-row">
+              <label for="product">Product<span class="required"> *</span></label>
+              <ProductSelector id="product" name="product" disabled={ !! props?.lineItem?.id } groupId={ props.groupId } productId={ productId } apiPath={ props.apiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductChange } setProducts={ handleFetchedProducts } products={ products } />
+            </p>
+          </fieldset>
         </div>
         { props?.lineItem?.id && <input type="hidden" name="line_item_id" value={ props.lineItem.id } /> }
 
         { !!price && products.length > 0 && 
         <>
           <div class="form-field">
-            <label for="price">Price</label>
-            <input type="number" id="price" disabled placeholder="0" value={ price } />
-            <input type="hidden" name="price" value={ price } />
+            <fieldset>
+              <p class="form-row">
+                <label for="price">Price</label>
+                <input type="number" id="price" disabled placeholder="0" value={ price } />
+                <input type="hidden" name="price" value={ price } />
+              </p>
+            </fieldset>
           </div>
 
           <div class="form-field">
-            <label for="quantity">Quantity<span class="required"> *</span></label>
-            <input type="number" id="quantity" disabled={ !! props?.lineItem?.id } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantityChange } value={ quantity } required />
-            <input type="hidden" name="quantity" value={ quantity } />
+            <fieldset>
+              <p class="form-row">
+                <label for="quantity">Quantity<span class="required"> *</span></label>
+                <input type="number" id="quantity" disabled={ !! props?.lineItem?.id } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantityChange } value={ quantity } required />
+                <input type="hidden" name="quantity" value={ quantity } />
+              </p>
+            </fieldset>
           </div>
 
           <div class="form-field">
-            <label for="total">Total</label>
-            <input type="number" id="total" type="number" disabled placeholder="0" value={ total } />
-            <input type="hidden" name="total" value={ total } />
+            <fieldset>
+              <p class="form-row">
+                <label for="total">Total</label>
+                <input type="number" id="total" type="number" disabled placeholder="0" value={ total } />
+                <input type="hidden" name="total" value={ total } />
+              </p>
+            </fieldset>
           </div>
         </>
         }

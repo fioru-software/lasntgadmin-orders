@@ -19,10 +19,17 @@ const ProductSelector = props => {
 
   const [ isLoading, setIsLoading ] = useState(true);
   const [ isDisabled, setIsDisabled ] = useState(false);
+  const [ productId, setProductId ] = useState(null);
 
   useEffect( () => {
       setIsDisabled( props.disabled );
   }, [ props.disabled ]);
+
+  useEffect( () => {
+    if(productId) {
+      setProductId(props.productId);
+    }
+  }, [props?.productId]);
 
   function setDisabled(disabled) {
     if( ! props.disabled ) {
@@ -34,6 +41,7 @@ const ProductSelector = props => {
     try {
       setIsLoading(true);
       setDisabled(true);
+      setProductId(null);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       const result = await apiFetch( {
         path: `${props.apiPath}/${props.groupId}`,
@@ -60,7 +68,7 @@ const ProductSelector = props => {
   return (
     <>
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ props?.productId }>
+      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ productId } >
         <option selected disabled value="">Please select</option>
         { props.products.map( (product) => {
           return <option key={ product.id.toString() } data-stock={ product.stock_quantity } data-spaces={ calculateAvailableSpaces( product.stock_quantity, findGroupQuota( props.groupId, findGroupQuotas( product.meta_data ) ) ) } data-price={ product.price } value={ product.id }>{ product.name }</option>

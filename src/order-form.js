@@ -14,7 +14,7 @@ const OrderForm = props => {
   const [ groupId, setGroupId ] = useState(null);
   const [ lineItem, setLineItem ] = useState({});
   const [ isLoading, setIsLoading ] = useState(false);
-  const [ isDisabled, setIsDisabled ] = useState(false);
+  const [ isDisabled, setIsDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create");
 
@@ -75,20 +75,27 @@ const OrderForm = props => {
   useEffect( () => {
   }, [ props?.userMeta]);
 
+  /**
+   * @deprecated
+   */
+  function parseBillingData(formData) {
+    return {
+      first_name: formData.get('first_name'),
+      last_name: formData.get('last_name'),
+      address_1: formData.get('address_1'),
+      address_2: formData.get('address_2'),
+      city: formData.get('city'),
+      state: formData.get('state'),
+      postcode: formData.get('postcode'),
+      country: formData.get('country'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+    };
+  }
+
   function parseFormData(formData) {
     const body = {
-      billing: {
-        first_name: formData.get('first_name'),
-        last_name: formData.get('last_name'),
-        address_1: formData.get('address_1'),
-        address_2: formData.get('address_2'),
-        city: formData.get('city'),
-        state: formData.get('state'),
-        postcode: formData.get('postcode'),
-        country: formData.get('country'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-      },
+      billing: {},
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
@@ -148,9 +155,9 @@ const OrderForm = props => {
       );
       setNotice({
         status: 'success',
-        message: props?.status === 'auto-draft' ? 'Order created. Please wait to be redirected...' : 'Please wait to be redirected...'
+        message: 'Updated order. Redirecting to attendees tab...'
       });
-      document.location.assign(  method === 'POST' ? `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` : '/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=order' );
+      document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` ); 
     } catch (e) {
       setNotice({
         status: 'error',
@@ -162,15 +169,12 @@ const OrderForm = props => {
     }
   }
 
-  return (
-    <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
-
-      <input type="hidden" name="email" value={ props.order.billing.email || props.user.data.user_email } />
-      <input type="hidden" name="currency" value={ props.order.currency || props.currency } />
-      <input type="hidden" name="customer_id" value={ props.order.customer_id || props.user.ID } />
-
-      <div id="order_data" class="panel woocommerce-order-data">
-
+  /**
+   * @deprecated
+   */
+  function renderPersonalFormInputs() {
+    return (
+      <>
         <div class="form-wrap">
           <h3>Personal</h3>
           <div class="form-field">
@@ -191,29 +195,49 @@ const OrderForm = props => {
           <h3>Address</h3>
           <BillingAddress order={ props.order } userMeta={ props.userMeta } />
         </div>
+      </>
+    );
+  }
+
+  return (
+    <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
+
+      <input type="hidden" name="email" value={ props.order.billing.email || props.user.data.user_email } />
+      <input type="hidden" name="currency" value={ props.order.currency || props.currency } />
+      <input type="hidden" name="customer_id" value={ props.order.customer_id || props.user.ID } />
+
+      <div id="order_data" class="panel woocommerce-order-data">
 
         <div class="form-wrap">
 
           <h3>Order</h3>
 
           <div class="form-field">
-            <label for="order_status">Status<span class="required"> *</span></label>
-            <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+            <fieldset>
+              <p class="form-row">
+                <label for="order_status">Status<span class="required"> *</span></label>
+                <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+              </p>
+            </fieldset>
           </div>
 
           <div class="form-field">
-            <label for="order_group">Order group<span class="required"> *</span></label>
-            <GroupSelector groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
+            <fieldset>
+              <p class="form-row">
+                <label for="order_group">Order group<span class="required"> *</span></label>
+                <GroupSelector groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
+              </p>
+            </fieldset>
           </div>
 
         </div>
 
-        { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } groupId={ groupId } setStatus={ setStatus } /></> }
+        { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } setIsDisabled={ setIsDisabled } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } groupId={ groupId } setStatus={ setStatus } /></> }
 
         <div class="form-wrap">
           <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ isDisabled } type="submit" class="button save_order button-primary" name="save" value="Create">{ buttonText }</button>
+          <button disabled={ isDisabled } type="submit" class="button save_order wp-element-button" name="save" value="Create">{ buttonText } the order</button>
           { isLoading && <Spinner/> }
           </div>
         </div>

@@ -11,30 +11,52 @@ use Lasntg\Admin\Orders\{
 use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
-use WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query;
-
-use function wc_get_order_statuses;
+use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Order_Item_Product;
 
 /**
  * Order Utility Class
  */
 class OrderUtils {
 
-	public static function add_filters() {
+	public static function init() {
+		self::add_filters();
+		self::add_actions();
+	}
+
+	private static function add_filters() {
 		add_filter( 'wc_order_statuses', [ self::class, 'order_statuses' ] );
 		add_filter( 'woocommerce_register_shop_order_post_statuses', [ self::class, 'register_shop_order_post_statuses' ] );
 		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
 		add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
 		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
+		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
 	}
 
-	public static function add_actions() {
+	private static function add_actions() {
 		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 
-		add_action( 'woocommerce_rest_insert_shop_order_object', [ self::class, 'insert_shop_order_meta' ], 10, 2 );
+		// @deprecated
+		// add_action( 'woocommerce_rest_insert_shop_order_object', [ self::class, 'insert_shop_order_meta' ], 10, 2 );
 
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
+	}
+
+	/**
+	 * Handle a custom 'customvar' query var to get orders with the 'customvar' meta.
+	 *
+	 * @param array $query - Args for WP_Query.
+	 * @param array $query_vars - Query vars from WC_Order_Query.
+	 * @return array modified $query
+	 */
+	public static function handle_filter_orders_by_funding_source( $query, $query_vars ) {
+		if ( ! empty( $query_vars['funding_source'] ) ) {
+			$query['meta_query'][] = array(
+				'key'   => 'funding_source',
+				'value' => esc_attr( $query_vars['funding_source'] ),
+			);
+		}
+		return $query;
 	}
 
 	/**
@@ -59,6 +81,7 @@ class OrderUtils {
 	/**
 	 * Update user meta when order is created
 	 *
+	 * @deprecated
 	 * @see https://developer.wordpress.org/reference/classes/wp_rest_request/
 	 */
 	public static function insert_shop_order_meta( WC_Order $order, WP_REST_Request $req ) {
@@ -179,22 +202,19 @@ class OrderUtils {
 		return $order_data;
 	}
 
-	/**
-	 * @todo param should rather be WC_Order
-	 */
-	public static function get_product_id( int $order_id ): int {
-		$order   = wc_get_order( $order_id );
-		$items   = $order->get_items();
-		$product = reset( $items );
+	public static function get_product( WC_Order $order ): WC_Order_Item_Product {
+		$items = $order->get_items();
+		return reset( $items );
+	}
+
+	public static function get_product_id( WC_Order $order ): int {
+		$product = self::get_product( $order );
 		return $product->get_product_id();
 	}
 
-	/**
-	 * @todo param should rather be WC_Order's
-	 */
 	public static function get_product_ids( array $order_ids ): array {
 		$product_ids = array_map(
-			fn( $order_id ) => self::get_product_id( $order_id ),
+			fn( $order_id ) => self::get_product_id( wc_get_order( $order_id ) ),
 			$order_ids
 		);
 		return $product_ids;
