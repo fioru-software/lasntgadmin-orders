@@ -3,12 +3,21 @@
 namespace Lasntg\Admin\Orders;
 
 use Lasntg\Admin\Orders\PluginUtils;
+use Lasntg\Admin\Products\ProductUtils;
 
-use WC_Payment_Gateway, WC_Payment_Gateways;
+use Lasntg\Admin\PaymentGateway\GrantFunded\{
+	PluginUtils as GrantFundedPluginUtils
+};
+
+use WC_Payment_Gateway, WC_Payment_Gateways, WC_Product;
 
 class PaymentUtils {
 
-	const TRANSIENT_NAME = 'lasntgadmin_orders_payment_result_transient';
+	const TRANSIENT_NAME          = 'lasntgadmin_orders_payment_result_transient';
+	const SUPPORTED_GATEWAY_SLUGS = [
+		'woocommerce_gateway_purchase_order',
+		'lasntgadmin_grant_funded_payment_gateway',
+	];
 
 	public static function save_notices( array $notices ) {
 		if ( $notices ) {
@@ -25,13 +34,18 @@ class PaymentUtils {
 		return $payment_gateways[ $gateway_id ];
 	}
 
-	public static function get_supported_admin_payment_gateways(): array {
-		$supported = [
-			'woocommerce_gateway_purchase_order',
-			'lasntgadmin_grant_funded_payment_gateway',
-		];
-		$gateways  = ( WC_Payment_Gateways::instance() )->get_available_payment_gateways();
-		return array_filter( $gateways, fn( $gateway ) => in_array( $gateway->id, $supported ) );
+	public static function get_supported_admin_payment_gateways( WC_Product $product ): array {
+		return array_filter(
+			( WC_Payment_Gateways::instance() )->get_available_payment_gateways(),
+			function( $gateway ) use ( $product ) {
+				if ( in_array( $gateway->id, self::SUPPORTED_GATEWAY_SLUGS ) ) {
+					if ( GrantFundedPluginUtils::get_camel_case_name() === $gateway->id ) {
+						return ProductUtils::is_funded( $product );
+					}
+					return true;
+				}
+			}
+		);
 	}
 
 	public static function render_gateway( WC_Payment_Gateway $gateway ) { ?>

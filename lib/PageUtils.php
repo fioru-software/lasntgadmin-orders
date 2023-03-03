@@ -18,6 +18,8 @@ use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout;
 use WC, WC_Session_Handler, WP_Post, WC_Order;
 
+use DateTimeImmutable, IntlDateFormatter;
+
 class PageUtils {
 
 	public static function init() {
@@ -235,6 +237,45 @@ class PageUtils {
 	}
 
 	/**
+	 * @todo Improve payment made UI.
+	 */
+	public static function render_order_paid( WC_Order $order ): void {
+		include_once sprintf( '%s/wp-content/plugins/%s/templates/order-paid.php', rtrim( ABSPATH, '/' ), PluginUtils::get_kebab_case_name() );
+	}
+
+	public static function render_payment_options( WC_Order $order ): void {
+		$product      = OrderUtils::get_product( $order );
+		$gateways     = PaymentUtils::get_supported_admin_payment_gateways( $product );
+		$checkout_url = $order->get_checkout_payment_url( true );
+		$order_key    = parse_str(
+			parse_url(
+				$checkout_url,
+				PHP_URL_QUERY
+			),
+			$query
+		);
+		$order_key    = $query['key'];
+
+		echo wp_kses( "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>", 'post' );
+		echo '<input type="hidden" name="woocommerce_pay" value="1">';
+		echo wp_kses( wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' ), 'post' );
+
+		echo wp_kses( "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>", 'post' );
+		echo '<h3>Payment options</h3>';
+
+		echo '<ul class="wc_payment_methods payment_methods methods">';
+
+		foreach ( $gateways as $gateway ) {
+			PaymentUtils::render_gateway( $gateway );
+		}
+
+		echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >Pay for order</button>';
+
+		echo '</ul>';
+		echo '</div>';
+	}
+
+	/**
 	 * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/class-wc-form-handler.php#L378
 	 * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/class-wc-checkout.php#L1039
 	 */
@@ -242,47 +283,11 @@ class PageUtils {
 		$order = wc_get_order( $post->ID );
 
 		echo "<div class='panel-wrap woocommerce' >";
-
 		if ( ! $order->needs_payment() ) {
-			$date = $order->get_date_paid();
-			echo '<h3>Paid</h3>';
-			echo esc_html( "<strong>payment method</strong>: {$order->get_payment_method_title()}<br/>" );
-			echo esc_html( "<strong>funding source</strong>: {$order->get_meta('funding_source', true)}<br/>" );
-			echo esc_html( "<strong>transaction id</strong>: {$order->get_transaction_id()}<br/>" );
-			echo esc_html( "<strong>total</strong>: {$order->get_currency()} {$order->get_total()}<br/>" );
-			echo esc_html( "<strong>date</strong>: {$date->date_i18n()}<br/>" );
+			self::render_order_paid( $order );
 		} else {
-			$product = OrderUtils::get_product( $order );
-
-			$gateways     = PaymentUtils::get_supported_admin_payment_gateways();
-			$checkout_url = $order->get_checkout_payment_url( true );
-			$order_key    = parse_str(
-				parse_url(
-					$checkout_url,
-					PHP_URL_QUERY
-				),
-				$query
-			);
-			$order_key    = $query['key'];
-
-			echo wp_kses( "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>", 'post' );
-			echo '<input type="hidden" name="woocommerce_pay" value="1">';
-			echo wp_kses( wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' ), 'post' );
-
-			echo wp_kses( "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>", 'post' );
-			echo '<h3>Payment options</h3>';
-
-			echo '<ul class="wc_payment_methods payment_methods methods">';
-
-			foreach ( $gateways as $gateway ) {
-				PaymentUtils::render_gateway( $gateway );
-			}
-
-			echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >Pay for order</button>';
-
-			echo '</ul>';
-			echo '</div>';
-		}//end if
+			self::render_payment_options( $order );
+		}
 
 		echo '</div>';
 	}

@@ -11,7 +11,7 @@ use Lasntg\Admin\Orders\{
 use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
-use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Order_Item_Product;
+use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
 
 /**
  * Order Utility Class
@@ -202,14 +202,14 @@ class OrderUtils {
 		return $order_data;
 	}
 
-	public static function get_product( WC_Order $order ): WC_Order_Item_Product {
+	public static function get_product( WC_Order $order ): WC_Product {
 		$items = $order->get_items();
-		return reset( $items );
+		return reset( $items )->get_product();
 	}
 
 	public static function get_product_id( WC_Order $order ): int {
 		$product = self::get_product( $order );
-		return $product->get_product_id();
+		return $product->get_id();
 	}
 
 	public static function get_product_ids( array $order_ids ): array {
