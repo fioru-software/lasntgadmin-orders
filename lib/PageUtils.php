@@ -46,27 +46,11 @@ class PageUtils {
 		 */
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
 
-		add_action(
-			'completed_shop_order',
-			function() {
-				error_log( '=== completed shop order ===' );
-			}
-		);
-
 		add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
 	}
 
 	private static function add_filters() {
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
-
-		add_filter(
-			'woocommerce_payment_successful_result',
-			function( array $result, int $order_id ) {
-				error_log( '=== payment result ===' );
-			},
-			10,
-			2
-		);
 
 		/**
 		 * @todo refactor globalpay
@@ -100,7 +84,6 @@ class PageUtils {
 	 */
 	public static function show_notices() {
 		$notices = PaymentUtils::get_notices();
-		error_log( print_r( $notices, true ) );
 		if ( isset( $notices['error'] ) ) {
 			$errors = $notices['error'];
 			echo "<div class='notice notice-error is-dismissible'>";
@@ -256,11 +239,11 @@ class PageUtils {
 		);
 		$order_key    = $query['key'];
 
-		echo wp_kses( "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>", 'post' );
+		echo wp_kses( "<input type='hidden' name='_wp_http_referer' value='/checkout/order-pay/{$order->get_id()}/?pay_for_order=true&key=$order_key'>", 'post' );
 		echo '<input type="hidden" name="woocommerce_pay" value="1">';
 		echo wp_kses( wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' ), 'post' );
 
-		echo wp_kses( "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/$post->ID/?pay_for_order=true&key=$order_key'>", 'post' );
+		echo wp_kses( "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/{$order->get_id()}/?pay_for_order=true&key=$order_key'>", 'post' );
 		echo '<h3>Payment options</h3>';
 
 		echo '<ul class="wc_payment_methods payment_methods methods">';
