@@ -346,7 +346,7 @@ class PageUtils {
 			$name,
 			plugins_url( sprintf( '%s/assets/js/lasntgadmin-payments.js', PluginUtils::get_kebab_case_name() ) ),
 			[ 'jquery' ],
-			'1.0.0',
+			'1.3.0',
 			true
 		);
 		wp_enqueue_script( $name );

@@ -107,7 +107,7 @@ jQuery(document).ready(function ($) {
   }
 
   function getSpinnerMarkup() {
-    return `<div class="lasntgadmin-spinner"><img src="http://localhost:8080/wp-admin/images/spinner.gif" alt="loading..."/></div>`;
+    return `<div class="lasntgadmin-spinner"><img src="/wp-admin/images/spinner.gif" alt="loading..."/></div>`;
   }
 
   function removeHiddenInputs() {
