@@ -30,6 +30,8 @@ class OrderUtils {
 		add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
 		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
+		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
+		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
 	}
 
 	private static function add_actions() {
@@ -58,6 +60,32 @@ class OrderUtils {
 		}
 		return $query;
 	}
+
+    /**
+     * Filter order by local authority group
+     */
+    public static function handle_filter_orders_by_group_id( $query, $query_vars ) {
+		if ( ! empty( $query_vars['group_id'] ) ) {
+			$query['meta_query'][] = array(
+				'key'   => 'groups-read',
+				'value' => esc_attr( $query_vars['group_id'] ),
+			);
+		}
+		return $query;
+    }
+
+    /**
+     * Filter order by grant year
+     */
+    public static function handle_filter_orders_by_grant_year( $query, $query_vars ) {
+		if ( ! empty( $query_vars['grant_year'] ) ) {
+			$query['meta_query'][] = array(
+				'key'   => 'grant_year',
+				'value' => esc_attr( $query_vars['grant_year'] ),
+			);
+		}
+		return $query;
+    }
 
 	/**
 	 *
@@ -161,6 +189,7 @@ class OrderUtils {
 				$new_columns['order_product']  = __( 'Product', 'lasntgadmin' );
 				$new_columns['order_quantity'] = __( 'Quantity', 'lasntgadmin' );
 				$new_columns['order_group']    = __( 'Group', 'lasntgadmin' );
+				$new_columns['order_payment_method']    = __( 'Payment Method', 'lasntgadmin' );
 			}
 		}
 		return $new_columns;
@@ -175,6 +204,10 @@ class OrderUtils {
 			$group_id = $order->get_meta( 'groups-read' );
 			$group    = new Groups_Group( $group_id );
 			echo esc_html( $group->name );
+		}
+
+		if ( 'order_payment_method' === $column ) {
+			echo esc_html( $order->get_payment_method_title() );
 		}
 
 		if ( in_array( $column, [ 'order_product', 'order_quantity' ] ) ) {
@@ -219,5 +252,7 @@ class OrderUtils {
 		);
 		return $product_ids;
 	}
+
+
 
 }
