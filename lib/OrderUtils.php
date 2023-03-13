@@ -61,10 +61,10 @@ class OrderUtils {
 		return $query;
 	}
 
-    /**
-     * Filter order by local authority group
-     */
-    public static function handle_filter_orders_by_group_id( $query, $query_vars ) {
+	/**
+	 * Filter order by local authority group
+	 */
+	public static function handle_filter_orders_by_group_id( $query, $query_vars ) {
 		if ( ! empty( $query_vars['group_id'] ) ) {
 			$query['meta_query'][] = array(
 				'key'   => 'groups-read',
@@ -72,12 +72,12 @@ class OrderUtils {
 			);
 		}
 		return $query;
-    }
+	}
 
-    /**
-     * Filter order by grant year
-     */
-    public static function handle_filter_orders_by_grant_year( $query, $query_vars ) {
+	/**
+	 * Filter order by grant year
+	 */
+	public static function handle_filter_orders_by_grant_year( $query, $query_vars ) {
 		if ( ! empty( $query_vars['grant_year'] ) ) {
 			$query['meta_query'][] = array(
 				'key'   => 'grant_year',
@@ -85,7 +85,7 @@ class OrderUtils {
 			);
 		}
 		return $query;
-    }
+	}
 
 	/**
 	 *
@@ -186,10 +186,10 @@ class OrderUtils {
 		foreach ( $columns as $column_name => $column_info ) {
 			$new_columns[ $column_name ] = $column_info;
 			if ( 'order_number' === $column_name ) {
-				$new_columns['order_product']  = __( 'Product', 'lasntgadmin' );
-				$new_columns['order_quantity'] = __( 'Quantity', 'lasntgadmin' );
-				$new_columns['order_group']    = __( 'Group', 'lasntgadmin' );
-				$new_columns['order_payment_method']    = __( 'Payment Method', 'lasntgadmin' );
+				$new_columns['order_product']        = __( 'Product', 'lasntgadmin' );
+				$new_columns['order_quantity']       = __( 'Quantity', 'lasntgadmin' );
+				$new_columns['order_group']          = __( 'Group', 'lasntgadmin' );
+				$new_columns['order_payment_method'] = __( 'Payment Method', 'lasntgadmin' );
 			}
 		}
 		return $new_columns;
