@@ -85,6 +85,7 @@ class PageUtils {
 	public static function show_notices() {
 		$notices = PaymentUtils::get_notices();
 		if ( isset( $notices['error'] ) ) {
+			PaymentUtils::delete_notices();
 			$errors = $notices['error'];
 			echo "<div class='notice notice-error is-dismissible'>";
 			foreach ( $errors as $error ) {

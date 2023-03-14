@@ -29,6 +29,10 @@ class PaymentUtils {
 		return get_transient( self::TRANSIENT_NAME );
 	}
 
+	public static function delete_notices() {
+		delete_transient( self::TRANSIENT_NAME );
+	}
+
 	public static function get_payment_gateway_by_id( string $gateway_id ): WC_Payment_Gateway {
 		$payment_gateways = ( WC_Payment_Gateways::instance() )->get_available_payment_gateways();
 		return $payment_gateways[ $gateway_id ];
