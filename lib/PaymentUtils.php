@@ -21,12 +21,16 @@ class PaymentUtils {
 
 	public static function save_notices( array $notices ) {
 		if ( $notices ) {
-			set_transient( self::TRANSIENT_NAME, $notices, 30 );
+			set_transient( sprintf( '%s_for_user_%d', self::TRANSIENT_NAME, get_current_user_id() ), $notices, 30 );
 		}
 	}
 
 	public static function get_notices() {
-		return get_transient( self::TRANSIENT_NAME );
+		return get_transient( sprintf( '%s_for_user_%d', self::TRANSIENT_NAME, get_current_user_id() ) );
+	}
+
+	public static function delete_notices() {
+		delete_transient( sprintf( '%s_for_user_%d', self::TRANSIENT_NAME, get_current_user_id() ) );
 	}
 
 	public static function get_payment_gateway_by_id( string $gateway_id ): WC_Payment_Gateway {

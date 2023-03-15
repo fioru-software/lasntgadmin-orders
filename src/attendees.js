@@ -94,7 +94,7 @@ const Attendees = props => {
         status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
         meta: {
           'groups-read': parseInt(props.groupId),
-          'attendee_order_ids': props.order.id
+          'order_ids': props.order.id
         },
         acf: Object.assign(
           Object.fromEntries(
