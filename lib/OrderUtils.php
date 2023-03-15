@@ -9,6 +9,7 @@ use Lasntg\Admin\Orders\{
 };
 
 use Lasntg\Admin\Group\GroupUtils;
+use Lasntg\Admin\Attendees\AttendeeUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
@@ -253,6 +254,20 @@ class OrderUtils {
 		return $product_ids;
 	}
 
-
+	public static function get_attendees( WC_Order $order ): array {
+		$attendee_ids = $order->get_meta( 'attendee_ids', true );
+		if ( ! empty( $attendee_ids ) ) {
+			return AttendeeUtils::get_attendee_profiles(
+				get_posts(
+					[
+						'post_type'           => 'attendee',
+						'include'             => $attendee_ids,
+						'ignore_sticky_posts' => true,
+					]
+				)
+			);
+		}
+		return [];
+	}
 
 }
