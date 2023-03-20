@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
+import { Search } from '@woocommerce/components';
 import { TextInput, SelectInput, EmailInput, DateInput, NumberInput, CheckBox } from './acf-inputs';
+import { AttendeeEmployeeIdAutocomplete } from './attendee-employee-id-autocomplete';
 
 const AttendeeFields = props => {
 
@@ -10,6 +12,7 @@ const AttendeeFields = props => {
 
       { props?.attendee?.ID && <input type="hidden" name={ `attendees[${props.index}]['id']` } value={ props.attendee.ID } /> }
       { props?.attendee?.post_status && <input type="hidden" name={ `attendees[${props.index}]['status']` } value={ props.attendee.post_status } /> }
+      <Search type="custom" placeholder="Search for an attendee" autocompleter={ AttendeeEmployeeIdAutocomplete } onChange={ items => console.log(items) } />
       
       { props?.fields.map( field => {
         return (
@@ -17,6 +20,7 @@ const AttendeeFields = props => {
             <fieldset>
               <p class="form-row">
                   <label for={ field.key }>{ field.label }{ !!field.required && <span class="required"> *</span> }</label>
+
 
                   { field.type === 'text' && <TextInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ props?.attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
 
