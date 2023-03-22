@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from '@wordpress/element';
+import { DateTime } from "luxon";
 
 const SelectInput = props => {
 
@@ -62,6 +63,13 @@ const EmailInput = props => {
 };
 
 const DateInput = props => {
+
+  useEffect( () => {
+    if( props.defaultValue) {
+      const dt = DateTime.fromFormat(props.defaultValue, 'dd/MM/yyyy' );
+      dateInput.current.value = dt.toISODate();
+    }
+  }, [ props.defaultValue ]);
 
   const dateInput = useRef(null);
 
