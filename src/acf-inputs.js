@@ -66,7 +66,10 @@ const DateInput = props => {
 
   useEffect( () => {
     if( props.defaultValue) {
-      const dt = DateTime.fromFormat(props.defaultValue, 'dd/MM/yyyy' );
+      let dt = DateTime.fromISO( props.defaultValue );
+      if(dt.invalid) {
+        dt = DateTime.fromFormat(props.defaultValue, 'dd/MM/yyyy' );
+      }
       dateInput.current.value = dt.toISODate();
     }
   }, [ props.defaultValue ]);
