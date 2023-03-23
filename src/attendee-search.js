@@ -63,6 +63,7 @@ const AttendeeSearch = props => {
 				acf_field_value: searchText
 			}
 			: {};
+    apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 		return await apiFetch( {
 			path: addQueryArgs( '/wp/v2/attendee', query )
 		});

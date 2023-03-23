@@ -3,6 +3,13 @@ import { Notice } from '@wordpress/components';
 import { AttendeeSearch } from './attendee-search';
 import { TextInput, SelectInput, EmailInput, DateInput, NumberInput, CheckBox } from './acf-inputs';
 
+/**
+ * @param { string } nonce 
+ * @param { array } fields
+ * @param { object } attendee
+ * @param { number } index
+ * @param { disabled } bool
+ */
 const AttendeeFields = props => {
 
   const [ attendee, setAttendee ] = useState(null);
@@ -34,7 +41,7 @@ const AttendeeFields = props => {
 
                   { field.type === 'text' && field.name !== 'employee_number' && <TextInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
 
-                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch acfFieldName="employee_number" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } /> }
+                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch nonce={ props.nonce } acfFieldName="employee_number" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } /> }
 
                   { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 

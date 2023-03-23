@@ -191,7 +191,7 @@ const Attendees = props => {
           <div id="order_data" class="panel woocommerce-order-data">
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
-                <AttendeeFields fields={ props.fields } attendee={ props.attendees[index] } index={ index } disabled={ isDisabled } />
+                <AttendeeFields fields={ props.fields } attendee={ props.attendees[index] } index={ index } disabled={ isDisabled } nonce={ props.nonce } />
               );
             })}
 
