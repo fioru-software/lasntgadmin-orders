@@ -8,10 +8,12 @@ namespace Lasntg\Admin\Orders;
 use Lasntg\Admin\Products\QuotaUtils;
 
 use wc_order;
+
 /**
  * Handle all Filters and actions for Waiting List
  */
 class WaitingListActionsFilters {
+
 
 	/**
 	 * Add Actions and Filters
@@ -102,6 +104,13 @@ class WaitingListActionsFilters {
 		if ( ! get_current_user_id() ) {
 			echo '<input type="email" id="lasntgadmin-guest-email" class="input-text" placeholder="Your email" /><br/><br/>';
 		}
+
+		echo '<div id="num-attendees">';
+		echo '<label for="lasntgadmin-attendees"><strong>Number of attendees</strong></label><br/>';
+		echo '<input type="number" id="lasntgadmin-attendees" class="input-text" placeholder="Attendees" /><br/><br/>';
+		echo '<input type="hidden" id="lasntgadmin-attendees-checked" value="' . ( $check ? 1 : 0 ) . '" />';
+		echo '</div>';
+
 		$btn_msg = ! $check ? 'Join Waiting list' : 'Remove Waiting list';
 		$html    = '<button class="lasntgadmin-wl-btn button" data-id=' . $product_id . '>' . $btn_msg . '</button>';
 		echo wp_kses_post( $html );
@@ -123,7 +132,17 @@ class WaitingListActionsFilters {
 			);
 			wp_die();
 		}
+		if ( ! isset( $_POST['attendees'] ) ) {
+			wp_send_json(
+				[
+					'status' => 0,
+					'msg'    => __( 'Attendees required', 'lasntgadmin' ),
+				]
+			);
+			wp_die();
+		}
 		$product_id = sanitize_text_field( wp_unslash( $_POST['product_id'] ) );
+		$qty        = sanitize_text_field( wp_unslash( $_POST['attendees'] ) );
 		$confirmed  = isset( $_POST['confirmed'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmed'] ) ) : '';
 		$email      = isset( $_POST['email'] ) ? sanitize_text_field( wp_unslash( $_POST['email'] ) ) : false;
 
@@ -179,7 +198,7 @@ class WaitingListActionsFilters {
 		}//end if
 		QuotaUtils::lasntgadmin_add_group( $order->get_id() );
 		// add product and update status.
-		$order->add_product( wc_get_product( $product_id ), 1 );
+		$order->add_product( wc_get_product( $product_id ), $qty );
 		$order->update_status( 'wc-waiting-list' );
 		$order->save();
 		wp_send_json(
