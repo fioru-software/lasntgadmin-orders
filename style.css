@@ -52,3 +52,16 @@ div#order_data {
     margin: 5px 11px 0px;
     display: inline-block;
 }
+
+.components-radio-control {
+    background: #fff;
+    padding: 5px;
+}
+
+.components-radio-control__input[type=radio] {
+    display:none;
+}
+
+.components-radio-control__option label:hover {
+    cursor: pointer;
+}
