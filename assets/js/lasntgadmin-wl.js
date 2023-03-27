@@ -1,9 +1,14 @@
 jQuery(document).ready(function ($) {
     let confirmed = 0;
+    const num_attendees = $('#num-attendees');
+    const checked = $('#lasntgadmin-attendees-checked');
+    if(num_attendees && checked.val() == 1){
+        num_attendees.hide();
+    }
     $('.lasntgadmin-wl-btn').on('click', () => {
         const _this = $('.lasntgadmin-wl-btn');
         const email_field = $('#lasntgadmin-guest-email');
-        const attendees = $('#lasntgadmin-attendees').val();
+        const attendees = $('#lasntgadmin-attendees');
         const info_div = $('.lasntgadmin-wl-info');
         const product_id = _this.attr('data-id');
         
@@ -11,7 +16,8 @@ jQuery(document).ready(function ($) {
             info_div.html(`<div class="woocommerce-error">Email is required.</div>`);
             return;
         }
-        if(attendees == '' || parseInt(attendees) < 1){
+
+        if(checked.val() == 0 && (attendees.val() == '' || parseInt(attendees.val()) < 1)){
             info_div.html(`<div class="woocommerce-error">Number of attendees is required.</div>`);
             return;
         }
@@ -24,8 +30,8 @@ jQuery(document).ready(function ($) {
                 product_id: product_id,
                 security: lasntgadmin_ws_localize.wl_nonce,
                 confirmed: confirmed,
-                attendees: attendees,
-                email: email_field.length ? email_field.val() : ''
+                email: email_field.length ? email_field.val() : '',
+                attendees: attendees.length ? attendees.val() : ''
             },
             beforeSend: function () {
                 console.log('before_send')
@@ -35,6 +41,8 @@ jQuery(document).ready(function ($) {
                 
                 _this.prop('disabled', false);
                 if (resp.status == 1) {
+                    num_attendees.hide();
+                    checked.val(1)
                     info_div.html(`<div class="woocommerce-info">${resp.msg}</div>`);
 
                     _this.html('Remove Waiting list');
@@ -42,6 +50,8 @@ jQuery(document).ready(function ($) {
                 }
                 //removed from waiting list.
                 else if(resp.status == 2) {
+                    num_attendees.show();
+                    checked.val(0)
                     info_div.html(`<div class="woocommerce-info">${resp.msg}.</div>`);
                     
                     _this.html('Join Waiting list');

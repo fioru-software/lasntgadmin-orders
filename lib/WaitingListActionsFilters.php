@@ -104,8 +104,13 @@ class WaitingListActionsFilters {
 		if ( ! get_current_user_id() ) {
 			echo '<input type="email" id="lasntgadmin-guest-email" class="input-text" placeholder="Your email" /><br/><br/>';
 		}
+
+		echo '<div id="num-attendees">';
 		echo '<label for="lasntgadmin-attendees"><strong>Number of attendees</strong></label><br/>';
 		echo '<input type="number" id="lasntgadmin-attendees" class="input-text" placeholder="Attendees" /><br/><br/>';
+		echo '<input type="hidden" id="lasntgadmin-attendees-checked" value="' . ( $check ? 1 : 0 ) . '" />';
+		echo '</div>';
+
 		$btn_msg = ! $check ? 'Join Waiting list' : 'Remove Waiting list';
 		$html    = '<button class="lasntgadmin-wl-btn button" data-id=' . $product_id . '>' . $btn_msg . '</button>';
 		echo wp_kses_post( $html );
