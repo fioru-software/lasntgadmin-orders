@@ -39,9 +39,13 @@ const AttendeeFields = props => {
                   <label for={ field.key }>{ field.label }{ !!field.required && <span class="required"> *</span> }</label>
 
 
-                  { field.type === 'text' && field.name !== 'employee_number' && <TextInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
+                  { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && <TextInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
 
-                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch nonce={ props.nonce } acfFieldName="employee_number" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } /> }
+                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch nonce={ props.nonce } acfFieldName="employee_number" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } helpText="Enter or search for existing employee numbers" /> }
+
+                  { field.type === 'text' && field.name === 'last_name' && <AttendeeSearch nonce={ props.nonce } acfFieldName="last_name" acfClarifyingFieldName="first_name" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } helpText="Enter or search for existing last names" /> }
+
+                  { field.type === 'text' && field.name === 'first_name' && <AttendeeSearch nonce={ props.nonce } acfFieldName="first_name" acfClarifyingFieldName="last_name" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } helpText="Enter or search for existing first names" /> }
 
                   { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 

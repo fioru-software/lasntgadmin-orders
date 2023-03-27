@@ -51,7 +51,16 @@ const AttendeeSearch = props => {
 	}, [ searchText ]);
 
 	function formatAttendeesIntoOptions( attendees ) {
-		return attendees.map( attendee => ({ label: attendee.acf[props.acfFieldName], value: attendee.acf[props.acfFieldName] }) );
+		return attendees.map( attendee => {
+			const option = {
+				label: attendee.acf[props.acfFieldName],
+				value: attendee.id
+			};
+			if( props?.acfClarifyingFieldName ) {
+				option.label += `, ${attendee.acf[props.acfClarifyingFieldName]}`
+			}
+			return option;
+		});
 	}
 
 	async function fetchAttendees( searchText ) {
@@ -76,13 +85,14 @@ const AttendeeSearch = props => {
 
 	function handleSelect( value ) {
 		textInput.current.value = value;
-		const attendee = attendees.find( attendee => attendee.acf[props.acfFieldName] === value );
+		const attendee = attendees.find( attendee => attendee.id === parseInt(value) );
 		props.handleSelect( attendee );
 		setOptions([]);
 	}
 
   return (
 		<>
+			<p class="description">{ props.helpText }</p>
 			<input type="text" ref={ textInput } onChange={ debouncedHandleInput } />
 			{ isLoading && options.length === 0 && <Spinner/>  }
 			{ ! isLoading && options.length > 0 && <RadioControl options={ options } onChange={ handleSelect } />}
