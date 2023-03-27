@@ -3,11 +3,16 @@ jQuery(document).ready(function ($) {
     $('.lasntgadmin-wl-btn').on('click', () => {
         const _this = $('.lasntgadmin-wl-btn');
         const email_field = $('#lasntgadmin-guest-email');
+        const attendees = $('#lasntgadmin-attendees').val();
         const info_div = $('.lasntgadmin-wl-info');
         const product_id = _this.attr('data-id');
         
         if(email_field.length && email_field.val() == ''){
             info_div.html(`<div class="woocommerce-error">Email is required.</div>`);
+            return;
+        }
+        if(attendees == '' || parseInt(attendees) < 1){
+            info_div.html(`<div class="woocommerce-error">Number of attendees is required.</div>`);
             return;
         }
         $.ajax({
@@ -19,6 +24,7 @@ jQuery(document).ready(function ($) {
                 product_id: product_id,
                 security: lasntgadmin_ws_localize.wl_nonce,
                 confirmed: confirmed,
+                attendees: attendees,
                 email: email_field.length ? email_field.val() : ''
             },
             beforeSend: function () {
