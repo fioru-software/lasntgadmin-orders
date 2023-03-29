@@ -6,6 +6,7 @@ import { Spinner } from '@wordpress/components';
 import { findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from './product-utils';
 
 /**
+ * @param { number } productId
  * @param { number } groupId
  * @param { object } selectedProduct
  * @param { string } apiPath
@@ -44,13 +45,14 @@ const ProductSelector = props => {
       setProductId(null);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       const result = await apiFetch( {
-        path: `${props.apiPath}/${props.groupId}`,
+        //path: `${props.apiPath}/${props.groupId}`,
+        path: `${props.apiPath}`,
         method: 'GET'
       } );
       if( ! result.length ) {
         props.setNotice({
           status: 'error',
-          message: 'No products are available for this group.'
+          message: 'No products are available.'
         });
       }
       props.setProducts(result);

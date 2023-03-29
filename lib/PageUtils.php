@@ -288,7 +288,8 @@ class PageUtils {
 	public static function order_form( WP_Post $post ): string {
 		$order = wc_get_order( $post->ID );
 		$user  = wp_get_current_user();
-
+        $product_id = $_GET['product_id'] ?? null;
+        
 		return sprintf(
 			'<div 
                 id="%s-form" 
@@ -300,6 +301,7 @@ class PageUtils {
                 data-status="%s" 
                 data-order="%s"
                 data-order-id="%d"
+                data-product-id="%d"
                 data-group-id="%s"
                 data-user-id="%d"
                 data-user="%s"
@@ -315,6 +317,7 @@ class PageUtils {
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $post->ID ),
+            esc_attr( (int)$product_id ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
 			esc_attr( $user->ID ),
 			esc_attr( json_encode( $user ) ),

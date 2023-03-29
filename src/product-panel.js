@@ -14,10 +14,12 @@ const ProductPanel = props => {
   const [ spaces, setSpaces ] = useState(0);
   const [ stock, setStock ] = useState(0);
   const [ productId, setProductId ] = useState(null);
+  const [ groupId, setGroupId ] = useState(null);
 
   useEffect( () => {
     setNotice(null);
     setPrice(null);
+    setGroupId(props.groupId);
   }, [ props?.groupId ]);
 
   useEffect( () => {
@@ -95,6 +97,18 @@ const ProductPanel = props => {
           </fieldset>
         </div>
         { props?.lineItem?.id && <input type="hidden" name="line_item_id" value={ props.lineItem.id } /> }
+
+        { productId > 0 && 
+          <div class="form-field">
+            <fieldset>
+              <p class="form-row">
+                <label for="order_group">Order group<span class="required"> *</span></label>
+                <GroupSelector productId={ productId } groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
+              </p>
+            </fieldset>
+          </div> 
+        }
+
 
         { !!price && products.length > 0 && 
         <>

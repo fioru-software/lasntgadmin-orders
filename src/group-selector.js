@@ -4,6 +4,13 @@ import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 
+/**
+ * @param { number } productId
+ * @param { number } groupId
+ * @param { string } apiPath Group API path
+ * @param { string } nonce
+ * @param { function } setGroupId
+ */
 const GroupSelector = props => {
 
   const [groupId, setGroupId] = useState(null);
@@ -24,7 +31,8 @@ const GroupSelector = props => {
       setIsDisabled(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       const groups = await apiFetch( {
-        path: `${props.apiPath}`,
+        // fetch all users groups or filter by product groups
+        path: props.productId ? `${props.apiPath}/${props.productId}` : `${props.apiPath}`,
         method: 'GET'
       } );
       if( ! groups.length ) {

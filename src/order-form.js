@@ -8,10 +8,25 @@ import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
 import { BillingAddress } from './billing-address';
 
+/**
+ * @param { string } nonce
+ * @param { string } groupApiPath
+ * @param { string } orderApiPath
+ * @param { string } productApiPath
+ * @param { string } title 
+ * @param { string } status
+ * @param { object } order
+ * @param { number } orderId
+ * @param { number } productId
+ * @param { number } userId
+ * @param { object } user
+ * @param { object } userMeta
+ * @param { string } currency
+ */
 const OrderForm = props => {
 
   const [ notice, setNotice ] = useState(null);
-  const [ groupId, setGroupId ] = useState(null);
+  const [ productId, setProductId ] = useState(null);
   const [ lineItem, setLineItem ] = useState({});
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isDisabled, setIsDisabled ] = useState(true);
@@ -19,8 +34,10 @@ const OrderForm = props => {
   const [ buttonText, setButtonText ] = useState("Create");
 
   useEffect( () => {
-    setGroupId(props.groupId);
-  }, [props.groupId]);
+    console.log('product id');
+    console.log(props.productId);
+    setProductId( props.productId );
+  }, [ props.productId]);
 
   /**
    * Set initial button text
@@ -212,27 +229,21 @@ const OrderForm = props => {
 
           <h3>Order</h3>
 
-          <div class="form-field">
-            <fieldset>
-              <p class="form-row">
-                <label for="order_status">Status<span class="required"> *</span></label>
-                <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
-              </p>
-            </fieldset>
-          </div>
-
-          <div class="form-field">
-            <fieldset>
-              <p class="form-row">
-                <label for="order_group">Order group<span class="required"> *</span></label>
-                <GroupSelector groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
-              </p>
-            </fieldset>
-          </div>
+          { props.status !== 'auto-draft' &&
+            <div class="form-field">
+              <fieldset>
+                <p class="form-row">
+                  <label for="order_status">Status<span class="required"> *</span></label>
+                  <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+                </p>
+              </fieldset>
+            </div>
+          }
+          
+          <ProductPanel nonce={ props.nonce } setIsDisabled={ setIsDisabled } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } setStatus={ setStatus } />
 
         </div>
 
-        { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } setIsDisabled={ setIsDisabled } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } groupId={ groupId } setStatus={ setStatus } /></> }
 
         <div class="form-wrap">
           <div class="form-field">
