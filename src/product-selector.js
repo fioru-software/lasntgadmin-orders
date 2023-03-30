@@ -3,7 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from './product-utils';
+import { isNull, isUndefined } from "lodash";
 
 /**
  * @param { number } productId
@@ -27,7 +27,7 @@ const ProductSelector = props => {
   }, [ props.disabled ]);
 
   useEffect( () => {
-    if(productId) {
+    if( ! isNull( props?.productId ) && ! isUndefined( props?.productId) ) {
       setProductId(props.productId);
     }
   }, [props?.productId]);
@@ -45,7 +45,6 @@ const ProductSelector = props => {
       setProductId(null);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       const result = await apiFetch( {
-        //path: `${props.apiPath}/${props.groupId}`,
         path: `${props.apiPath}`,
         method: 'GET'
       } );
@@ -55,7 +54,7 @@ const ProductSelector = props => {
           message: 'No products are available.'
         });
       }
-      props.setProducts(result);
+      props.onFetch(result);
     } catch (e) {
       props.setNotice({
         status: 'error',
@@ -65,15 +64,15 @@ const ProductSelector = props => {
     }
     setIsLoading(false);
     setDisabled(false);
-  }, [ props.groupId ]);
+  }, []);
 
   return (
     <>
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ productId } >
+      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ productId } defaultValue={ productId } >
         <option selected disabled value="">Please select</option>
         { props.products.map( (product) => {
-          return <option key={ product.id.toString() } data-stock={ product.stock_quantity } data-spaces={ calculateAvailableSpaces( product.stock_quantity, findGroupQuota( props.groupId, findGroupQuotas( product.meta_data ) ) ) } data-price={ product.price } value={ product.id }>{ product.name }</option>
+          return <option key={ product.id.toString() } value={ product.id }>{ product.name }</option>
         }
         )}
       </select> }

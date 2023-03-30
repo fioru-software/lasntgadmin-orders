@@ -3,10 +3,10 @@ import { useState, useEffect } from '@wordpress/element';
 import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
-import { GroupSelector } from './group-selector';
+import { isNil, isNull, isUndefined } from "lodash";
+
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { BillingAddress } from './billing-address';
 
 /**
  * @param { string } nonce
@@ -26,18 +26,15 @@ import { BillingAddress } from './billing-address';
 const OrderForm = props => {
 
   const [ notice, setNotice ] = useState(null);
-  const [ productId, setProductId ] = useState(null);
-  const [ lineItem, setLineItem ] = useState({});
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isDisabled, setIsDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create");
 
   useEffect( () => {
-    console.log('product id');
-    console.log(props.productId);
-    setProductId( props.productId );
-  }, [ props.productId]);
+    console.log('order form: props.order changed');
+    console.log(props.order);
+  }, [ props?.order ]);
 
   /**
    * Set initial button text
@@ -64,52 +61,6 @@ const OrderForm = props => {
     }
   }, [ status ]);
 
-  /**
-   * Only a single product line item per order
-   */
-  useEffect( () => {
-    setLineItem( props.order.line_items[0] );
-  }, props.order.line_items );
-
-  /**
-   * @todo fetch order via order api instead of injecting as prop
-   * @see https://woocommerce.github.io/woocommerce-rest-api-docs/?php#retrieve-an-order
-   */
-  useEffect( async () => {
-  }, [props?.order?.id]);
-
-  /**
-   * @todo Fetch user and meta via WP REST API
-   * @see https://developer.wordpress.org/rest-api/reference/users/
-   * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/modifying-responses/
-   */
-  useEffect( async () => {
-  }, [props?.user?.id]);
-
-  useEffect( () => {
-  }, [ props?.user]);
-
-  useEffect( () => {
-  }, [ props?.userMeta]);
-
-  /**
-   * @deprecated
-   */
-  function parseBillingData(formData) {
-    return {
-      first_name: formData.get('first_name'),
-      last_name: formData.get('last_name'),
-      address_1: formData.get('address_1'),
-      address_2: formData.get('address_2'),
-      city: formData.get('city'),
-      state: formData.get('state'),
-      postcode: formData.get('postcode'),
-      country: formData.get('country'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-    };
-  }
-
   function parseFormData(formData) {
     const body = {
       billing: {},
@@ -133,8 +84,10 @@ const OrderForm = props => {
 
     /**
      * When editing an existing order
+     * @todo refactor
      */
-    if( lineItem?.order_id ) {
+    if( props?.order?.lineItems[0]?.order_id ) {
+      const lineItem = props.order.lineItems[0];
       body.line_items = [
         {
           ...body.line_items[0],
@@ -186,36 +139,6 @@ const OrderForm = props => {
     }
   }
 
-  /**
-   * @deprecated
-   */
-  function renderPersonalFormInputs() {
-    return (
-      <>
-        <div class="form-wrap">
-          <h3>Personal</h3>
-          <div class="form-field">
-            <label for="first_name">First name<span class="required"> *</span></label>
-            <input type="text" name="first_name" id="first_name" defaultValue={ props.order.billing.first_name || props.userMeta.first_name } required /> 
-          </div>
-          <div class="form-field">
-            <label for="last_name">Last name<span class="required"> *</span></label>
-            <input type="text" name="last_name" id="last_name" defaultValue={ props.order.billing.last_name || props.userMeta.last_name } required /> 
-          </div>
-          <div class="form-field">
-            <label for="phone">Phone<span class="required"> *</span></label>
-            <input type="tel" name="phone" id="phone" defaultValue={ props.order.billing.phone || props.userMeta.billing_phone } required /> 
-          </div>
-        </div>
-
-        <div class="form-wrap">
-          <h3>Address</h3>
-          <BillingAddress order={ props.order } userMeta={ props.userMeta } />
-        </div>
-      </>
-    );
-  }
-
   return (
     <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
 
@@ -240,7 +163,7 @@ const OrderForm = props => {
             </div>
           }
           
-          <ProductPanel nonce={ props.nonce } setIsDisabled={ setIsDisabled } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } setStatus={ setStatus } />
+          <ProductPanel productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setIsDisabled={ setIsDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } />
 
         </div>
 

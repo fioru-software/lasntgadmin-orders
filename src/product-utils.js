@@ -1,4 +1,8 @@
 
+function findProductById( productId, products ) {
+  return products.find( product => product.id === parseInt(productId) );
+}
+
 function findGroupQuotas( metaData ) {
   return metaData.filter( item => {
     return /_quotas_field_[\d]+/.test(item.key);
@@ -34,6 +38,7 @@ function calculateAvailableSpaces( stockQuantity, groupQuota ) {
 }
 
 export {
+  findProductById,
   findGroupQuotas,
   findGroupQuota,
   calculateAvailableSpaces

@@ -317,7 +317,7 @@ class PageUtils {
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $post->ID ),
-            esc_attr( (int)$product_id ),
+            esc_attr( $product_id ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
 			esc_attr( $user->ID ),
 			esc_attr( json_encode( $user ) ),

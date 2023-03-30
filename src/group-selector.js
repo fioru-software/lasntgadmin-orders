@@ -4,12 +4,14 @@ import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 
+import { isNull, isUndefined } from "lodash";
+
 /**
  * @param { number } productId
  * @param { number } groupId
  * @param { string } apiPath Group API path
  * @param { string } nonce
- * @param { function } setGroupId
+ * @param { function } handleGroupSelect
  */
 const GroupSelector = props => {
 
@@ -20,58 +22,46 @@ const GroupSelector = props => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   useEffect(() => {
-    if(props.groupId) {
+    if( ! isUndefined( props.groupsId) ) {
       setGroupId(props.groupId);
     }
-  }, [ props.groupId ]);
+  }, [ props?.groupId ]);
 
   useEffect( async () => {
-    try {
-      setIsLoading(true);
-      setIsDisabled(true);
-      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-      const groups = await apiFetch( {
-        // fetch all users groups or filter by product groups
-        path: props.productId ? `${props.apiPath}/${props.productId}` : `${props.apiPath}`,
-        method: 'GET'
-      } );
-      if( ! groups.length ) {
+    if( ! isUndefined(props.productId) && ! isNull(props.productId) ) {
+      try {
+        setIsLoading(true);
+        setIsDisabled(true);
+        apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+        const groups = await apiFetch( {
+          path: `${props.apiPath}/${props.productId}`,
+          method: 'GET'
+        } );
+        if( ! groups.length ) {
+          setNotice({
+            status: 'warning',
+            message: 'You are not a member of any groups.'
+          });
+        }
+        setGroups(groups);
+        props.onFetch(groups);
+      } catch (e) {
         setNotice({
-          status: 'warning',
-          message: 'You are not a member of any groups.'
+          status: 'error',
+          message: e.message
         });
+        console.error(e);
       }
-      setGroups(groups);
-    } catch (e) {
-      setNotice({
-        status: 'error',
-        message: e.message
-      });
-      console.error(e);
-    }
-    setIsLoading(false);
-
-    /**
-     * Changing group is not allowed when editing an order
-     * as it also impacts which products are available
-     * and since the order already contains line items
-     * this will cause unecessary complexity
-     */
-    if( ! props.groupId ) {
+      setIsLoading(false);
       setIsDisabled(false);
     }
-
-  }, []);
-
-  function handleChange(e) {
-    props.setGroupId(e.target.value);
-  }
+  }, [ props.productId ]);
 
   return (
     <>
       { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ handleChange } value={ groupId } >
+      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ groupId } defaultValue={ groupId }>
         { ! groupId && <option selected disabled value="">Please select</option> }
         { groups.map( (group) => {
           return <option key={ group.group_id.toString() } value={ group.group_id } >{ group.name }</option>
