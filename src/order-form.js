@@ -32,8 +32,6 @@ const OrderForm = props => {
   const [ buttonText, setButtonText ] = useState("Create");
 
   useEffect( () => {
-    console.log('order form: props.order changed');
-    console.log(props.order);
   }, [ props?.order ]);
 
   /**

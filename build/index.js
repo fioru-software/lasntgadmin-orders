@@ -671,9 +671,14 @@ const GroupSelector = props => {
   const [groups, setGroups] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
-  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_3__.isUndefined)(props.groupsId)) {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_3__.isNil)(props.disabled)) {
+      setIsDisabled(props.disabled);
+    }
+  }, [props === null || props === void 0 ? void 0 : props.disabled]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_3__.isUndefined)(props.groupId)) {
       setGroupId(props.groupId);
     }
   }, [props === null || props === void 0 ? void 0 : props.groupId]);
@@ -705,14 +710,14 @@ const GroupSelector = props => {
       setIsLoading(false);
       setIsDisabled(false);
     }
-  }, [props.productId]);
+  }, [props === null || props === void 0 ? void 0 : props.productId]);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
     status: notice.status,
     isDismissable: true,
     onDismiss: () => setNotice(null)
   }, notice.message), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null), !isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
     id: props.id,
-    disabled: isDisabled,
+    disabled: props.disabled,
     required: true,
     onChange: props.onChange,
     value: groupId,
@@ -817,10 +822,7 @@ const OrderForm = props => {
   const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   const [status, setStatus] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const [buttonText, setButtonText] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("Create");
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    console.log('order form: props.order changed');
-    console.log(props.order);
-  }, [props === null || props === void 0 ? void 0 : props.order]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {}, [props === null || props === void 0 ? void 0 : props.order]);
 
   /**
    * Set initial button text
@@ -978,6 +980,34 @@ const OrderForm = props => {
 
 /***/ }),
 
+/***/ "./src/order-utils.js":
+/*!****************************!*\
+  !*** ./src/order-utils.js ***!
+  \****************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "findOrderMetaByKey": function() { return /* binding */ findOrderMetaByKey; },
+/* harmony export */   "getLineItemByProductId": function() { return /* binding */ getLineItemByProductId; },
+/* harmony export */   "isExistingOrder": function() { return /* binding */ isExistingOrder; }
+/* harmony export */ });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+
+function findOrderMetaByKey(key, orderMeta) {
+  return orderMeta.find(item => item.key === key);
+}
+function getLineItemByProductId(productId, order) {
+  return order.line_items.find(item => item.product_id === productId);
+}
+function isExistingOrder(order) {
+  return order.line_items.find(item => (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isNumber)(item === null || item === void 0 ? void 0 : item.product_id));
+}
+
+
+/***/ }),
+
 /***/ "./src/product-panel.js":
 /*!******************************!*\
   !*** ./src/product-panel.js ***!
@@ -997,8 +1027,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _product_selector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./product-selector */ "./src/product-selector.js");
 /* harmony import */ var _group_selector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./group-selector */ "./src/group-selector.js");
 /* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./product-utils */ "./src/product-utils.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./order-utils */ "./src/order-utils.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_7__);
+
 
 
 
@@ -1012,7 +1044,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param { object } order
  */
 const ProductPanel = props => {
-  var _props$lineItem, _props$lineItem2, _props$lineItem3;
+  var _props$lineItem;
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [price, setPrice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [quantity, setQuantity] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
@@ -1023,30 +1055,80 @@ const ProductPanel = props => {
   const [productId, setProductId] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [groupId, setGroupId] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [product, setProduct] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
 
   /**
    *  @see handleProductSelect()
    *  @see handlePreselectedProduct()
    */
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNull)(productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isUndefined)(productId) && (products === null || products === void 0 ? void 0 : products.length) > 0) {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNil)(productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNull)(productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isUndefined)(productId) && (products === null || products === void 0 ? void 0 : products.length) > 0) {
       const product = (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.findProductById)(productId, products);
       reset();
       setProduct(product);
     }
   }, [productId]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNull)(groupId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNull)(product)) {
+      const groupQuota = (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.findGroupQuota)(groupId, (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.findGroupQuotas)(product.meta_data));
+      const availableSpaces = (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.calculateAvailableSpaces)(product.stock_quantity || product.quantity, groupQuota);
+      setSpaces(availableSpaces);
+    }
+  }, [groupId]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNil)(spaces)) {
+      const stock = parseInt(product.stock_quantity);
+      const price = parseInt(product.price);
+      setPrice(price);
+      setStock(stock);
+      if (spaces < 1 && stock > 0) {
+        props.setStatus("waiting-list");
+      } else {
+        props.setStatus(props.order.status);
+      }
+      if (!(0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.isExistingOrder)(props.order)) {
+        if (!stock) {
+          setNotice({
+            status: "error",
+            message: "Out of stock"
+          });
+        } else {
+          setNotice({
+            status: parseInt(spaces) > 0 ? "info" : "warning",
+            message: `${spaces} spaces available.`
+          });
+        }
+      }
+    }
+  }, [spaces]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if ((0,lodash__WEBPACK_IMPORTED_MODULE_7__.isObject)(product) && (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.isExistingOrder)(props.order)) {
+      const lineItem = (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.getLineItemByProductId)(product.id, props.order);
+      setQuantity(lineItem.quantity);
+      setTotal(product.price * lineItem.quantity);
+    }
+  }, [product]);
+  function reset() {
+    setTotal(null);
+    setQuantity(null);
+    setNotice(null);
+    setPrice(null);
+    setStock(null);
+    setGroupId(null);
+  }
 
   /**
    * Given it is a new order and productId has been preselected via URL query product, then product id is changed and new product id set
    * Given it is an existing order and order has a line item with product id, then product id is changed and a new product id is set
    */
   function handlePreselectedProduct(productId) {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNull)(productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isUndefined)(productId)) {
+    productId = parseInt(productId);
+    if (productId) {
       setProductId(productId);
     }
   }
   function handlePreselectedGroup(groupId) {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(groupId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNull)(groupId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isUndefined)(groupId)) {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNil)(groupId)) {
       setGroupId(groupId);
     }
   }
@@ -1064,88 +1146,36 @@ const ProductPanel = props => {
   function handleGroupSelect(e) {
     setGroupId(e.target.value);
   }
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNull)(groupId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNull)(product)) {
-      const groupQuota = (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.findGroupQuota)(groupId, (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.findGroupQuotas)(product.meta_data));
-      const availableSpaces = (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.calculateAvailableSpaces)(product.stock_quantity || product.quantity, groupQuota);
-      setSpaces(availableSpaces);
-    }
-  }, [groupId]);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNull)(spaces) && !(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isUndefined)(spaces)) {
-      const stock = parseInt(product.stock_quantity);
-      const price = parseInt(product.price);
-      setPrice(price);
-      setStock(stock);
-      setQuantity(0);
-      setTotal(0);
-      if (spaces < 1 && stock > 0) {
-        props.setStatus("waiting-list");
-      } else {
-        props.setStatus(props.order.status);
-      }
-      if (!stock) {
-        setNotice({
-          status: "error",
-          message: "Out of stock"
-        });
-      } else {
-        setNotice({
-          status: parseInt(spaces) > 0 ? "info" : "warning",
-          message: `${spaces} spaces available.`
-        });
-      }
-    }
-  }, [spaces]);
-  function reset() {
-    setTotal(null);
-    setQuantity(null);
-    setNotice(null);
-    setPrice(null);
-    setStock(null);
-    setGroupId(null);
-  }
 
   /**
    * @todo add groupUtils for extracting group id
    */
   function handleFetchedGroups(groups) {
-    var _props$order;
-    handlePreselectedGroup(parseInt(props === null || props === void 0 ? void 0 : (_props$order = props.order) === null || _props$order === void 0 ? void 0 : _props$order.meta_data[0].value));
+    const orderMeta = (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.findOrderMetaByKey)('groups-read', props.order.meta_data);
+    handlePreselectedGroup(orderMeta === null || orderMeta === void 0 ? void 0 : orderMeta.value);
+    props.setIsDisabled(false);
   }
   function handleFetchedProducts(products) {
     setProducts(products);
     handlePreselectedProduct(props.productId);
-    props.setIsDisabled(false); // activate the order form submit button
-
-    /**
-     * When editing an existing order
-     * @todo refactor
-     */
-    /*
-    if( props?.lineItem?.product_id ) {
-      const product = products.find( product => props.lineItem.product_id === product.id );
-      const price = parseInt( product.price );
-      setPrice( price );
-      setQuantity( props.lineItem.quantity );
-      setTotal( price*props.lineItem.quantity );
-      setProductId( props.lineItem.id );
+    const orderMeta = (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.findOrderMetaByKey)('groups-read', props.order.meta_data);
+    handlePreselectedGroup(orderMeta === null || orderMeta === void 0 ? void 0 : orderMeta.value);
+    if (!(0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.isExistingOrder)(props.order)) {
+      setIsDisabled(false);
     }
-    */
   }
-
   function handleQuantitySelect(e) {
     const quantity = parseInt(e.target.value);
     setQuantity(quantity);
     setTotal(quantity * price);
   }
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    class: "form-wrap"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Product"), notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
     status: notice.status,
     isDismissable: true,
     onDismiss: () => setNotice(null)
   }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-wrap"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Product"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
     class: "form-row"
@@ -1156,7 +1186,7 @@ const ProductPanel = props => {
   }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_product_selector__WEBPACK_IMPORTED_MODULE_3__.ProductSelector, {
     id: "product",
     name: "product",
-    disabled: !!(props !== null && props !== void 0 && (_props$lineItem = props.lineItem) !== null && _props$lineItem !== void 0 && _props$lineItem.id),
+    disabled: isDisabled,
     groupId: groupId,
     productId: productId,
     apiPath: props.productApiPath,
@@ -1165,7 +1195,7 @@ const ProductPanel = props => {
     onChange: handleProductSelect,
     onFetch: handleFetchedProducts,
     products: products
-  })))), (props === null || props === void 0 ? void 0 : (_props$lineItem2 = props.lineItem) === null || _props$lineItem2 === void 0 ? void 0 : _props$lineItem2.id) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  })))), (props === null || props === void 0 ? void 0 : (_props$lineItem = props.lineItem) === null || _props$lineItem === void 0 ? void 0 : _props$lineItem.id) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: "line_item_id",
     value: props.lineItem.id
@@ -1179,6 +1209,7 @@ const ProductPanel = props => {
     class: "required"
   }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_group_selector__WEBPACK_IMPORTED_MODULE_4__.GroupSelector, {
     productId: productId,
+    disabled: isDisabled,
     groupId: groupId,
     id: "order_group",
     name: "order_group",
@@ -1213,7 +1244,7 @@ const ProductPanel = props => {
   }, " *")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "number",
     id: "quantity",
-    disabled: !!(props !== null && props !== void 0 && (_props$lineItem3 = props.lineItem) !== null && _props$lineItem3 !== void 0 && _props$lineItem3.id),
+    disabled: isDisabled,
     step: "1",
     min: "1",
     max: spaces > 0 ? spaces : stock,
@@ -1287,25 +1318,17 @@ __webpack_require__.r(__webpack_exports__);
  */
 const ProductSelector = props => {
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
-  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [productId, setProductId] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    setIsDisabled(props.disabled);
-  }, [props.disabled]);
+  const [isDisabled, setIsDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_3__.isNull)(props === null || props === void 0 ? void 0 : props.productId) && !(0,lodash__WEBPACK_IMPORTED_MODULE_3__.isUndefined)(props === null || props === void 0 ? void 0 : props.productId)) {
       setProductId(props.productId);
     }
   }, [props === null || props === void 0 ? void 0 : props.productId]);
-  function setDisabled(disabled) {
-    if (!props.disabled) {
-      setIsDisabled(disabled);
-    }
-  }
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(async () => {
     try {
       setIsLoading(true);
-      setDisabled(true);
+      setIsDisabled(true);
       setProductId(null);
       _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().createNonceMiddleware(props.nonce));
       const result = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
@@ -1327,11 +1350,11 @@ const ProductSelector = props => {
       console.error(e);
     }
     setIsLoading(false);
-    setDisabled(false);
+    setIsDisabled(false);
   }, []);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null), !isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
     id: props.id,
-    disabled: isDisabled,
+    disabled: (0,lodash__WEBPACK_IMPORTED_MODULE_3__.isBoolean)(props.disabled) ? props.disabled : isDisabled,
     required: true,
     onChange: props.onChange,
     value: productId,

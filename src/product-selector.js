@@ -3,7 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { isNull, isUndefined } from "lodash";
+import { isBoolean, isNull, isUndefined } from "lodash";
 
 /**
  * @param { number } productId
@@ -19,12 +19,8 @@ import { isNull, isUndefined } from "lodash";
 const ProductSelector = props => {
 
   const [ isLoading, setIsLoading ] = useState(true);
-  const [ isDisabled, setIsDisabled ] = useState(false);
   const [ productId, setProductId ] = useState(null);
-
-  useEffect( () => {
-      setIsDisabled( props.disabled );
-  }, [ props.disabled ]);
+  const [ isDisabled, setIsDisabled ]  = useState(true);
 
   useEffect( () => {
     if( ! isNull( props?.productId ) && ! isUndefined( props?.productId) ) {
@@ -32,16 +28,10 @@ const ProductSelector = props => {
     }
   }, [props?.productId]);
 
-  function setDisabled(disabled) {
-    if( ! props.disabled ) {
-      setIsDisabled(disabled);
-    }
-  }
-
   useEffect( async () => {
     try {
       setIsLoading(true);
-      setDisabled(true);
+      setIsDisabled(true);
       setProductId(null);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       const result = await apiFetch( {
@@ -63,13 +53,13 @@ const ProductSelector = props => {
       console.error(e);
     }
     setIsLoading(false);
-    setDisabled(false);
+    setIsDisabled(false);
   }, []);
 
   return (
     <>
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ productId } defaultValue={ productId } >
+      { !isLoading && <select id={ props.id } disabled={ isBoolean( props.disabled ) ? props.disabled : isDisabled } required onChange={ props.onChange } value={ productId } defaultValue={ productId } >
         <option selected disabled value="">Please select</option>
         { props.products.map( (product) => {
           return <option key={ product.id.toString() } value={ product.id }>{ product.name }</option>

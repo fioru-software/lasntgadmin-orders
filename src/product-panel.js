@@ -6,8 +6,9 @@ import apiFetch from '@wordpress/api-fetch';
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
 import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from './product-utils';
+import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder } from './order-utils';
 
-import { isNil, isNull, isUndefined } from "lodash";
+import { isObject, isNil, isNull, isUndefined } from "lodash";
 
 /**
  * @param { object } order
@@ -24,6 +25,7 @@ const ProductPanel = props => {
   const [ productId, setProductId ] = useState(null);
   const [ groupId, setGroupId ] = useState(null);
   const [ product, setProduct ] = useState(null);
+  const [ isDisabled, setIsDisabled ] = useState(true);
 
   /**
    *  @see handleProductSelect()
@@ -37,18 +39,80 @@ const ProductPanel = props => {
     }
   }, [ productId ]);
 
+  useEffect( () => {
+    if( ! isNull(groupId) && ! isNull(product) ) {
+      const groupQuota = findGroupQuota( 
+        groupId, 
+        findGroupQuotas( product.meta_data ) 
+      ) ;
+      const availableSpaces = calculateAvailableSpaces( 
+        product.stock_quantity || product.quantity, 
+        groupQuota
+      );
+      setSpaces( availableSpaces );
+
+    }
+  }, [ groupId ]);
+
+  useEffect( () => {
+    if( ! isNil(spaces) ) {
+      const stock = parseInt( product.stock_quantity );
+      const price = parseInt( product.price );
+      setPrice( price );
+      setStock( stock );
+
+      if( spaces < 1 && stock > 0 ) {
+        props.setStatus("waiting-list");
+      } else {
+        props.setStatus(props.order.status);
+      }
+
+      if( ! isExistingOrder( props.order ) ) {
+        if( ! stock ) {
+          setNotice({
+            status: "error",
+            message: "Out of stock"
+          });
+        } else {
+          setNotice({
+            status: parseInt(spaces) > 0 ? "info" : "warning",
+            message: `${ spaces} spaces available.`
+          });
+        }
+      }
+    }
+  }, [ spaces ]);
+
+  useEffect( () => {
+    if( isObject(product) && isExistingOrder( props.order ) ) {
+      const lineItem = getLineItemByProductId( product.id, props.order );
+      setQuantity( lineItem.quantity );
+      setTotal( product.price*lineItem.quantity );
+    }
+  }, [ product ]);
+
+  function reset() {
+    setTotal(null);
+    setQuantity(null);
+    setNotice(null);
+    setPrice(null);
+    setStock(null);
+    setGroupId(null);
+  }
+
   /**
    * Given it is a new order and productId has been preselected via URL query product, then product id is changed and new product id set
    * Given it is an existing order and order has a line item with product id, then product id is changed and a new product id is set
    */
   function handlePreselectedProduct( productId ) {
-    if( ! isNil( productId ) && ! isNull( productId ) && ! isUndefined( productId ) ) {
+    productId = parseInt(productId);
+    if( productId ) {
       setProductId( productId );
     }
   }
 
   function handlePreselectedGroup( groupId ) {
-    if( ! isNil( groupId ) && ! isNull( groupId ) && ! isUndefined( groupId ) ) {
+    if( ! isNil( groupId ) ) {
       setGroupId( groupId );
     }
   }
@@ -67,86 +131,27 @@ const ProductPanel = props => {
     setGroupId(e.target.value);
   }
 
-  useEffect( () => {
-    if( ! isNull(groupId) && ! isNull(product) ) {
-      const groupQuota = findGroupQuota( 
-        groupId, 
-        findGroupQuotas( product.meta_data ) 
-      ) ;
-      const availableSpaces = calculateAvailableSpaces( 
-        product.stock_quantity || product.quantity, 
-        groupQuota
-      );
-      setSpaces( availableSpaces );
-
-    }
-  }, [ groupId ]);
-
-  useEffect( () => {
-    if( ! isNull(spaces) && ! isUndefined(spaces) ) {
-      const stock = parseInt( product.stock_quantity );
-      const price = parseInt( product.price );
-      setPrice( price );
-      setStock( stock );
-      setQuantity( 0 );
-      setTotal( 0 );
-
-      if( spaces < 1 && stock > 0 ) {
-        props.setStatus("waiting-list");
-      } else {
-        props.setStatus(props.order.status);
-      }
-
-      if( ! stock ) {
-        setNotice({
-          status: "error",
-          message: "Out of stock"
-        });
-      } else {
-        setNotice({
-          status: parseInt(spaces) > 0 ? "info" : "warning",
-          message: `${ spaces} spaces available.`
-        });
-      }
-    }
-  }, [ spaces ]);
-
-  function reset() {
-    setTotal(null);
-    setQuantity(null);
-    setNotice(null);
-    setPrice(null);
-    setStock(null);
-    setGroupId(null);
-  }
-
   /**
    * @todo add groupUtils for extracting group id
    */
   function handleFetchedGroups( groups ) {
-    handlePreselectedGroup( parseInt( props?.order?.meta_data[0].value ) );
+    const orderMeta = findOrderMetaByKey( 'groups-read', props.order.meta_data );
+    handlePreselectedGroup( orderMeta?.value );
+    props.setIsDisabled(false);
   }
 
   function handleFetchedProducts( products ) {
 
     setProducts(products);
     handlePreselectedProduct( props.productId );
-    props.setIsDisabled(false); // activate the order form submit button
 
-    /**
-     * When editing an existing order
-     * @todo refactor
-     */
-    /*
-    if( props?.lineItem?.product_id ) {
-      const product = products.find( product => props.lineItem.product_id === product.id );
-      const price = parseInt( product.price );
-      setPrice( price );
-      setQuantity( props.lineItem.quantity );
-      setTotal( price*props.lineItem.quantity );
-      setProductId( props.lineItem.id );
+    const orderMeta = findOrderMetaByKey( 'groups-read', props.order.meta_data );
+    handlePreselectedGroup( orderMeta?.value );
+
+    if( ! isExistingOrder( props.order ) ) {
+      setIsDisabled(false);
     }
-    */
+
   }
 
   function handleQuantitySelect(e) {
@@ -157,14 +162,14 @@ const ProductPanel = props => {
 
   return (
     <>
-      { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
       <div class="form-wrap">
         <h3>Product</h3>
+        { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
         <div class="form-field">
           <fieldset>
             <p class="form-row">
               <label for="product">Product<span class="required"> *</span></label>
-              <ProductSelector id="product" name="product" disabled={ !! props?.lineItem?.id } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
+              <ProductSelector id="product" name="product" disabled={ isDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
             </p>
           </fieldset>
         </div>
@@ -175,12 +180,11 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="order_group">Group<span class="required"> *</span></label>
-                <GroupSelector productId={ productId } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
+                <GroupSelector productId={ productId } disabled={ isDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
               </p>
             </fieldset>
           </div> 
         }
-
 
         { !!price && productId > 0 && groupId &&
         <>
@@ -198,7 +202,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="quantity">Quantity<span class="required"> *</span></label>
-                <input type="number" id="quantity" disabled={ !! props?.lineItem?.id } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+                <input type="number" id="quantity" disabled={ isDisabled } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
             </fieldset>
