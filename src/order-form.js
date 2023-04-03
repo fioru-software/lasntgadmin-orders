@@ -7,6 +7,7 @@ import { isNil, isNull, isUndefined } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
+import { isExistingOrder, getLineItemByProductId } from './order-utils';
 
 /**
  * @param { string } nonce
@@ -84,8 +85,8 @@ const OrderForm = props => {
      * When editing an existing order
      * @todo refactor
      */
-    if( props?.order?.lineItems[0]?.order_id ) {
-      const lineItem = props.order.lineItems[0];
+    if( isExistingOrder(props?.order) ) {
+      const lineItem = getLineItemByProductId( body.line_items[0].product_id, props.order);
       body.line_items = [
         {
           ...body.line_items[0],

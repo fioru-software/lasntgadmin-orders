@@ -44,7 +44,7 @@ class PageUtils {
 		/**
 		 * Enqueue admin order component
 		 */
-		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ] );
+		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ], 11 );
 
 		add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
 	}
@@ -286,10 +286,10 @@ class PageUtils {
 	 * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/admin/meta-boxes/views/html-order-items.php
 	 */
 	public static function order_form( WP_Post $post ): string {
-		$order = wc_get_order( $post->ID );
-		$user  = wp_get_current_user();
-        $product_id = $_GET['product_id'] ?? null;
-        
+		$order      = wc_get_order( $post->ID );
+		$user       = wp_get_current_user();
+		$product_id = absint( $_GET['product_id'] ) ?? null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+
 		return sprintf(
 			'<div 
                 id="%s-form" 
@@ -317,7 +317,7 @@ class PageUtils {
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $post->ID ),
-            esc_attr( $product_id ),
+			esc_attr( $product_id ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
 			esc_attr( $user->ID ),
 			esc_attr( json_encode( $user ) ),
@@ -336,6 +336,9 @@ class PageUtils {
 		if ( ! in_array( $hook, [ 'post.php', 'post-new.php' ] ) || 'shop_order' !== $post_type ) {
 			return;
 		}
+
+		wp_deregister_script( 'wc-admin-app' );
+		wp_dequeue_script( 'wc-admin-app' );
 
 		self::enqueue_order_and_attendee_tabs();
 		self::enqueue_payment_tab();
