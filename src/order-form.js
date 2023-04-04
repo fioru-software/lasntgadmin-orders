@@ -3,24 +3,37 @@ import { useState, useEffect } from '@wordpress/element';
 import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
-import { GroupSelector } from './group-selector';
+import { isNil, isNull, isUndefined } from "lodash";
+
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { BillingAddress } from './billing-address';
+import { isExistingOrder, getLineItemByProductId } from './order-utils';
 
+/**
+ * @param { string } nonce
+ * @param { string } groupApiPath
+ * @param { string } orderApiPath
+ * @param { string } productApiPath
+ * @param { string } title 
+ * @param { string } status
+ * @param { object } order
+ * @param { number } orderId
+ * @param { number } productId
+ * @param { number } userId
+ * @param { object } user
+ * @param { object } userMeta
+ * @param { string } currency
+ */
 const OrderForm = props => {
 
   const [ notice, setNotice ] = useState(null);
-  const [ groupId, setGroupId ] = useState(null);
-  const [ lineItem, setLineItem ] = useState({});
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isDisabled, setIsDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create");
 
   useEffect( () => {
-    setGroupId(props.groupId);
-  }, [props.groupId]);
+  }, [ props?.order ]);
 
   /**
    * Set initial button text
@@ -47,52 +60,6 @@ const OrderForm = props => {
     }
   }, [ status ]);
 
-  /**
-   * Only a single product line item per order
-   */
-  useEffect( () => {
-    setLineItem( props.order.line_items[0] );
-  }, props.order.line_items );
-
-  /**
-   * @todo fetch order via order api instead of injecting as prop
-   * @see https://woocommerce.github.io/woocommerce-rest-api-docs/?php#retrieve-an-order
-   */
-  useEffect( async () => {
-  }, [props?.order?.id]);
-
-  /**
-   * @todo Fetch user and meta via WP REST API
-   * @see https://developer.wordpress.org/rest-api/reference/users/
-   * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/modifying-responses/
-   */
-  useEffect( async () => {
-  }, [props?.user?.id]);
-
-  useEffect( () => {
-  }, [ props?.user]);
-
-  useEffect( () => {
-  }, [ props?.userMeta]);
-
-  /**
-   * @deprecated
-   */
-  function parseBillingData(formData) {
-    return {
-      first_name: formData.get('first_name'),
-      last_name: formData.get('last_name'),
-      address_1: formData.get('address_1'),
-      address_2: formData.get('address_2'),
-      city: formData.get('city'),
-      state: formData.get('state'),
-      postcode: formData.get('postcode'),
-      country: formData.get('country'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-    };
-  }
-
   function parseFormData(formData) {
     const body = {
       billing: {},
@@ -116,8 +83,10 @@ const OrderForm = props => {
 
     /**
      * When editing an existing order
+     * @todo refactor
      */
-    if( lineItem?.order_id ) {
+    if( isExistingOrder(props?.order) ) {
+      const lineItem = getLineItemByProductId( body.line_items[0].product_id, props.order);
       body.line_items = [
         {
           ...body.line_items[0],
@@ -169,36 +138,6 @@ const OrderForm = props => {
     }
   }
 
-  /**
-   * @deprecated
-   */
-  function renderPersonalFormInputs() {
-    return (
-      <>
-        <div class="form-wrap">
-          <h3>Personal</h3>
-          <div class="form-field">
-            <label for="first_name">First name<span class="required"> *</span></label>
-            <input type="text" name="first_name" id="first_name" defaultValue={ props.order.billing.first_name || props.userMeta.first_name } required /> 
-          </div>
-          <div class="form-field">
-            <label for="last_name">Last name<span class="required"> *</span></label>
-            <input type="text" name="last_name" id="last_name" defaultValue={ props.order.billing.last_name || props.userMeta.last_name } required /> 
-          </div>
-          <div class="form-field">
-            <label for="phone">Phone<span class="required"> *</span></label>
-            <input type="tel" name="phone" id="phone" defaultValue={ props.order.billing.phone || props.userMeta.billing_phone } required /> 
-          </div>
-        </div>
-
-        <div class="form-wrap">
-          <h3>Address</h3>
-          <BillingAddress order={ props.order } userMeta={ props.userMeta } />
-        </div>
-      </>
-    );
-  }
-
   return (
     <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
 
@@ -212,27 +151,21 @@ const OrderForm = props => {
 
           <h3>Order</h3>
 
-          <div class="form-field">
-            <fieldset>
-              <p class="form-row">
-                <label for="order_status">Status<span class="required"> *</span></label>
-                <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
-              </p>
-            </fieldset>
-          </div>
-
-          <div class="form-field">
-            <fieldset>
-              <p class="form-row">
-                <label for="order_group">Order group<span class="required"> *</span></label>
-                <GroupSelector groupId={ groupId || props.groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } setGroupId={ setGroupId } />
-              </p>
-            </fieldset>
-          </div>
+          { props.status !== 'auto-draft' &&
+            <div class="form-field">
+              <fieldset>
+                <p class="form-row">
+                  <label for="order_status">Status<span class="required"> *</span></label>
+                  <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+                </p>
+              </fieldset>
+            </div>
+          }
+          
+          <ProductPanel productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setIsDisabled={ setIsDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } />
 
         </div>
 
-        { !!groupId && <><hr/><ProductPanel nonce={ props.nonce } setIsDisabled={ setIsDisabled } apiPath={ props.productApiPath } lineItem={ lineItem } order={ props.order } groupId={ groupId } setStatus={ setStatus } /></> }
 
         <div class="form-wrap">
           <div class="form-field">

@@ -3,9 +3,10 @@ import { useState, useEffect } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from './product-utils';
+import { isNil, isBoolean } from "lodash";
 
 /**
+ * @param { number } productId
  * @param { number } groupId
  * @param { object } selectedProduct
  * @param { string } apiPath
@@ -18,42 +19,32 @@ import { findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from './pro
 const ProductSelector = props => {
 
   const [ isLoading, setIsLoading ] = useState(true);
-  const [ isDisabled, setIsDisabled ] = useState(false);
   const [ productId, setProductId ] = useState(null);
+  const [ isDisabled, setIsDisabled ]  = useState(true);
 
   useEffect( () => {
-      setIsDisabled( props.disabled );
-  }, [ props.disabled ]);
-
-  useEffect( () => {
-    if(productId) {
+    if( ! isNil( props?.productId ) ) {
       setProductId(props.productId);
     }
   }, [props?.productId]);
 
-  function setDisabled(disabled) {
-    if( ! props.disabled ) {
-      setIsDisabled(disabled);
-    }
-  }
-
   useEffect( async () => {
     try {
       setIsLoading(true);
-      setDisabled(true);
+      setIsDisabled(true);
       setProductId(null);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       const result = await apiFetch( {
-        path: `${props.apiPath}/${props.groupId}`,
+        path: `${props.apiPath}`,
         method: 'GET'
       } );
       if( ! result.length ) {
         props.setNotice({
           status: 'error',
-          message: 'No products are available for this group.'
+          message: 'No products are available.'
         });
       }
-      props.setProducts(result);
+      props.onFetch(result);
     } catch (e) {
       props.setNotice({
         status: 'error',
@@ -62,16 +53,16 @@ const ProductSelector = props => {
       console.error(e);
     }
     setIsLoading(false);
-    setDisabled(false);
-  }, [ props.groupId ]);
+    setIsDisabled(false);
+  }, []);
 
   return (
     <>
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required onChange={ props.onChange } value={ productId } >
+      { !isLoading && <select id={ props.id } disabled={ isBoolean( props.disabled ) ? props.disabled : isDisabled } required onChange={ props.onChange } value={ productId } defaultValue={ productId } >
         <option selected disabled value="">Please select</option>
         { props.products.map( (product) => {
-          return <option key={ product.id.toString() } data-stock={ product.stock_quantity } data-spaces={ calculateAvailableSpaces( product.stock_quantity, findGroupQuota( props.groupId, findGroupQuotas( product.meta_data ) ) ) } data-price={ product.price } value={ product.id }>{ product.name }</option>
+          return <option key={ product.id.toString() } value={ product.id }>{ product.name }</option>
         }
         )}
       </select> }

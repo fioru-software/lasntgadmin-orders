@@ -5,6 +5,7 @@ import { debounce } from 'lodash';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { RadioControl } from '@wordpress/components';
+import { isNil } from "lodash";
 
 const AttendeeSearch = props => {
 
@@ -35,18 +36,23 @@ const AttendeeSearch = props => {
 		}
 	}, [ attendees ]);
 
-	useEffect( async () => {
-		if(searchText.length > 0) {
-			setIsLoading(true);
-			const res = await fetchAttendees( searchText );
-			setIsLoading(false);
-			if(textInput.current.value) {
-				setAttendees( res );
+	useEffect( () => {
+		if( ! isNil(searchText) ) {
+			if(searchText.length > 0) {
+				async function runFetch() {
+					setIsLoading(true);
+					const res = await fetchAttendees( searchText );
+					setIsLoading(false);
+					if(textInput.current.value) {
+						setAttendees( res );
+					}
+				}
+				runFetch();
+			} else {
+				debouncedHandleInput.cancel();
+				setOptions([]);
+				setIsLoading(false);
 			}
-		} else {
-			debouncedHandleInput.cancel();
-			setOptions([]);
-			setIsLoading(false);
 		}
 	}, [ searchText ]);
 

@@ -70,7 +70,7 @@ const DateInput = props => {
       if(dt.invalid) {
         dt = DateTime.fromFormat(props.defaultValue, 'dd/MM/yyyy' );
       }
-      dateInput.current.value = dt.toISODate();
+      dateInput.current = dt.toISODate();
     }
   }, [ props.defaultValue ]);
 
