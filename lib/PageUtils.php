@@ -288,7 +288,8 @@ class PageUtils {
 	public static function order_form( WP_Post $post ): string {
 		$order      = wc_get_order( $post->ID );
 		$user       = wp_get_current_user();
-		$product_id = absint( $_GET['product_id'] ) ?? null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+		$product_id = null;
+		$product_id = isset( $_GET['product_id'] ) ? absint( $_GET['product_id'] ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 
 		return sprintf(
 			'<div 

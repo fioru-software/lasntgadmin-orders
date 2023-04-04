@@ -3,7 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { isBoolean, isNull, isUndefined } from "lodash";
+import { isNil, isBoolean } from "lodash";
 
 /**
  * @param { number } productId
@@ -23,7 +23,7 @@ const ProductSelector = props => {
   const [ isDisabled, setIsDisabled ]  = useState(true);
 
   useEffect( () => {
-    if( ! isNull( props?.productId ) && ! isUndefined( props?.productId) ) {
+    if( ! isNil( props?.productId ) ) {
       setProductId(props.productId);
     }
   }, [props?.productId]);

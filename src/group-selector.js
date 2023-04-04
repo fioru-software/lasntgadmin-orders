@@ -4,7 +4,7 @@ import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 
-import { isNull, isUndefined, isNil } from "lodash";
+import { isUndefined, isNil } from "lodash";
 
 /**
  * @param { number } productId
@@ -34,7 +34,8 @@ const GroupSelector = props => {
   }, [ props?.groupId ]);
 
   useEffect( async () => {
-    if( ! isUndefined(props.productId) && ! isNull(props.productId) ) {
+    if( ! isNil(props.productId) ) {
+
       try {
         setIsLoading(true);
         setIsDisabled(true);
