@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import { AttendeeSearch } from './attendee-search';
 import { TextInput, SelectInput, EmailInput, DateInput, NumberInput, CheckBox } from './acf-inputs';
+import { isNil } from 'lodash';
 
 /**
  * @param { string } nonce 
@@ -15,7 +16,7 @@ const AttendeeFields = props => {
   const [ attendee, setAttendee ] = useState(null);
 
   useEffect( () => {
-    if( props.attendee ) {
+    if( ! isNil( props.attendee ) ) {
       setAttendee( props.attendee );
     }
   }, [ props.attendee ]);
@@ -41,11 +42,11 @@ const AttendeeFields = props => {
 
                   { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && <TextInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
 
-                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch nonce={ props.nonce } acfFieldName="employee_number" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } helpText="Enter or search for existing employee numbers" /> }
+                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch nonce={ props.nonce } acfFieldName={ field.name } handleSelect={ handleAttendeeSelect } helpText="Enter or search for existing employee numbers" name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 
-                  { field.type === 'text' && field.name === 'last_name' && <AttendeeSearch nonce={ props.nonce } acfFieldName="last_name" acfClarifyingFieldName="first_name" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } helpText="Enter or search for existing last names" /> }
+                  { field.type === 'text' && field.name === 'last_name' && <AttendeeSearch nonce={ props.nonce } acfFieldName={ field.name } acfClarifyingFieldName="first_name" handleSelect={ handleAttendeeSelect } helpText="Enter or search for existing last names" name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }/> }
 
-                  { field.type === 'text' && field.name === 'first_name' && <AttendeeSearch nonce={ props.nonce } acfFieldName="first_name" acfClarifyingFieldName="last_name" handleSelect={ handleAttendeeSelect } defaultValue={ attendee?.acf[field.name] || field.default_value } helpText="Enter or search for existing first names" /> }
+                  { field.type === 'text' && field.name === 'first_name' && <AttendeeSearch nonce={ props.nonce } acfFieldName={ field.name } acfClarifyingFieldName="last_name" handleSelect={ handleAttendeeSelect } helpText="Enter or search for existing first names" name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }/> }
 
                   { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${props.index}][${field.prefix}][${field.name}]` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 

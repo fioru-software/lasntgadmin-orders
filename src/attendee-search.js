@@ -56,6 +56,12 @@ const AttendeeSearch = props => {
 		}
 	}, [ searchText ]);
 
+  function handleBlur(e) {
+    debouncedHandleInput.cancel();
+    setOptions([]);
+    setIsLoading(false);
+  }
+
 	function formatAttendeesIntoOptions( attendees ) {
 		return attendees.map( attendee => {
 			const option = {
@@ -99,7 +105,7 @@ const AttendeeSearch = props => {
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input type="text" ref={ textInput } onChange={ debouncedHandleInput } />
+			<input name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } onChange={ debouncedHandleInput } onBlur={ handleBlur } />
 			{ isLoading && options.length === 0 && <Spinner/>  }
 			{ ! isLoading && options.length > 0 && <RadioControl options={ options } onChange={ handleSelect } />}
 		</>

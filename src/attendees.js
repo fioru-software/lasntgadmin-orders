@@ -7,7 +7,7 @@ import { Spinner } from '@wordpress/components';
 import { AttendeeFields } from './attendee-fields';
 import { removeEmptyEntries } from './form-utils';
 
-import { range } from 'lodash';
+import { range, isNil } from 'lodash';
 
 /**
  * @param { number } quantity
