@@ -83,6 +83,9 @@ const Attendees = props => {
     });
   }
 
+  /**
+   * @todo refactor groups-read, order_ids and product_ids meta
+   */
   function createAttendeesRequestBody( index, form, groupId, orderId ) {
     const formData = new FormData(form);
     const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
@@ -93,8 +96,9 @@ const Attendees = props => {
         id: attendeeId,
         status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
         meta: {
-          'groups-read': parseInt(props.groupId),
-          'order_ids': props.order.id
+          'groups-read': formData.has(`attendees[${index}]['meta']['groups-read']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['groups-read']`).split(',').concat( parseInt(props.groupId) ) ) ] : [ parseInt(props.groupId) ],
+          'order_ids': formData.has(`attendees[${index}]['meta']['order_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['order_ids']`).split(',').concat( props.order.id ) ) ] : [ props.order.id ],
+          'product_ids': formData.has(`attendees[${index}]['meta']['product_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['product_ids']`).split(',').concat( parseInt(props.productId) ) ) ] : [ parseInt(props.productId) ]
         },
         acf: Object.assign(
           Object.fromEntries(

@@ -202,6 +202,7 @@ class PageUtils {
                 data-order="%s"
                 data-group-id="%s"
                 data-attendees="%s"
+                data-product-id="%d"
             ><p>Loading attendees...</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
@@ -216,7 +217,8 @@ class PageUtils {
 			),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) )
+            esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
+            esc_attr( $product_id )
 		);
 	}
 

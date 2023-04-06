@@ -66,7 +66,7 @@ const OrderForm = props => {
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
-      status: formData.get('order_status'),
+      status: formData.get('order_status') || status || 'attendees',
       meta_data: [
         {
           key: 'groups-read',
@@ -126,7 +126,7 @@ const OrderForm = props => {
         status: 'success',
         message: 'Updated order. Redirecting to attendees tab...'
       });
-      document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees` ); 
+      document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees&status=${status}` ); 
     } catch (e) {
       setNotice({
         status: 'error',
