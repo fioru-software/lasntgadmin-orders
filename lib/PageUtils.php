@@ -217,8 +217,8 @@ class PageUtils {
 			),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-            esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
-            esc_attr( $product_id )
+			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
+			esc_attr( $product_id )
 		);
 	}
 
