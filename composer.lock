@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91499227328e7c4d978bdbfa7a106352",
+    "content-hash": "879c3bc3ab5f3aa63ca29257a99f2fb2",
     "packages": [
         {
             "name": "composer/installers",
@@ -529,21 +529,21 @@
         },
         {
             "name": "fioru/lasntgadmin-users",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-users.git",
-                "reference": "d975a12f9efca44e2d3a1a23f715028e0f7a04d2"
+                "reference": "4a0aa192633c596b5413ff6b127e10b8c3d2539a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-users/zipball/d975a12f9efca44e2d3a1a23f715028e0f7a04d2",
-                "reference": "d975a12f9efca44e2d3a1a23f715028e0f7a04d2",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-users/zipball/4a0aa192633c596b5413ff6b127e10b8c3d2539a",
+                "reference": "4a0aa192633c596b5413ff6b127e10b8c3d2539a",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "~2.0",
-                "fioru/lasntgadmin-groups": "^1.0.5"
+                "fioru/lasntgadmin-groups": "^1.2.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
@@ -595,10 +595,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-users/tree/3.2.0",
+                "source": "https://github.com/fioru-software/lasntgadmin-users/tree/3.2.1",
                 "issues": "https://github.com/fioru-software/lasntgadmin-users/issues"
             },
-            "time": "2023-04-04T13:13:23+00:00"
+            "time": "2023-04-06T11:20:17+00:00"
         },
         {
             "name": "symfony/polyfill-uuid",
