@@ -33,34 +33,37 @@ const GroupSelector = props => {
     }
   }, [ props?.groupId ]);
 
-  useEffect( async () => {
+  useEffect( () => {
     if( ! isNil(props.productId) ) {
 
-      try {
-        setIsLoading(true);
-        setIsDisabled(true);
-        apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-        const groups = await apiFetch( {
-          path: `${props.apiPath}/${props.productId}`,
-          method: 'GET'
-        } );
-        if( ! groups.length ) {
+      async function runFetch() {
+        try {
+          setIsLoading(true);
+          setIsDisabled(true);
+          apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+          const groups = await apiFetch( {
+            path: `${props.apiPath}/${props.productId}`,
+            method: 'GET'
+          } );
+          if( ! groups.length ) {
+            setNotice({
+              status: 'warning',
+              message: 'You are not a member of any groups.'
+            });
+          }
+          setGroups(groups);
+          props.onFetch(groups);
+        } catch (e) {
           setNotice({
-            status: 'warning',
-            message: 'You are not a member of any groups.'
+            status: 'error',
+            message: e.message
           });
+          console.error(e);
         }
-        setGroups(groups);
-        props.onFetch(groups);
-      } catch (e) {
-        setNotice({
-          status: 'error',
-          message: e.message
-        });
-        console.error(e);
+        setIsLoading(false);
+        setIsDisabled(false);
       }
-      setIsLoading(false);
-      setIsDisabled(false);
+      runFetch();
     }
   }, [ props?.productId ]);
 

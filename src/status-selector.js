@@ -30,29 +30,32 @@ const StatusSelector = props => {
   /**
    * Fetch list of statuses
    */
-  useEffect( async () => {
-    try {
-      setIsLoading(true);
-      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-      const statuses = await apiFetch( {
-        path: `${props.apiPath}/statuses`,
-        method: 'GET'
-      } );
-      if( ! statuses.length ) {
+  useEffect( () => {
+    async function runFetch() {
+      try {
+        setIsLoading(true);
+        apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+        const statuses = await apiFetch( {
+          path: `${props.apiPath}/statuses`,
+          method: 'GET'
+        } );
+        if( ! statuses.length ) {
+          setNotice({
+            status: 'warning',
+            message: 'Failed fetching order statuses.'
+          });
+        }
+        setStatuses( statuses );
+      } catch (e) {
         setNotice({
-          status: 'warning',
-          message: 'Failed fetching order statuses.'
+          status: 'error',
+          message: e.message
         });
+        console.error(e);
       }
-      setStatuses( statuses );
-    } catch (e) {
-      setNotice({
-        status: 'error',
-        message: e.message
-      });
-      console.error(e);
+      setIsLoading(false);
     }
-    setIsLoading(false);
+    runFetch();
   }, []);
 
   function handleChange(e) {

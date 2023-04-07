@@ -32,7 +32,7 @@ const ProductPanel = props => {
    *  @see handlePreselectedProduct()
    */
   useEffect( () => {
-    if( ! isNil(productId) && ! isNull(productId) && ! isUndefined(productId) && products?.length > 0 ) {
+    if( ! isNil(productId) && products?.length > 0 ) {
       const product = findProductById( productId, products );
       reset();
       setProduct( product );

@@ -165,13 +165,13 @@ class PageUtils {
 	public static function order_menu( WP_Post $post, string $tab ): string {
 		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
 		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>Order</a>";
-		// Only show attendees tab when order has been created.
+		// Show attendees tab when order has been created.
 		if ( ! in_array( $post->post_status, [ 'auto-draft' ] ) ) {
 			$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>Attendees</a>";
 			/**
 			 * Only show payment tab when order and attendees have been created
 			 */
-			if ( ! in_array( $post->post_status, [ 'auto-draft', 'wc-attendees' ] ) ) {
+			if ( ! in_array( $post->post_status, [ 'auto-draft', 'wc-attendees', 'wc-waiting-list' ] ) ) {
 				$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>Payment</a>";
 			}
 		}
@@ -202,6 +202,7 @@ class PageUtils {
                 data-order="%s"
                 data-group-id="%s"
                 data-attendees="%s"
+                data-product-id="%d"
             ><p>Loading attendees...</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
@@ -216,7 +217,8 @@ class PageUtils {
 			),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) )
+			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
+			esc_attr( $product_id )
 		);
 	}
 
