@@ -39,7 +39,7 @@ const GroupSelector = props => {
       async function runFetch() {
         try {
           setIsLoading(true);
-          setIsDisabled(true);
+          props.setIsDisabled(true);
           apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
           const groups = await apiFetch( {
             path: `${props.apiPath}/${props.productId}`,
@@ -61,7 +61,7 @@ const GroupSelector = props => {
           console.error(e);
         }
         setIsLoading(false);
-        setIsDisabled(false);
+        props.setIsDisabled(false);
       }
       runFetch();
     }

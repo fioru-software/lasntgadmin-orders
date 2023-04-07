@@ -61,7 +61,7 @@ const ProductPanel = props => {
       setPrice( price );
       setStock( stock );
 
-      if( spaces < 1 && stock > 0 ) {
+      if( spaces < 1 && stock > 0 && props.order.status === 'auto-draft') {
         props.setStatus("waiting-list");
       } else {
         props.setStatus(props.order.status);
@@ -169,7 +169,7 @@ const ProductPanel = props => {
           <fieldset>
             <p class="form-row">
               <label for="product">Product<span class="required"> *</span></label>
-              <ProductSelector id="product" name="product" disabled={ isDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
+              <ProductSelector id="product" name="product" disabled={ isDisabled } setIsDisabled={ setIsDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
             </p>
           </fieldset>
         </div>
@@ -180,7 +180,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="order_group">Group<span class="required"> *</span></label>
-                <GroupSelector productId={ productId } disabled={ isDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
+                <GroupSelector productId={ productId } disabled={ isDisabled } setIsDisabled={ setIsDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
               </p>
             </fieldset>
           </div> 

@@ -23,6 +23,12 @@ const ProductSelector = props => {
   const [ isDisabled, setIsDisabled ]  = useState(true);
 
   useEffect( () => {
+    if( ! isNil( props.disabled ) ) {
+      setIsDisabled( props.disabled );
+    }
+  }, [props?.disabled]);
+
+  useEffect( () => {
     if( ! isNil( props?.productId ) ) {
       setProductId(props.productId);
     }
@@ -32,7 +38,7 @@ const ProductSelector = props => {
     async function runFetch() {
       try {
         setIsLoading(true);
-        setIsDisabled(true);
+        props.setIsDisabled(true);
         setProductId(null);
         apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
         const result = await apiFetch( {
@@ -54,7 +60,7 @@ const ProductSelector = props => {
         console.error(e);
       }
       setIsLoading(false);
-      setIsDisabled(false);
+      props.setIsDisabled(false);
     }
     runFetch();
   }, []);
