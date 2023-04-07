@@ -1,5 +1,4 @@
 <?php
-
 /**
  * All related Actions and filters for Waiting List
  */
@@ -13,8 +12,8 @@ use wc_order;
 /**
  * Handle all Filters and actions for Waiting List
  */
-class WaitingListActionsFilters
-{
+class WaitingListActionsFilters {
+
 
 
 	/**
@@ -22,16 +21,15 @@ class WaitingListActionsFilters
 	 *
 	 * @return void
 	 */
-	public static function init(): void
-	{
-		add_filter('wc_order_statuses', [self::class, 'custom_order_status']);
-		add_filter('woocommerce_product_meta_start', [self::class, '_form'], 10);
+	public static function init(): void {
+		add_filter( 'wc_order_statuses', [ self::class, 'custom_order_status' ] );
+		add_filter( 'woocommerce_product_meta_start', [ self::class, '_form' ], 10 );
 
-		add_action('init', [self::class, 'register_waitinglist_order_status'], 1);
-		add_action('wp_enqueue_scripts', [self::class, '_enqueue_scripts'], 500);
-		add_action('wp_ajax_lasntgadmin_wl', [self::class, 'create_wl_order']);
-		add_action('wp_ajax_nopriv_lasntgadmin_wl', [self::class, 'create_wl_order']);
-		add_action('user_register', [self::class, 'associate_order_with_new_customer'], 10, 2);
+		add_action( 'init', [ self::class, 'register_waitinglist_order_status' ], 1 );
+		add_action( 'wp_enqueue_scripts', [ self::class, '_enqueue_scripts' ], 500 );
+		add_action( 'wp_ajax_lasntgadmin_wl', [ self::class, 'create_wl_order' ] );
+		add_action( 'wp_ajax_nopriv_lasntgadmin_wl', [ self::class, 'create_wl_order' ] );
+		add_action( 'user_register', [ self::class, 'associate_order_with_new_customer' ], 10, 2 );
 	}
 
 	/**
@@ -39,11 +37,10 @@ class WaitingListActionsFilters
 	 *
 	 * @return void
 	 */
-	public static function _enqueue_scripts(): void
-	{
-		$wl_nonce   = wp_create_nonce('lasntgadmin-wl-nonce');
-		$assets_dir = untrailingslashit(plugin_dir_url(__FILE__)) . '/../assets/';
-		wp_enqueue_script('lasntgadmin-wl-js', ($assets_dir . 'js/lasntgadmin-wl.js'), array('jquery'), '1.4', true);
+	public static function _enqueue_scripts(): void {
+		$wl_nonce   = wp_create_nonce( 'lasntgadmin-wl-nonce' );
+		$assets_dir = untrailingslashit( plugin_dir_url( __FILE__ ) ) . '/../assets/';
+		wp_enqueue_script( 'lasntgadmin-wl-js', ( $assets_dir . 'js/lasntgadmin-wl.js' ), array( 'jquery' ), '1.4', true );
 		wp_localize_script(
 			'lasntgadmin-wl-js',
 			'lasntgadmin_ws_localize',
@@ -59,8 +56,7 @@ class WaitingListActionsFilters
 	 *
 	 * @return void
 	 */
-	public static function register_waitinglist_order_status(): void
-	{
+	public static function register_waitinglist_order_status(): void {
 		register_post_status(
 			'wc-waiting-list',
 			array(
@@ -70,7 +66,7 @@ class WaitingListActionsFilters
 				'show_in_admin_all_list'    => true,
 				'show_in_admin_status_list' => true,
 				/* translators: %s: waiting list count */
-				'label_count'               => _n_noop('Waiting list <span class="count">(%s)</span>', 'Waiting list <span class="count">(%s)</span>', 'lasntgadmin'),
+				'label_count'               => _n_noop( 'Waiting list <span class="count">(%s)</span>', 'Waiting list <span class="count">(%s)</span>', 'lasntgadmin' ),
 			)
 		);
 	}
@@ -81,9 +77,8 @@ class WaitingListActionsFilters
 	 * @param  mixed $order_statuses Order Statuses.
 	 * @return array Order Statuses.
 	 */
-	public static function custom_order_status($order_statuses): array
-	{
-		$order_statuses['wc-waiting-list'] = _x('Waiting list', 'Order status', 'lasntgadmin');
+	public static function custom_order_status( $order_statuses ): array {
+		$order_statuses['wc-waiting-list'] = _x( 'Waiting list', 'Order status', 'lasntgadmin' );
 		return $order_statuses;
 	}
 
@@ -92,35 +87,34 @@ class WaitingListActionsFilters
 	 *
 	 * @return void
 	 */
-	public static function _form(): void
-	{
+	public static function _form(): void {
 		global $product;
 		$product_id = $product->get_id();
-		$orders     = QuotaUtils::get_product_quota($product_id);
+		$orders     = QuotaUtils::get_product_quota( $product_id );
 
-		if ($orders > 0) {
+		if ( $orders > 0 ) {
 			return;
 		}
-		$check = WaitingListUtils::check_already_in_waitinglist($product_id);
+		$check = WaitingListUtils::check_already_in_waitinglist( $product_id );
 
 		echo '<div class="lasntgadmin-wl-info">';
-		if ($check) {
+		if ( $check ) {
 			echo '<div class="woocommerce-info">Already in whitelist.</div>';
 		}
 		echo '</div>';
-		if (!get_current_user_id()) {
+		if ( ! get_current_user_id() ) {
 			echo '<input type="email" id="lasntgadmin-guest-email" class="input-text" placeholder="Your email" /><br/><br/>';
 		}
 
 		echo '<div id="num-attendees">';
 		echo '<label for="lasntgadmin-attendees"><strong>Number of attendees</strong></label><br/>';
 		echo '<input type="number" id="lasntgadmin-attendees" class="input-text" placeholder="Attendees" /><br/><br/>';
-		echo '<input type="hidden" id="lasntgadmin-attendees-checked" value="' . ($check ? 1 : 0) . '" />';
+		echo '<input type="hidden" id="lasntgadmin-attendees-checked" value="' . ( $check ? 1 : 0 ) . '" />';
 		echo '</div>';
 
-		$btn_msg = !$check ? 'Join Waiting list' : 'Remove Waiting list';
+		$btn_msg = ! $check ? 'Join Waiting list' : 'Remove Waiting list';
 		$html    = '<button class="lasntgadmin-wl-btn button" data-id=' . $product_id . '>' . $btn_msg . '</button>';
-		echo wp_kses_post($html);
+		echo wp_kses_post( $html );
 	}
 
 	/**
@@ -128,158 +122,110 @@ class WaitingListActionsFilters
 	 *
 	 * @return void
 	 */
-	public static function create_wl_order(): void
-	{
-		check_ajax_referer('lasntgadmin-wl-nonce', 'security');
-		if (!isset($_POST['product_id'])) {
+	public static function create_wl_order(): void {
+		check_ajax_referer( 'lasntgadmin-wl-nonce', 'security' );
+		if ( ! isset( $_POST['product_id'] ) ) {
 			wp_send_json(
 				[
 					'status' => 0,
-					'msg'    => __('No product id', 'lasntgadmin'),
+					'msg'    => __( 'No product id', 'lasntgadmin' ),
 				]
 			);
 			wp_die();
 		}
-		if (!isset($_POST['attendees'])) {
+		if ( ! isset( $_POST['attendees'] ) ) {
 			wp_send_json(
 				[
 					'status' => 0,
-					'msg'    => __('Attendees required', 'lasntgadmin'),
+					'msg'    => __( 'Attendees required', 'lasntgadmin' ),
 				]
 			);
 			wp_die();
 		}
-		$product_id = sanitize_text_field(wp_unslash($_POST['product_id']));
-		$qty        = sanitize_text_field(wp_unslash($_POST['attendees']));
-		$confirmed  = isset($_POST['confirmed']) ? sanitize_text_field(wp_unslash($_POST['confirmed'])) : '';
-		$email      = isset($_POST['email']) ? sanitize_text_field(wp_unslash($_POST['email'])) : false;
+		$product_id = sanitize_text_field( wp_unslash( $_POST['product_id'] ) );
+		$qty        = sanitize_text_field( wp_unslash( $_POST['attendees'] ) );
+		$confirmed  = isset( $_POST['confirmed'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmed'] ) ) : '';
+		$email      = isset( $_POST['email'] ) ? sanitize_text_field( wp_unslash( $_POST['email'] ) ) : false;
 
-		$check = !$email ? WaitingListUtils::check_already_in_waitinglist($product_id, true) : false;
-		if ($check) {
+		$check = ! $email ? WaitingListUtils::check_already_in_waitinglist( $product_id, true ) : false;
+		if ( $check ) {
 			// product already in the waiting list.
 			wp_send_json(
 				[
 					'status' => 2,
-					'msg'    => __('Removed from waiting list', 'lasntgadmin'),
+					'msg'    => __( 'Removed from waiting list', 'lasntgadmin' ),
 				]
 			);
 			wp_die();
 		}
 		$user = get_current_user_id();
-		if ($email) {
-			$user = get_user_by('email', $email);
+		if ( $email ) {
+			$user = get_user_by( 'email', $email );
 		}
 
 		// associate order by email.
 		// if it's guest.
-		if (!$user) {
+		if ( ! $user ) {
 			$key    = WaitingListUtils::LASNTGADMIN_EMAIL_META_KEY . '_' . $product_id;
-			$exists = WaitingListUtils::check_order_meta($key, $email);
-			if (!$exists) {
+			$exists = WaitingListUtils::check_order_meta( $key, $email );
+			if ( ! $exists ) {
 				$order = wc_create_order();
-				$order->update_meta_data($key, $email);
-			} elseif ($exists && !$confirmed) {
+				$order->update_meta_data( $key, $email );
+			} elseif ( $exists && ! $confirmed ) {
 				wp_send_json(
 					[
 						'status' => -3,
-						'msg'    => __('Already joined waiting list', 'lasntgadmin'),
+						'msg'    => __( 'Already joined waiting list', 'lasntgadmin' ),
 					]
 				);
 				wp_die();
-			} elseif ($exists && $confirmed) {
+			} elseif ( $exists && $confirmed ) {
 				// to remove.
-				WaitingListUtils::remove_guest($email, $product_id);
+				WaitingListUtils::remove_guest( $email, $product_id );
 				wp_send_json(
 					[
 						'status' => 2,
-						'msg'    => __('Removed from waiting list', 'lasntgadmin'),
+						'msg'    => __( 'Removed from waiting list', 'lasntgadmin' ),
 					]
 				);
 				wp_die();
-			} //end if
+			}//end if
 		} else {
 			$order_args =
 				[
 					'customer_id' => (int) get_current_user_id(),
 				];
-			$order      = wc_create_order($order_args);
-		} //end if
-		QuotaUtils::lasntgadmin_add_group($order->get_id());
-		// add product and update status.
-		$order = self::add_info_to_order($order, get_user_by("ID", $user));
-		$order->add_product(wc_get_product($product_id), $qty);
-		$order->update_status('wc-waiting-list');
+			$order      = wc_create_order( $order_args );
+		}//end if
+		QuotaUtils::lasntgadmin_add_group( $order->get_id() );
+		$order->add_product( wc_get_product( $product_id ), $qty );
+		$order->update_status( 'wc-waiting-list' );
 		$order->save();
 		wp_send_json(
 			[
 				'status' => 1,
-				'msg'    => __('Added to Waiting list.', 'lasntgadmin'),
+				'msg'    => __( 'Added to Waiting list.', 'lasntgadmin' ),
 			]
 		);
 		wp_die();
 	}
 
-	private static function add_info_to_order($order, $user)
-	{
-		$order->calculate_totals();
-		$fname          =    get_user_meta($user->ID, 'first_name', true);
-		$lname          =    get_user_meta($user->ID, 'last_name', true);
-		$email          =    $user->user_email;
-		$address_1      =    get_user_meta($user->ID, 'billing_address_1', true);
-		$address_2      =    get_user_meta($user->ID, 'billing_address_1', true);
-		$city           =    get_user_meta($user->ID, 'billing_city', true);
-		$postcode       =    get_user_meta($user->ID, 'billing_postcode', true);
-		$country        =    get_user_meta($user->ID, 'billing_country', true);
-		$state          =    get_user_meta($user->ID, 'billing_state', true);
-		
-		// $country        =    '';
-		$state          =    'Dublin';
-
-		$billing_address    =   array(
-			'first_name' => $fname,
-			'last_name'  => $lname,
-			'email'      => $email,
-			'address_1'  => $address_1,
-			'address_2'  => $address_2,
-			'city'       => $city,
-			'state'      => $state,
-			'postcode'   => $postcode,
-			'country'    => $country,
-		);
-		$address = array(
-			'first_name' => $fname,
-			'last_name'  => $lname,
-			'email'      => $email,
-			'address_1'  => $address_1,
-			'address_2'  => $address_2,
-			'city'       => $city,
-			'state'      => $state,
-			'postcode'   => $postcode,
-			'country'    => $country,
-		);
-
-		$order->set_address($billing_address, 'billing');
-
-		$order->set_address($address, 'shipping');
-		return $order;
-	}
 	/**
 	 * Associate previous waitinglist orders to new customer.
 	 *
 	 * @param  integer $user_id User ID.
 	 * @return void
 	 */
-	public static function associate_order_with_new_customer(int $user_id): void
-	{
-		$user  = get_user_by('id', $user_id);
-		$metas = WaitingListUtils::get_orders_by_meta($user->user_email);
+	public static function associate_order_with_new_customer( int $user_id ): void {
+		$user  = get_user_by( 'id', $user_id );
+		$metas = WaitingListUtils::get_orders_by_meta( $user->user_email );
 
-		if (!$metas) {
+		if ( ! $metas ) {
 			return;
 		}
-		foreach ($metas as $meta) {
-			$order = new wc_order($meta->post_id);
-			$order->set_customer_id($user_id);
+		foreach ( $metas as $meta ) {
+			$order = new wc_order( $meta->post_id );
+			$order->set_customer_id( $user_id );
 			$order->save();
 		}
 	}
