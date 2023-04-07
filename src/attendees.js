@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 
 import { AttendeeFields } from './attendee-fields';
+import { isWaitingOrder, hasAttendees } from './order-utils';
 import { removeEmptyEntries } from './form-utils';
 
 import { range, isNil } from 'lodash';
@@ -33,12 +34,6 @@ const Attendees = props => {
       });
     }
   }, [ props.quantity]);
-
-  useEffect( () => {
-  }, [ props.fields ]);
-
-  useEffect( () => {
-  }, [ props.attendees ]);
 
   /**
    * @param { number } index Attendee index for HTML inputs
@@ -96,9 +91,9 @@ const Attendees = props => {
         id: attendeeId,
         status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
         meta: {
-          'groups-read': formData.has(`attendees[${index}]['meta']['groups-read']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['groups-read']`).split(',').concat( parseInt(props.groupId) ) ) ] : [ parseInt(props.groupId) ],
-          'order_ids': formData.has(`attendees[${index}]['meta']['order_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['order_ids']`).split(',').concat( props.order.id ) ) ] : [ props.order.id ],
-          'product_ids': formData.has(`attendees[${index}]['meta']['product_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['product_ids']`).split(',').concat( parseInt(props.productId) ) ) ] : [ parseInt(props.productId) ]
+          'groups-read': formData.has(`attendees[${index}]['meta']['groups-read']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['groups-read']`).split(',').map(Number).filter(Number).concat( parseInt(props.groupId) ) ) ] : [ parseInt(props.groupId) ],
+          'order_ids': formData.has(`attendees[${index}]['meta']['order_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['order_ids']`).split(',').map(Number).filter(Number).concat( props.order.id ) ) ] : [ props.order.id ],
+          'product_ids': formData.has(`attendees[${index}]['meta']['product_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['product_ids']`).split(',').map(Number).filter(Number).concat( parseInt(props.productId) ) ) ] : [ parseInt(props.productId) ]
         },
         acf: Object.assign(
           Object.fromEntries(
@@ -126,7 +121,7 @@ const Attendees = props => {
   }
 
   function extractAttendeeIdsFromResponse( attendeeResponses ) {
-    return attendeeResponses.map( res => res.body.id );
+    return attendeeResponses.map( res => parseInt(res.body.id) );
   }
 
   /**
@@ -168,15 +163,19 @@ const Attendees = props => {
       });
 
       const orderRes = await apiFetch( 
-        createOrderUpdateRequestBody( props.order.id, 'pending', attendeeIds )
+        createOrderUpdateRequestBody( 
+          props.order.id, 
+          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? props.order.status : 'pending', 
+          attendeeIds 
+        )
       );
 
       setNotice({
         status: 'success',
-        message: 'Updated attendees. Redirecting to payment tab...'
+        message: `Updated attendees. Redirecting to ${ isWaitingOrder( props.order ) ? 'order list' : 'payment tab' }...`
       });
 
-      document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
+      document.location.assign( isWaitingOrder( props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
     } catch (e) {
       setNotice({
         status: 'error',

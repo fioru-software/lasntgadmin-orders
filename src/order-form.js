@@ -30,32 +30,31 @@ const OrderForm = props => {
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isDisabled, setIsDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
-  const [ buttonText, setButtonText ] = useState("Create");
-
-  useEffect( () => {
-  }, [ props?.order ]);
+  const [ buttonText, setButtonText ] = useState("Create the order");
 
   /**
    * Set initial button text
    */
   useEffect( () => {
-    setStatus(props.status);
-    if(props.status !== 'auto-draft') {
-      setButtonText('Update');
+    if( ! isNil( props?.status ) ) {
+      setStatus(props.status);
+      if(props.status !== 'auto-draft') {
+        setButtonText('Update the order');
+      }
     }
-  }, [props.status]);
+  }, [props?.status]);
 
   /**
    * Change button text
    */
   useEffect( () => {
     if( status === 'waiting-list' ) {
-      setButtonText("Add to waiting list");
+      setButtonText("Add order to waiting list");
     } else {
       if(props?.status === 'auto-draft') {
-        setButtonText("Create");
+        setButtonText("Create the order");
       } else {
-        setButtonText("Update");
+        setButtonText("Update the order");
       }
     }
   }, [ status ]);
@@ -170,7 +169,7 @@ const OrderForm = props => {
         <div class="form-wrap">
           <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ isDisabled } type="submit" class="button save_order wp-element-button" name="save" value="Create">{ buttonText } the order</button>
+          <button disabled={ isDisabled } type="submit" class="button save_order wp-element-button" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
           </div>
         </div>
