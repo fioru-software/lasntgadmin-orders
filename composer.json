@@ -39,13 +39,17 @@
         {
             "type": "vcs",
             "url":  "git@github.com:fioru-software/lasntgadmin-products.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@github.com:fioru-software/lasntgadmin-users.git"
         }
     ],
     "require": {
         "composer/installers": "~2.0",
         "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.7",
         "fioru/lasntgadmin-attendees": "^3.1.0",
-        "fioru/lasntgadmin-products": "^5.4.0",
+        "fioru/lasntgadmin-products": "^5.5.0",
         "fioru/lasntgadmin-groups": "^1.1"
     },
     "require-dev": {
