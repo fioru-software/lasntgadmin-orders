@@ -31,6 +31,9 @@ const OrderForm = props => {
   const [ isDisabled, setIsDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create the order");
+  const oldStatus = props.order.status;
+  useEffect( () => {
+  }, [ props?.order ]);
 
   /**
    * Set initial button text
@@ -125,7 +128,24 @@ const OrderForm = props => {
         status: 'success',
         message: 'Updated order. Redirecting to attendees tab...'
       });
-      document.location.assign( `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees&status=${status}` ); 
+      
+      // if the order is being moved from waiting-list to pending do navigate to add attendees.
+      if ('waiting-list' === oldStatus &&
+        status === 'pending'
+      ) {
+        setNotice({
+          status: 'success',
+          message: 'Updated order. Client will be notified.'
+        });
+        setIsLoading(false);
+      } else {
+        setNotice({
+          status: 'success',
+          message: 'Updated order. Redirecting to attendees tab...'
+        });
+        document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
+      }
+      
     } catch (e) {
       setNotice({
         status: 'error',
@@ -136,7 +156,7 @@ const OrderForm = props => {
       setIsDisabled(false);
     }
   }
-
+  
   return (
     <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
 

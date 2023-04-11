@@ -13,11 +13,12 @@ defined( 'ABSPATH' ) || exit;
 
 require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
-use Lasntg\Admin\Orders\{ PageUtils, PluginUtils, OrderUtils, WaitingListActionsFilters };
+use Lasntg\Admin\Orders\{ PageUtils, PluginUtils, OrderUtils, PrivatePaymentUtils, WaitingListActionsFilters };
 
 PageUtils::init();
 OrderUtils::init();
 WaitingListActionsFilters::init();
+PrivatePaymentUtils::init();
 
 /**
  * Plugin activation

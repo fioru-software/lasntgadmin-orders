@@ -15,6 +15,7 @@ use wc_order;
 class WaitingListActionsFilters {
 
 
+
 	/**
 	 * Add Actions and Filters
 	 *
@@ -197,7 +198,6 @@ class WaitingListActionsFilters {
 			$order      = wc_create_order( $order_args );
 		}//end if
 		QuotaUtils::lasntgadmin_add_group( $order->get_id() );
-		// add product and update status.
 		$order->add_product( wc_get_product( $product_id ), $qty );
 		$order->update_status( 'wc-waiting-list' );
 		$order->save();
