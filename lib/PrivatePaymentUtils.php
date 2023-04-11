@@ -16,18 +16,13 @@ class PrivatePaymentUtils {
 		if ( ! is_user_logged_in() || is_admin() ) {
 			return;
 		}
-		$is_private = self::is_private_client();
-		$id         = 'lasntgadmin_grant_funded_payment_gateway';
-		if ( $is_private && isset( $available_gateways[ $id ] ) ) {
-			unset( $available_gateways[ $id ] );
+		$id = 'globalpayments_gpapi';
+		foreach ( $available_gateways as $key => $available_gateway ) {
+			if ( $id !== $key ) {
+				unset( $available_gateways[ $key ] );
+			}
 		}
 
 		return $available_gateways;
-	}
-
-	private static function is_private_client() {
-		$user  = wp_get_current_user();
-		$roles = (array) $user->roles;
-		return in_array( 'customer', $roles ) !== false;
 	}
 }
