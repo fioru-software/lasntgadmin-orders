@@ -13,7 +13,7 @@ class PrivatePaymentUtils {
 	}
 
 	public static function payment_gateway_disable_grant_funded( $available_gateways ) {
-		if ( ! is_user_logged_in() ) {
+		if ( ! is_user_logged_in() || is_admin() ) {
 			return;
 		}
 		$is_private = self::is_private_client();
