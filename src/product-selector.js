@@ -23,37 +23,46 @@ const ProductSelector = props => {
   const [ isDisabled, setIsDisabled ]  = useState(true);
 
   useEffect( () => {
+    if( ! isNil( props.disabled ) ) {
+      setIsDisabled( props.disabled );
+    }
+  }, [props?.disabled]);
+
+  useEffect( () => {
     if( ! isNil( props?.productId ) ) {
       setProductId(props.productId);
     }
   }, [props?.productId]);
 
-  useEffect( async () => {
-    try {
-      setIsLoading(true);
-      setIsDisabled(true);
-      setProductId(null);
-      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-      const result = await apiFetch( {
-        path: `${props.apiPath}`,
-        method: 'GET'
-      } );
-      if( ! result.length ) {
+  useEffect( () => {
+    async function runFetch() {
+      try {
+        setIsLoading(true);
+        props.setIsDisabled(true);
+        setProductId(null);
+        apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+        const result = await apiFetch( {
+          path: `${props.apiPath}`,
+          method: 'GET'
+        } );
+        if( ! result.length ) {
+          props.setNotice({
+            status: 'error',
+            message: 'No products are available.'
+          });
+        }
+        props.onFetch(result);
+      } catch (e) {
         props.setNotice({
           status: 'error',
-          message: 'No products are available.'
+          message: e.message
         });
+        console.error(e);
       }
-      props.onFetch(result);
-    } catch (e) {
-      props.setNotice({
-        status: 'error',
-        message: e.message
-      });
-      console.error(e);
+      setIsLoading(false);
+      props.setIsDisabled(false);
     }
-    setIsLoading(false);
-    setIsDisabled(false);
+    runFetch();
   }, []);
 
   return (

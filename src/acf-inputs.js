@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { DateTime } from "luxon";
+import { isNil } from 'lodash';
 
 const SelectInput = props => {
 
@@ -14,7 +15,7 @@ const SelectInput = props => {
   }
 
   return (
-    <select id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } value={ value } onChange={ handleChange } >
+    <select id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } value={ value } onChange={ handleChange } onFocus={ props?.handleFocus }>
       { ! props.value && ! props.defaultValue && <option disabled value="">Please select</option> }
       { props.children }
     </select> 
@@ -38,7 +39,7 @@ const CheckBox = props => {
   }
 
   return (
-    <input type="checkbox" id={ props.id } name={ props.name} disabled={ props.disabled } required={ props?.required } onClick={ handleClick } checked={ checked } value={ checked } />
+    <input type="checkbox" id={ props.id } name={ props.name} disabled={ props.disabled } required={ props?.required } onClick={ handleClick } checked={ checked } value={ checked } onFocus={ props?.handleFocus }/>
   );
 };
 
@@ -47,7 +48,7 @@ const TextInput = props => {
   const textInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } />
+    <input name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } onFocus={ props?.handleFocus }/>
   );
 
 };
@@ -57,7 +58,7 @@ const EmailInput = props => {
   const emailInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="email" ref={ emailInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$" } readonly={ props?.readonly || false } disabled={ props?.disabled || false } />
+    <input name={ props.name } id={ props.id } type="email" ref={ emailInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$" } readonly={ props?.readonly || false } disabled={ props?.disabled || false } onFocus={ props?.handleFocus } />
   );
 
 };
@@ -65,19 +66,19 @@ const EmailInput = props => {
 const DateInput = props => {
 
   useEffect( () => {
-    if( props.defaultValue) {
+    if( ! isNil( props.defaultValue ) ) {
       let dt = DateTime.fromISO( props.defaultValue );
       if(dt.invalid) {
         dt = DateTime.fromFormat(props.defaultValue, 'dd/MM/yyyy' );
       }
-      dateInput.current = dt.toISODate();
+      dateInput.current.value = dt.toISODate();
     }
   }, [ props.defaultValue ]);
 
   const dateInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="date" ref={ dateInput } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } />
+    <input name={ props.name } id={ props.id } type="date" ref={ dateInput } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } onFocus={ props?.handleFocus } />
   );
 
 };
@@ -87,7 +88,7 @@ const NumberInput = props => {
   const numberInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="number" ref={ numberInput } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^\d+" } readonly={ props?.readonly || false } max={ props?.max } min={ props?.min || 0 } step={ props?.step || 1 } disabled={ props?.disabled || false } onChange={ props?.onChange } value={ props?.value } />
+    <input name={ props.name } id={ props.id } type="number" ref={ numberInput } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^\d+" } readonly={ props?.readonly || false } max={ props?.max } min={ props?.min || 0 } step={ props?.step || 1 } disabled={ props?.disabled || false } onChange={ props?.onChange } value={ props?.value } onFocus={ props?.handleFocus } />
   );
 
 };
@@ -97,7 +98,7 @@ const TelInput = props => {
   const telInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="tel" ref={ telInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "[0-9+\s]+"} readonly={ props?.readonly || false } disabled={ props?.disabled || false } />
+    <input name={ props.name } id={ props.id } type="tel" ref={ telInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "[0-9+\s]+"} readonly={ props?.readonly || false } disabled={ props?.disabled || false } onFocus={ props?.handleFocus } />
   );
 
 };

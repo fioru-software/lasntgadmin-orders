@@ -1,6 +1,6 @@
 
 import { Spinner } from '@wordpress/components';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { debounce } from 'lodash';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -9,7 +9,7 @@ import { isNil } from "lodash";
 
 const AttendeeSearch = props => {
 
-	let debouncedHandleInput = debounce( handleInput, 500);
+	const debouncedHandleInput = useCallback( debounce( handleInput, 500) );
 
   const textInput = useRef(null);
 
@@ -21,10 +21,18 @@ const AttendeeSearch = props => {
   const [ isLoading, setIsLoading ] = useState(false);
 
 	useEffect( () => {
-		if(props.defaultValue) {
+		if( ! isNil( props?.options ) ) {
+			setIsLoading(false);
+			setOptions(props.options);
+		}
+	}, [ props?.options ]);
+	
+
+	useEffect( () => {
+		if( ! isNil( props?.defaultValue ) ) {
 			textInput.current.value = props.defaultValue;
 		}
-	}, [ props.defaultValue ]);
+	}, [ props?.defaultValue ]);
 
 	useEffect( () => {
 		if( attendees?.length ) {
@@ -43,7 +51,7 @@ const AttendeeSearch = props => {
 					setIsLoading(true);
 					const res = await fetchAttendees( searchText );
 					setIsLoading(false);
-					if(textInput.current.value) {
+					if(textInput.current.value && textInput.current.matches(':focus')) {
 						setAttendees( res );
 					}
 				}
@@ -55,6 +63,10 @@ const AttendeeSearch = props => {
 			}
 		}
 	}, [ searchText ]);
+
+  function handleBlur(e) {
+    setIsLoading(false);
+  }
 
 	function formatAttendeesIntoOptions( attendees ) {
 		return attendees.map( attendee => {
@@ -93,13 +105,12 @@ const AttendeeSearch = props => {
 		textInput.current.value = value;
 		const attendee = attendees.find( attendee => attendee.id === parseInt(value) );
 		props.handleSelect( attendee );
-		setOptions([]);
 	}
 
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input type="text" ref={ textInput } onChange={ debouncedHandleInput } />
+			<input name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } onChange={ debouncedHandleInput } onBlur={ handleBlur } onFocus={ props.handleFocus } />
 			{ isLoading && options.length === 0 && <Spinner/>  }
 			{ ! isLoading && options.length > 0 && <RadioControl options={ options } onChange={ handleSelect } />}
 		</>
