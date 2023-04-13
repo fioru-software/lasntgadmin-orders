@@ -14,7 +14,7 @@ class PrivatePaymentUtils {
 
 	public static function payment_gateway_disable_grant_funded( $available_gateways ) {
 		if ( ! is_user_logged_in() || is_admin() ) {
-			return;
+			return $available_gateways;
 		}
 		$id = 'globalpayments_gpapi';
 		foreach ( $available_gateways as $key => $available_gateway ) {
