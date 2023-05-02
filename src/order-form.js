@@ -28,7 +28,7 @@ const OrderForm = props => {
 
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
-  const [ isDisabled, setIsDisabled ] = useState(true);
+  const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create the order");
   const oldStatus = props.order.status;
@@ -115,7 +115,7 @@ const OrderForm = props => {
     try {
       setNotice(null);
       setIsLoading(true);
-      setIsDisabled(true);
+      setSubmitButtonDisabled(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       props.order = await apiFetch( 
         {
@@ -130,8 +130,7 @@ const OrderForm = props => {
       });
       
       // if the order is being moved from waiting-list to pending do navigate to add attendees.
-      if ('waiting-list' === oldStatus &&
-        status === 'pending'
+      if ('waiting-list' === oldStatus && status === 'pending'
       ) {
         setNotice({
           status: 'success',
@@ -141,8 +140,12 @@ const OrderForm = props => {
       } else {
         setNotice({
           status: 'success',
-          message: 'Updated order. Redirecting to attendees tab...'
+          message: 'Updated order. Redirecting...'
         });
+      }
+      if( isExistingOrder( props.order ) ) {
+        document.location.reload();
+      } else {
         document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
       }
       
@@ -153,7 +156,7 @@ const OrderForm = props => {
       });
       console.error(e);
       setIsLoading(false);
-      setIsDisabled(false);
+      setSubmitButtonDisabled(false);
     }
   }
   
@@ -181,7 +184,7 @@ const OrderForm = props => {
             </div>
           }
           
-          <ProductPanel productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setIsDisabled={ setIsDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } />
+          <ProductPanel productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } />
 
         </div>
 
@@ -189,7 +192,7 @@ const OrderForm = props => {
         <div class="form-wrap">
           <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ isDisabled } type="submit" class="button save_order wp-element-button" name="save" value="Create">{ buttonText }</button>
+          <button disabled={ isSubmitButtonDisabled } type="submit" class="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
           </div>
         </div>

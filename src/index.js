@@ -40,6 +40,7 @@ window.addEventListener(
           quantity={ attendeesComponent.dataset.quantity }
           nonce={ attendeesComponent.dataset.nonce } 
           fields={ JSON.parse( attendeesComponent.dataset.fields ) }
+          status={ attendeesComponent.dataset.status }
           order={ JSON.parse(attendeesComponent.dataset.order) }
           groupId={ JSON.parse(attendeesComponent.dataset.groupId) }
           attendees={ JSON.parse(attendeesComponent.dataset.attendees) }
