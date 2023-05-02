@@ -162,7 +162,7 @@ class OrderUtils {
 	}
 
 	public static function get_default_order_status() {
-		return 'processing';
+		return 'attendees';
 	}
 
 	/**
