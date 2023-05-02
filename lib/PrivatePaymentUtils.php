@@ -23,7 +23,7 @@ class PrivatePaymentUtils {
 		}
 
 		// shop orders.
-		$allowed_gateway_ids = [ 'globalpayments_gpapi' ];
+		$allowed_gateway_ids = [ 'globalpayments_gpapi', 'cod' ];
 
 		return array_filter( $available_gateways, fn( $gateway_id ) => in_array( $gateway_id, $allowed_gateway_ids ), ARRAY_FILTER_USE_KEY );
 	}

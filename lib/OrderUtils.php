@@ -7,8 +7,6 @@ use Lasntg\Admin\Orders\{
 	OrderApi,
 	OrderData
 };
-
-use Lasntg\Admin\Group\GroupUtils;
 use Lasntg\Admin\Attendees\AttendeeUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
@@ -42,7 +40,7 @@ class OrderUtils {
 			return;
 		}
 
-		$order = \wc_get_order( $order_id );
+		$order = wc_get_order( $order_id );
 		$order->update_status( 'completed' );
 	}
 	private static function add_actions() {
