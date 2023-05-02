@@ -34,12 +34,14 @@ class OrderUtils {
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
 
-		add_action( 'woocommerce_thankyou', [self::class, 'autocomplete_order'] );
+		add_action( 'woocommerce_thankyou', [ self::class, 'autocomplete_order' ] );
 	}
 
-	public static function autocomplete_order( $order_id ) { 
-	    if ( ! $order_id ) return;
-    
+	public static function autocomplete_order( $order_id ) {
+		if ( ! $order_id ) {
+			return;
+		}
+
 		$order = \wc_get_order( $order_id );
 		$order->update_status( 'completed' );
 	}
