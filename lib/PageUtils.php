@@ -164,7 +164,7 @@ class PageUtils {
 
 	public static function order_menu( WP_Post $post, string $tab ): string {
 		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
-		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>Order</a>";
+		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>" . __( 'Enrollment', 'lasntgadmin' ) . '</a>';
 		// Show attendees tab when order has been created.
 		if ( ! in_array( $post->post_status, [ 'auto-draft' ] ) ) {
 			$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>Attendees</a>";
@@ -271,13 +271,13 @@ class PageUtils {
                 data-user="%s"
                 data-user-meta="%s"
                 data-currency="%s"
-            ><p>Loading order...</p></div>',
+            ><p>Loading enrollment...</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( GroupApi::get_api_path() ),
 			esc_attr( OrderApi::get_api_path() ),
 			esc_attr( ProductApi::get_api_path() ),
-			esc_attr( empty( $order->get_title() ) ? __( 'Order', 'lasntgadmin' ) : $order->get_title() ),
+			esc_attr( empty( $order->get_title() ) ? __( 'Enrollment', 'lasntgadmin' ) : $order->get_title() ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $post->ID ),
