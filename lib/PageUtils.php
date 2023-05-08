@@ -184,45 +184,6 @@ class PageUtils {
 	}
 
 	/**
-	 * @todo get_product_id calls wc_get_order again, fix
-	 */
-	public static function attendees( WP_Post $post ) {
-		$order                   = wc_get_order( $post->ID );
-		$product_id              = OrderUtils::get_product_id( $order );
-		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product_id );
-		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
-		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
-
-		echo sprintf(
-			'<div
-                id="%s-attendees"
-                data-nonce="%s"
-                data-quantity="%d"
-                data-fields="%s"
-                data-order="%s"
-                data-group-id="%s"
-                data-attendees="%s"
-                data-product-id="%d"
-            ><p>Loading attendees...</p></div>',
-			esc_attr( PluginUtils::get_kebab_case_name() ),
-			esc_attr( wp_create_nonce( 'wp_rest' ) ),
-			esc_attr( self::get_order_quantity( $order ) ),
-			esc_attr(
-				json_encode(
-					array_merge(
-						$attendee_profile_fields,
-						$awarding_body_fields
-					)
-				)
-			),
-			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
-			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
-			esc_attr( $product_id )
-		);
-	}
-
-	/**
 	 * @todo Improve payment made UI.
 	 */
 	public static function render_order_paid( WC_Order $order ): void {
@@ -328,6 +289,48 @@ class PageUtils {
 			esc_attr( get_woocommerce_currency() )
 		);
 	}
+
+	/**
+	 * @todo get_product_id calls wc_get_order again, fix
+	 */
+	public static function attendees( WP_Post $post ) {
+		$order                   = wc_get_order( $post->ID );
+		$product_id              = OrderUtils::get_product_id( $order );
+		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product_id );
+		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
+
+		echo sprintf(
+			'<div
+                id="%s-attendees"
+                data-nonce="%s"
+                data-quantity="%d"
+                data-fields="%s"
+                data-status="%s"
+                data-order="%s"
+                data-group-id="%s"
+                data-attendees="%s"
+                data-product-id="%d"
+            ><p>Loading attendees...</p></div>',
+			esc_attr( PluginUtils::get_kebab_case_name() ),
+			esc_attr( wp_create_nonce( 'wp_rest' ) ),
+			esc_attr( self::get_order_quantity( $order ) ),
+			esc_attr(
+				json_encode(
+					array_merge(
+						$attendee_profile_fields,
+						$awarding_body_fields
+					)
+				)
+			),
+			esc_attr( sprintf( '%s', $order->get_status() ) ),
+			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
+			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
+			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
+			esc_attr( $product_id )
+		);
+	}
+
 
 	/**
 	 * Enqueues admin order component

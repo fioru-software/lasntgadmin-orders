@@ -38,7 +38,6 @@ const ProductSelector = props => {
     async function runFetch() {
       try {
         setIsLoading(true);
-        props.setIsDisabled(true);
         setProductId(null);
         apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
         const result = await apiFetch( {
@@ -60,7 +59,6 @@ const ProductSelector = props => {
         console.error(e);
       }
       setIsLoading(false);
-      props.setIsDisabled(false);
     }
     runFetch();
   }, []);
