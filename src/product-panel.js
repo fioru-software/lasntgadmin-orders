@@ -163,12 +163,12 @@ const ProductPanel = props => {
   return (
     <>
       <div class="form-wrap">
-        <h3>Product</h3>
+        <h3>Course</h3>
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
         <div class="form-field">
           <fieldset>
             <p class="form-row">
-              <label for="product">Product<span class="required"> *</span></label>
+              <label for="product">Course<span class="required"> *</span></label>
               <ProductSelector id="product" name="product" disabled={ isDisabled } setIsDisabled={ setIsDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
             </p>
           </fieldset>

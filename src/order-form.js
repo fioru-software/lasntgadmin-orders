@@ -30,7 +30,7 @@ const OrderForm = props => {
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isDisabled, setIsDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
-  const [ buttonText, setButtonText ] = useState("Create the order");
+  const [ buttonText, setButtonText ] = useState("Add the enrollment");
   const oldStatus = props.order.status;
   useEffect( () => {
   }, [ props?.order ]);
@@ -42,7 +42,7 @@ const OrderForm = props => {
     if( ! isNil( props?.status ) ) {
       setStatus(props.status);
       if(props.status !== 'auto-draft') {
-        setButtonText('Update the order');
+        setButtonText('Update enrollment');
       }
     }
   }, [props?.status]);
@@ -52,12 +52,12 @@ const OrderForm = props => {
    */
   useEffect( () => {
     if( status === 'waiting-list' ) {
-      setButtonText("Add order to waiting list");
+      setButtonText("Add enrollment to waiting list");
     } else {
       if(props?.status === 'auto-draft') {
-        setButtonText("Create the order");
+        setButtonText("Create enrollment");
       } else {
-        setButtonText("Update the order");
+        setButtonText("Update enrollment");
       }
     }
   }, [ status ]);
@@ -126,7 +126,7 @@ const OrderForm = props => {
       );
       setNotice({
         status: 'success',
-        message: 'Updated order. Redirecting to attendees tab...'
+        message: 'Updated enrollment. Redirecting to attendees tab...'
       });
       
       // if the order is being moved from waiting-list to pending do navigate to add attendees.
@@ -135,13 +135,13 @@ const OrderForm = props => {
       ) {
         setNotice({
           status: 'success',
-          message: 'Updated order. Client will be notified.'
+          message: 'Updated enrollment. Client will be notified.'
         });
         setIsLoading(false);
       } else {
         setNotice({
           status: 'success',
-          message: 'Updated order. Redirecting to attendees tab...'
+          message: 'Updated enrollment. Redirecting to attendees tab...'
         });
         document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
       }
@@ -168,7 +168,7 @@ const OrderForm = props => {
 
         <div class="form-wrap">
 
-          <h3>Order</h3>
+          <h3>Enrollment</h3>
 
           { props.status !== 'auto-draft' &&
             <div class="form-field">

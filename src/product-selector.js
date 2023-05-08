@@ -48,7 +48,7 @@ const ProductSelector = props => {
         if( ! result.length ) {
           props.setNotice({
             status: 'error',
-            message: 'No products are available.'
+            message: 'No courses are available.'
           });
         }
         props.onFetch(result);
