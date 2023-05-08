@@ -21,7 +21,7 @@ const Attendees = props => {
 
   const [ notice, setNotice ] = useState(null);
   const [ quantity, setQuantity ] = useState(0);
-  const [ isDisabled, setIsDisabled ] = useState(false);
+  const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
   const [ isLoading, setIsLoading ] = useState(false);
 
   useEffect( () => {
@@ -33,7 +33,13 @@ const Attendees = props => {
         message: 'Please add a product to your order'
       });
     }
-  }, [ props.quantity]);
+  }, [ props.quantity ]);
+
+  useEffect( () => {
+    if( ! isNil( props.status ) && props.status === 'attendees' ) {
+      setSubmitButtonDisabled(false);
+    }
+  }, [ props.status ] );
 
   /**
    * @param { number } index Attendee index for HTML inputs
@@ -136,7 +142,7 @@ const Attendees = props => {
     try {
       setNotice(null);
       setIsLoading(true);
-      setIsDisabled(true);
+      setSubmitButtonDisabled(true);
 
       setNotice({
         status: 'info',
@@ -183,7 +189,7 @@ const Attendees = props => {
       });
       console.error(e);
       setIsLoading(false);
-      setIsDisabled(false);
+      setSubmitButtonDisabled(false);
     }
   }
   
@@ -194,14 +200,14 @@ const Attendees = props => {
           <div id="order_data" class="panel woocommerce-order-data">
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
-                <AttendeeFields fields={ props.fields } attendee={ props.attendees[index] } index={ index } disabled={ isDisabled } nonce={ props.nonce } />
+                <AttendeeFields fields={ props.fields } attendee={ props.attendees[index] } index={ index } disabled={ isSubmitButtonDisabled } nonce={ props.nonce } />
               );
             })}
 
             { props?.quantity > 0 && 
             <div class="form-field">
               { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-              <button disabled={ isDisabled } type="submit" class="button alt save_order wp-element-button" name="save" value="Create">Save attendees</button>
+              <button disabled={ isSubmitButtonDisabled } type="submit" class="button alt save_order wp-element-button" name="save" value="Create">Save attendees</button>
               { isLoading && <Spinner/> }
             </div>}
           </div>

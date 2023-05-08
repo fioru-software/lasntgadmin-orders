@@ -25,7 +25,7 @@ const ProductPanel = props => {
   const [ productId, setProductId ] = useState(null);
   const [ groupId, setGroupId ] = useState(null);
   const [ product, setProduct ] = useState(null);
-  const [ isDisabled, setIsDisabled ] = useState(true);
+  const [ isProductFormDisabled, setProductFormDisabled ] = useState(true);
 
   /**
    *  @see handleProductSelect()
@@ -137,7 +137,11 @@ const ProductPanel = props => {
   function handleFetchedGroups( groups ) {
     const orderMeta = findOrderMetaByKey( 'groups-read', props.order.meta_data );
     handlePreselectedGroup( orderMeta?.value );
-    props.setIsDisabled(false);
+
+    if( props?.user?.allcaps?.view_others_shop_orders ) {
+      props.setSubmitButtonDisabled(false);
+    }
+
   }
 
   function handleFetchedProducts( products ) {
@@ -149,7 +153,8 @@ const ProductPanel = props => {
     handlePreselectedGroup( orderMeta?.value );
 
     if( ! isExistingOrder( props.order ) ) {
-      setIsDisabled(false);
+      setProductFormDisabled(false);
+      props.setSubmitButtonDisabled(false);
     }
 
   }
@@ -163,13 +168,13 @@ const ProductPanel = props => {
   return (
     <>
       <div class="form-wrap">
-        <h3>Product</h3>
+        <h3>Course</h3>
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
         <div class="form-field">
           <fieldset>
             <p class="form-row">
-              <label for="product">Product<span class="required"> *</span></label>
-              <ProductSelector id="product" name="product" disabled={ isDisabled } setIsDisabled={ setIsDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
+              <label for="product">Course<span class="required"> *</span></label>
+              <ProductSelector id="product" name="product" disabled={ isProductFormDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
             </p>
           </fieldset>
         </div>
@@ -180,7 +185,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="order_group">Group<span class="required"> *</span></label>
-                <GroupSelector productId={ productId } disabled={ isDisabled } setIsDisabled={ setIsDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
+                <GroupSelector productId={ productId } disabled={ isProductFormDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
               </p>
             </fieldset>
           </div> 
@@ -202,7 +207,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="quantity">Quantity<span class="required"> *</span></label>
-                <input type="number" id="quantity" disabled={ isDisabled } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
             </fieldset>
