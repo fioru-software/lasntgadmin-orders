@@ -166,12 +166,12 @@ class PageUtils {
 		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
 		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>" . __( 'Enrollment', 'lasntgadmin' ) . '</a>';
 		// Show attendees tab when order has been created.
-		if ( in_array( $post->post_status, [ 'wc-attendees', 'wc-waiting-list', 'wc-pending' ] ) ) {
+		if ( in_array( $post->post_status, [ 'wc-attendees', 'wc-waiting-list', 'wc-pending', 'wc-completed', 'wc-on-hold' ] ) ) {
 			$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>" . __( 'Attendees', 'lasntgadmin' ) . '</a>';
 			/**
 			 * Only show payment tab when order and attendees have been created
 			 */
-			if ( in_array( $post->post_status, [ 'wc-pending' ] ) ) {
+			if ( in_array( $post->post_status, [ 'wc-pending', 'wc-completed', 'wc-on-hold' ] ) ) {
 				$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>" . __( 'Payment', 'lasntgadmin' ) . '</a>';
 			}
 		}
