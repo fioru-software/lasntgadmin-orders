@@ -7,7 +7,7 @@ import { isNil, isNull, isUndefined } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { isExistingOrder, getLineItemByProductId } from './order-utils';
+import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId } from './order-utils';
 
 /**
  * @param { string } nonce
@@ -41,7 +41,7 @@ const OrderForm = props => {
   useEffect( () => {
     if( ! isNil( props?.status ) ) {
       setStatus(props.status);
-      if(props.status !== 'auto-draft') {
+      if( ! isDraftStatus( props.status ) ) {
         setButtonText('Update enrollment');
       }
     }
@@ -51,10 +51,10 @@ const OrderForm = props => {
    * Change button text
    */
   useEffect( () => {
-    if( status === 'waiting-list' ) {
+    if( isWaitingStatus( status ) ) {
       setButtonText("Add enrollment to waiting list");
     } else {
-      if(props?.status === 'auto-draft') {
+      if( isDraftStatus( props?.status ) ) {
         setButtonText("Create enrollment");
       } else {
         setButtonText("Update enrollment");
@@ -62,13 +62,20 @@ const OrderForm = props => {
     }
   }, [ status ]);
 
+  function determineStatus( formData ) {
+    if( isDraftStatus( status ) ) {
+      return 'attendees';
+    }
+    return status;
+  }
+
   function parseFormData(formData) {
     const body = {
       billing: {},
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
-      status: formData.get('order_status') || status || 'attendees',
+      status: determineStatus( formData ),
       meta_data: [
         {
           key: 'groups-read',
@@ -111,7 +118,7 @@ const OrderForm = props => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = parseFormData(formData);
-    const method = props.order.date_created ? 'PUT' : 'POST';
+    const method = isExistingOrder( props.order ) ? 'PUT' : 'POST';
     try {
       setNotice(null);
       setIsLoading(true);
@@ -119,7 +126,7 @@ const OrderForm = props => {
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
       props.order = await apiFetch( 
         {
-          path: props.order.date_created ? `/wc/v3/orders/${ props.order.id }` : `/wc/v3/orders`,
+          path: isExistingOrder( props.order ) ? `/wc/v3/orders/${ props.order.id }` : `/wc/v3/orders`,
           method,
           data
         } 
@@ -129,9 +136,8 @@ const OrderForm = props => {
         message: 'Updated enrollment. Redirecting to attendees tab...'
       });
       
-      // if the order is being moved from waiting-list to pending do navigate to add attendees.
-      if ('waiting-list' === oldStatus && status === 'pending'
-      ) {
+      // if the order is being moved from waiting-list to pending 
+      if ( isWaitingStatus( oldStatus ) && isPendingStatus( status ) ) {
         setNotice({
           status: 'success',
           message: 'Updated enrollment. Client will be notified.'
@@ -143,10 +149,21 @@ const OrderForm = props => {
           message: 'Updated enrollment. Redirecting...'
         });
       }
-      if( isExistingOrder( props.order ) ) {
-        document.location.reload();
-      } else {
-        document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
+
+      switch( props.order.status ) {
+
+        case 'waiting-list':
+        case 'attendees':
+          document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
+          break;
+
+        case 'pending':
+          document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment`);
+          break;
+
+        default:
+          document.location.reload();
+
       }
       
     } catch (e) {
@@ -173,12 +190,12 @@ const OrderForm = props => {
 
           <h3>Order</h3>
 
-          { props.status !== 'auto-draft' &&
+          { ! isDraftStatus( props.status ) && 
             <div class="form-field">
               <fieldset>
                 <p class="form-row">
                   <label for="order_status">Status<span class="required"> *</span></label>
-                  <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+                  <StatusSelector id="order_status" disabled={ isSubmitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
                 </p>
               </fieldset>
             </div>

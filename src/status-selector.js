@@ -4,6 +4,7 @@ import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Option } from './option.js';
+import { isDraftStatus } from './order-utils.js';
 
 const StatusSelector = props => {
 
@@ -16,10 +17,10 @@ const StatusSelector = props => {
    * Default order status
    */
   useEffect( () => {
-    if( props?.order?.status !== 'auto-draft' && props?.user?.allcaps?.view_others_shop_orders ) {
-      setIsDisabled(false);
+    if( props?.user?.allcaps?.view_others_shop_orders ) {
+      setIsDisabled( props.disabled );
     }
-  }, [ props?.order?.status ] );
+  }, [ props?.disabled ] );
 
   /**
    * User changed the order status
@@ -66,18 +67,18 @@ const StatusSelector = props => {
     <>
       { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isDisabled } required value={ props.status } onChange={ handleChange } >
-        { props.status === 'auto-draft' &&
+      { !isLoading && <select id={ props.id } disabled={ props.disabled } required value={ props.status } onChange={ handleChange } >
+        { isDraftStatus( props.status ) &&
         <option selected value="auto-draft">Draft</option>
         }
-        { props.status !== 'auto-draft' && 
+        { ! isDraftStatus( props.status ) && 
         <option selected disabled value="">Please select</option>
         }
         { statuses.map( status => 
           <Option value={ status.id }>{ status.name }</Option>
         )}
       </select> }
-      { props.status !== 'auto-draft' &&
+      { ! isDraftStatus( props.status ) &&
         <input type="hidden" name={ props.name } value={ props?.status } />
       }
     </>
