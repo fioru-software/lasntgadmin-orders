@@ -14,7 +14,23 @@ function isExistingOrder( order ) {
 }
 
 function isWaitingOrder( order ) {
-  return order.status === 'waiting-list';
+  return isWaitingStatus( order.status );
+}
+
+function isWaitingStatus( status ) {
+  return status === 'waiting-list';
+}
+
+function isPendingStatus( status ) {
+  return status === 'pending';
+}
+
+function isDraftOrder( order ) {
+  return isDraftStatus( order.status );
+}
+
+function isDraftStatus( status ) {
+  return status === 'auto-draft';
 }
 
 function hasAttendees( order ) {
@@ -26,5 +42,9 @@ export {
   findOrderMetaByKey,
   isExistingOrder,
   isWaitingOrder,
+  isWaitingStatus, 
+  isPendingStatus,
+  isDraftOrder,
+  isDraftStatus,
   hasAttendees
 };

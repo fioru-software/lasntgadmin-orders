@@ -61,7 +61,7 @@ const ProductPanel = props => {
       setPrice( price );
       setStock( stock );
 
-      if( spaces < 1 && stock > 0 && props.order.status === 'auto-draft') {
+      if( spaces < 1 && stock > 0 ) {
         props.setStatus("waiting-list");
       } else {
         props.setStatus(props.order.status);

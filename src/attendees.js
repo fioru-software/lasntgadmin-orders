@@ -36,7 +36,7 @@ const Attendees = props => {
   }, [ props.quantity ]);
 
   useEffect( () => {
-    if( ! isNil( props.status ) && props.status === 'attendees' ) {
+    if( ! isNil( props.status ) && ['attendees', 'waiting-list'].includes( props.status ) ) {
       setSubmitButtonDisabled(false);
     }
   }, [ props.status ] );

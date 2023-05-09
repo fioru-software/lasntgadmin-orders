@@ -164,15 +164,15 @@ class PageUtils {
 
 	public static function order_menu( WP_Post $post, string $tab ): string {
 		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
-		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>" . __( 'Enrollment', 'lasntgadmin' ) . '</a>';
+		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>" . __( 'Order', 'lasntgadmin' ) . '</a>';
 		// Show attendees tab when order has been created.
-		if ( ! in_array( $post->post_status, [ 'auto-draft' ] ) ) {
-			$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>Attendees</a>";
+		if ( in_array( $post->post_status, [ 'wc-attendees', 'wc-waiting-list', 'wc-pending' ] ) ) {
+			$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>" . __( 'Attendees', 'lasntgadmin' ) . '</a>';
 			/**
 			 * Only show payment tab when order and attendees have been created
 			 */
-			if ( ! in_array( $post->post_status, [ 'auto-draft', 'wc-attendees', 'wc-waiting-list' ] ) ) {
-				$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>Payment</a>";
+			if ( in_array( $post->post_status, [ 'wc-pending' ] ) ) {
+				$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=payment' class='nav-tab" . self::get_class_attribute( $tab, 'payment' ) . "'>" . __( 'Payment', 'lasntgadmin' ) . '</a>';
 			}
 		}
 		$markup .= '</nav>';
@@ -208,7 +208,7 @@ class PageUtils {
 		echo wp_kses( wp_nonce_field( 'woocommerce-pay', 'woocommerce-pay-nonce' ), 'post' );
 
 		echo wp_kses( "<div id='order_data' class='panel woocommerce-order-data' data-action='/checkout/order-pay/{$order->get_id()}/?pay_for_order=true&key=$order_key'>", 'post' );
-		echo '<h3>Payment options</h3>';
+		echo '<h3>' . esc_html( __( 'Payment options', 'lasntgadmin' ) ) . '</h3>';
 
 		echo '<ul class="wc_payment_methods payment_methods methods">';
 
@@ -216,7 +216,7 @@ class PageUtils {
 			PaymentUtils::render_gateway( $gateway );
 		}
 
-		echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >Pay for order</button>';
+		echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >' . esc_html( __( 'Pay for order', 'lasntgadmin' ) ) . '</button>';
 
 		echo '</ul>';
 		echo '</div>';
@@ -271,13 +271,13 @@ class PageUtils {
                 data-user="%s"
                 data-user-meta="%s"
                 data-currency="%s"
-            ><p>Loading enrollment...</p></div>',
+            ><p>' . __( 'Loading order...', 'lasntgadmin' ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( GroupApi::get_api_path() ),
 			esc_attr( OrderApi::get_api_path() ),
 			esc_attr( ProductApi::get_api_path() ),
-			esc_attr( empty( $order->get_title() ) ? __( 'Enrollment', 'lasntgadmin' ) : $order->get_title() ),
+			esc_attr( empty( $order->get_title() ) ? __( 'Order', 'lasntgadmin' ) : $order->get_title() ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $post->ID ),
@@ -311,7 +311,7 @@ class PageUtils {
                 data-group-id="%s"
                 data-attendees="%s"
                 data-product-id="%d"
-            ><p>Loading attendees...</p></div>',
+            ><p>' . esc_html( __( 'Loading attendees...', 'lasntgadmin' ) ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( self::get_order_quantity( $order ) ),
