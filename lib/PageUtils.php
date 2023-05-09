@@ -128,7 +128,7 @@ class PageUtils {
 			$order = wc_get_order( $post->ID );
 			add_meta_box(
 				'woocommerce-order-data',
-				sprintf( 'Order #%d', $order->get_order_number() ),
+				sprintf( '%s #%d', __( 'Enrollment', 'lasntgadmin' ), $order->get_order_number() ),
 				[ self::class, 'output_admin_order_markup' ],
 				$screen_id,
 				'advanced',
@@ -164,7 +164,7 @@ class PageUtils {
 
 	public static function order_menu( WP_Post $post, string $tab ): string {
 		$markup  = "<nav class='nav-tab-wrapper woo-nav-tab-wrapper'>";
-		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>" . __( 'Order', 'lasntgadmin' ) . '</a>';
+		$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=order' class='nav-tab" . self::get_class_attribute( $tab, 'order' ) . "'>" . __( 'Enrollment', 'lasntgadmin' ) . '</a>';
 		// Show attendees tab when order has been created.
 		if ( in_array( $post->post_status, [ 'wc-attendees', 'wc-waiting-list', 'wc-pending' ] ) ) {
 			$markup .= "<a href='/wp-admin/post.php?post=$post->ID&action=edit&tab=attendees' class='nav-tab" . self::get_class_attribute( $tab, 'attendees' ) . "'>" . __( 'Attendees', 'lasntgadmin' ) . '</a>';
@@ -277,7 +277,7 @@ class PageUtils {
 			esc_attr( GroupApi::get_api_path() ),
 			esc_attr( OrderApi::get_api_path() ),
 			esc_attr( ProductApi::get_api_path() ),
-			esc_attr( empty( $order->get_title() ) ? __( 'Order', 'lasntgadmin' ) : $order->get_title() ),
+			esc_attr( empty( $order->get_title() ) ? __( 'Enrollment', 'lasntgadmin' ) : $order->get_title() ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $post->ID ),
