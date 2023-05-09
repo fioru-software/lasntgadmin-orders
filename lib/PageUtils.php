@@ -401,4 +401,3 @@ class PageUtils {
 		remove_post_type_support( 'shop_order', 'title' );
 	}
 }
-
