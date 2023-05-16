@@ -171,7 +171,7 @@ const OrderForm = props => {
 
         <div class="form-wrap">
 
-          <h3>Order</h3>
+          <h3>Enrollment</h3>
 
           { props.status !== 'auto-draft' &&
             <div class="form-field">
