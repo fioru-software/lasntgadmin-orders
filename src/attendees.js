@@ -111,19 +111,18 @@ const Attendees = props => {
   }
 
   function createOrderUpdateRequestBody( orderId, status, attendeeIds ) {
-    return {
-      path: `/wc/v3/orders/${ orderId }`,
+    const body = {
+      path: `/wp/v2/shop_order/${orderId}`,
       method: 'PUT',
       data: {
+        id: orderId,
         status,
-        meta_data: [
-          {
-            key: 'attendee_ids',
-            value: attendeeIds
-          }
-        ]
+        meta: {
+          'attendee_ids': [ ... new Set(attendeeIds) ]
+        }
       }
     };
+    return body;
   }
 
   function extractAttendeeIdsFromResponse( attendeeResponses ) {
@@ -171,7 +170,7 @@ const Attendees = props => {
       const orderRes = await apiFetch( 
         createOrderUpdateRequestBody( 
           props.order.id, 
-          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? props.order.status : 'pending', 
+          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? props.order.status : 'wc-pending', 
           attendeeIds 
         )
       );
@@ -182,6 +181,7 @@ const Attendees = props => {
       });
 
       document.location.assign( isWaitingOrder( props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
+      
     } catch (e) {
       setNotice({
         status: 'error',

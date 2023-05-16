@@ -8,6 +8,7 @@ use Lasntg\Admin\Orders\{
 	OrderData
 };
 use Lasntg\Admin\Attendees\AttendeeUtils;
+use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
@@ -20,6 +21,12 @@ class OrderUtils {
 	public static function init() {
 		self::add_filters();
 		self::add_actions();
+	}
+
+	private static function add_actions() {
+		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
+		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
+		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 	}
 
 	private static function add_filters() {
@@ -42,15 +49,6 @@ class OrderUtils {
 
 		$order = wc_get_order( $order_id );
 		$order->update_status( 'completed' );
-	}
-	private static function add_actions() {
-		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
-		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
-
-		// @deprecated
-		// add_action( 'woocommerce_rest_insert_shop_order_object', [ self::class, 'insert_shop_order_meta' ], 10, 2 );
-
-		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 	}
 
 	/**
@@ -113,31 +111,6 @@ class OrderUtils {
 		}
 
 		return $where;
-	}
-
-	/**
-	 * Update user meta when order is created
-	 *
-	 * @deprecated
-	 * @see https://developer.wordpress.org/reference/classes/wp_rest_request/
-	 */
-	public static function insert_shop_order_meta( WC_Order $order, WP_REST_Request $req ) {
-		$params = $req->get_params();
-
-		if ( isset( $params['customer_id'] ) ) {
-			update_user_meta( $params['customer_id'], 'billing_first_name', wc_clean( $params['billing']['first_name'] ) );
-			update_user_meta( $params['customer_id'], 'first_name', wc_clean( $params['billing']['first_name'] ) );
-			update_user_meta( $params['customer_id'], 'billing_last_name', wc_clean( $params['billing']['last_name'] ) );
-			update_user_meta( $params['customer_id'], 'last_name', wc_clean( $params['billing']['last_name'] ) );
-
-			update_user_meta( $params['customer_id'], 'billing_address_1', wc_clean( $params['billing']['address_1'] ) );
-			update_user_meta( $params['customer_id'], 'billing_address_2', wc_clean( $params['billing']['address_2'] ) );
-			update_user_meta( $params['customer_id'], 'billing_city', wc_clean( $params['billing']['city'] ) );
-			update_user_meta( $params['customer_id'], 'billing_country', wc_clean( $params['billing']['country'] ) );
-			update_user_meta( $params['customer_id'], 'billing_state', wc_clean( $params['billing']['state'] ) );
-			update_user_meta( $params['customer_id'], 'billing_postcode', wc_clean( $params['billing']['postcode'] ) );
-			update_user_meta( $params['customer_id'], 'billing_phone', wc_clean( $params['billing']['phone'] ) );
-		}
 	}
 
 	public static function get_statuses() {
@@ -276,6 +249,26 @@ class OrderUtils {
 			);
 		}
 		return [];
+	}
+
+	/**
+	 * Get orders with the same group memberships as my user.
+	 *
+	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_orders-and-WC_Order_Query
+	 * @return WC_Order[]
+	 */
+	public static function get_visible_orders(): array {
+		return wc_get_orders(
+			[
+				'meta_query' => [
+					[
+						'key'     => 'groups-read',
+						'compare' => 'IN',
+						'value'   => GroupUtils::get_current_users_group_ids(),
+					],
+				],
+			]
+		);
 	}
 
 }
