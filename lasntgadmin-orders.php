@@ -3,7 +3,7 @@
  * Plugin Name:       LASNTG Orders
  * Plugin URI:        https://github.com/fioru-software/lasntgadmin-orders
  * Description:       Orders plugin
- * Version:           1.5.14
+ * Version:           1.6.0
  * Requires PHP:      7.2
  * Text Domain:       lasntgadmin
  * Domain Path:       /languages
@@ -13,12 +13,16 @@ defined( 'ABSPATH' ) || exit;
 
 require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
-use Lasntg\Admin\Orders\{ PageUtils, PluginUtils, OrderUtils, PrivatePaymentUtils, WaitingListActionsFilters };
+use Lasntg\Admin\Orders\{
+	PageUtils, PluginUtils, OrderUtils, PrivatePaymentUtils,
+	WaitingListActionsFilters, AdminTableView
+};
 
 PageUtils::init();
 OrderUtils::init();
 WaitingListActionsFilters::init();
 PrivatePaymentUtils::init();
+AdminTableView::init();
 
 /**
  * Plugin activation
