@@ -13,7 +13,6 @@ class AdminTableView {
 
 	private static function add_actions() {
 		add_action( 'rest_api_init', [ self::class, 'register_meta' ] );
-		add_action( 'restrict_manage_posts', [ self::class, 'add_custom_filters' ], 10, 2 );
 	}
 
 	private static function add_filters() {
@@ -65,18 +64,6 @@ class AdminTableView {
 		}
 
 		return $actions;
-	}
-
-	/**
-	 * @see restrict_manage_posts
-	 */
-	public static function add_custom_filters( string $post_type ): void {
-		if ( 'shop_order' === $post_type && is_admin() && function_exists( 'get_current_screen' ) ) {
-			$screen = get_current_screen();
-			if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id ) {
-				echo AdminTableViewFilters::dropdown_attendees(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			}
-		}
 	}
 
 	/**
