@@ -16,10 +16,13 @@ class AdminTableView {
 	}
 
 	private static function add_filters() {
-		add_filter( 'post_row_actions', [ self::class, 'modify_order_row_actions' ], 101, 2 );
 		// WC uses priority 100.
-		add_filter( 'parse_query', [ self::class, 'handle_filter_request' ] );
+		add_filter( 'post_row_actions', [ self::class, 'modify_order_row_actions' ], 101, 2 );
+		add_filter( 'parse_query', [ self::class, 'handle_filter_query' ] );
 		add_filter( 'woocommerce_register_post_type_shop_order', [ self::class, 'register_post_type_shop_order' ] );
+
+		// Filter orders by product id.
+		add_filter( 'posts_clauses', [ self::class, 'handle_filter_clauses' ], 101, 2 );
 	}
 
 	public static function register_post_type_shop_order( array $args ): array {
@@ -66,10 +69,7 @@ class AdminTableView {
 		return $actions;
 	}
 
-	/**
-	 * Add additional filters dropdowns.
-	 */
-	public static function handle_filter_request( WP_Query $query ): WP_Query {
+	public static function handle_filter_query( WP_Query $query ): WP_Query {
 		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
 			if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && 'shop_order' === $query->query_vars['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -82,7 +82,7 @@ class AdminTableView {
 	}
 
 	private static function handle_filter_by_attendee_id( WP_Query $query ): WP_Query {
-		if ( isset( $_GET['attendee_id'] ) && ! empty( $_GET['attendee_id'] ) ) {
+		if ( isset( $_GET['attendee_id'] ) ) {
 			$attendee_id     = absint( $_GET['attendee_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$attendee_filter = [
 				'key'     => 'attendee_ids',
@@ -100,6 +100,26 @@ class AdminTableView {
 			}
 		}
 		return $query;
+	}
+
+	public static function handle_filter_clauses( array $clauses, WP_Query $query ): array {
+		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+			if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && isset( $_GET['post_type'] ) && 'shop_order' === $_GET['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$clauses = self::handle_filter_by_product_id( $clauses, $query );
+			}
+		}
+		return $clauses;
+	}
+
+	private static function handle_filter_by_product_id( array $clauses, WP_Query $query ): array {
+		if ( isset( $_GET['product_id'] ) ) {
+			$product_id        = absint( $_GET['product_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$clauses['join']  .= ' INNER JOIN wp_woocommerce_order_items ON wp_posts.ID = wp_woocommerce_order_items.order_id';
+			$clauses['join']  .= ' INNER JOIN wp_woocommerce_order_itemmeta ON wp_woocommerce_order_items.order_item_id = wp_woocommerce_order_itemmeta.order_item_id';
+			$clauses['where'] .= " AND wp_woocommerce_order_itemmeta.meta_key = '_product_id' AND wp_woocommerce_order_itemmeta.meta_value = $product_id";
+		}
+		return $clauses;
 	}
 
 }
