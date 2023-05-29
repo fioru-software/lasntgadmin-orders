@@ -365,8 +365,13 @@ class PageUtils {
 		wp_enqueue_script( $name );
 	}
 
-	private static function enqueue_order_and_attendee_tabs() {
+	public static function get_admin_order_script_handle(): string {
 		$name = sprintf( '%s-order-and-attendee-tabs', PluginUtils::get_kebab_case_name() );
+		return $name;
+	}
+
+	private static function enqueue_order_and_attendee_tabs() {
+		$name = self::get_admin_order_script_handle();
 		// Automatically load imported dependencies and assets version.
 		$asset_file = include sprintf( '%s/build/index.asset.php', PluginUtils::get_absolute_plugin_path() );
 

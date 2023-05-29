@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { DateTime } from "luxon";
 import { isNil } from 'lodash';
+import { __ } from '@wordpress/i18n';
 
 const SelectInput = props => {
 
@@ -16,7 +17,7 @@ const SelectInput = props => {
 
   return (
     <select id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } value={ value } onChange={ handleChange } onFocus={ props?.handleFocus }>
-      { ! props.value && ! props.defaultValue && <option disabled value="">Please select</option> }
+      { ! props.value && ! props.defaultValue && <option disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option> }
       { props.children }
     </select> 
   );

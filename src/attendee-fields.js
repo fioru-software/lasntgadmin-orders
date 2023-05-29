@@ -3,10 +3,10 @@ import { Notice } from '@wordpress/components';
 import { AttendeeSearch } from './attendee-search';
 import { TextInput, SelectInput, EmailInput, DateInput, NumberInput, CheckBox } from './acf-inputs';
 import { isNil } from 'lodash';
+import { __ } from '@wordpress/i18n';
 
 /**
- * @param { string } nonce 
- * @param { array } fields
+ * @param { string } nonce @param { array } fields
  * @param { object } attendee
  * @param { number } index
  * @param { disabled } bool
@@ -33,7 +33,7 @@ const AttendeeFields = props => {
 
   return (
     <>
-      <h3>Attendee { props.index+1 }</h3>
+      <h3>{ __( `Attendee ${ props.index+1 }`, 'lasntgadmin' ) }</h3>
 
       { ( props?.attendee?.ID || attendee?.id ) && <input type="hidden" name={ `attendees[${props.index}]['id']` } value={ props?.attendee?.ID || attendee?.id } /> }
       { ( props?.attendee?.post_status || attendee?.status ) && <input type="hidden" name={ `attendees[${props.index}]['status']` } value={ props?.attendee?.post_status || attendee?.status } /> }

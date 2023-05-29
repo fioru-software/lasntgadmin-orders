@@ -2,6 +2,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 
 import { isNil, isNull, isUndefined } from "lodash";
 
@@ -42,7 +43,7 @@ const OrderForm = props => {
     if( ! isNil( props?.status ) ) {
       setStatus(props.status);
       if( ! isDraftStatus( props.status ) ) {
-        setButtonText('Update enrollment');
+        setButtonText( __( 'Update enrollment', 'lasntgadmin' ));
       }
     }
   }, [props?.status]);
@@ -52,12 +53,12 @@ const OrderForm = props => {
    */
   useEffect( () => {
     if( isWaitingStatus( status ) ) {
-      setButtonText("Add enrollment to waiting list");
+      setButtonText( __( 'Add enrollment to waiting list', 'lasntgadmin' ));
     } else {
       if( isDraftStatus( props?.status ) ) {
-        setButtonText("Create enrollment");
+        setButtonText( __( 'Create enrollment', 'lasntgadmin' ) );
       } else {
-        setButtonText("Update enrollment");
+        setButtonText( __( 'Update enrollment', 'lasntgadmin' ) );
       }
     }
   }, [ status ]);
@@ -133,20 +134,20 @@ const OrderForm = props => {
       );
       setNotice({
         status: 'success',
-        message: 'Updated enrollment. Redirecting to attendees tab...'
+        message: __( 'Updated enrollment. Redirecting to attendees tab...', 'lasntgadmin' )
       });
       
       // if the order is being moved from waiting-list to pending 
       if ( isWaitingStatus( oldStatus ) && isPendingStatus( status ) ) {
         setNotice({
           status: 'success',
-          message: 'Updated enrollment. Client will be notified.'
+          message: __( 'Updated enrollment. Client will be notified.', 'lasntgadmin' )
         });
         setIsLoading(false);
       } else {
         setNotice({
           status: 'success',
-          message: 'Updated enrollment. Redirecting...'
+          message: __( 'Updated enrollment. Redirecting...', 'lastngadmin' )
         });
       }
 
@@ -188,13 +189,13 @@ const OrderForm = props => {
 
         <div class="form-wrap">
 
-          <h3>Order</h3>
+          <h3>{ __( 'Order', 'lasntgadmin' ) }</h3>
 
           { ! isDraftStatus( props.status ) && 
             <div class="form-field">
               <fieldset>
                 <p class="form-row">
-                  <label for="order_status">Status<span class="required"> *</span></label>
+                  <label for="order_status">{ __( 'Status', 'lasntgadmin' ) }<span class="required"> *</span></label>
                   <StatusSelector id="order_status" disabled={ isSubmitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
                 </p>
               </fieldset>
