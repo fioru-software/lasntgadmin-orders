@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 import { AttendeeFields } from './attendee-fields';
 import { isWaitingOrder, hasAttendees } from './order-utils';
@@ -30,7 +31,7 @@ const Attendees = props => {
     } else {
       setNotice({
         status: 'warning',
-        message: 'Please add a product to your order'
+        message: __( 'Please add a product to your order', 'lasntgadmin' )
       });
     }
   }, [ props.quantity ]);
@@ -145,7 +146,7 @@ const Attendees = props => {
 
       setNotice({
         status: 'info',
-        message: 'Updating attendees.'
+        message: __( 'Updating attendees.', 'lasntgadmin' )
       });
 
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
@@ -164,7 +165,7 @@ const Attendees = props => {
 
       setNotice({
         status: 'info',
-        message: 'Updating order.'
+        message: __( 'Updating order.', 'lasntgadmin' )
       });
 
       const orderRes = await apiFetch( 
@@ -177,7 +178,7 @@ const Attendees = props => {
 
       setNotice({
         status: 'success',
-        message: `Updated attendees. Redirecting to ${ isWaitingOrder( props.order ) ? 'order list' : 'payment tab' }...`
+        message: __( 'Updated attendees. Redirecting...', 'lasntgadmin' )
       });
 
       document.location.assign( isWaitingOrder( props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
@@ -207,7 +208,7 @@ const Attendees = props => {
             { props?.quantity > 0 && 
             <div class="form-field">
               { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-              <button disabled={ isSubmitButtonDisabled } type="submit" class="button alt save_order wp-element-button" name="save" value="Create">Save attendees</button>
+              <button disabled={ isSubmitButtonDisabled } type="submit" class="button alt save_order wp-element-button" name="save" value="Create">{ __( 'Save attendees', 'lasntgadmin' ) }</button>
               { isLoading && <Spinner/> }
             </div>}
           </div>

@@ -3,6 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { isNil, isBoolean } from "lodash";
 
 /**
@@ -47,7 +48,7 @@ const ProductSelector = props => {
         if( ! result.length ) {
           props.setNotice({
             status: 'error',
-            message: 'No courses are available.'
+            message: __( 'No courses are available.', 'lasntgadmin' )
           });
         }
         props.onFetch(result);
@@ -67,7 +68,7 @@ const ProductSelector = props => {
     <>
       { isLoading && <Spinner/> }
       { !isLoading && <select id={ props.id } disabled={ isBoolean( props.disabled ) ? props.disabled : isDisabled } required onChange={ props.onChange } value={ productId } defaultValue={ productId } >
-        <option selected disabled value="">Please select</option>
+        <option selected disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option>
         { props.products.map( (product) => {
           return <option key={ product.id.toString() } value={ product.id }>{ product.name }</option>
         }
@@ -80,4 +81,3 @@ const ProductSelector = props => {
 }
 
 export { ProductSelector };
-
