@@ -9,7 +9,7 @@ import { AttendeeFields } from './attendee-fields';
 import { isWaitingOrder, hasAttendees } from './order-utils';
 import { removeEmptyEntries } from './form-utils';
 
-import { range, isNil } from 'lodash';
+import { delay, range, isNil, isNull } from 'lodash';
 
 /**
  * @param { number } quantity
@@ -49,7 +49,7 @@ const Attendees = props => {
    */
   function extractAttendeeByIndex( index, form ) {
     return Array.from(
-      form.querySelectorAll(`[name^="attendees[${index}][acf]"]`))
+      form.querySelectorAll(`[name^="attendees[${index}]['acf']"]`))
       .filter( input => input.value !== "" )
       .map( input => { 
         return [ extractAcfInputs( input.getAttribute('name') ), determineAcfValue( input.value) ]
@@ -68,7 +68,7 @@ const Attendees = props => {
    * @param { string } name ACF input field's name attribute
    */
   function extractAcfInputs( name ) {
-    const match = name.match(/attendees\[\d\]\[acf\]\[(.+)\]/)
+    const match = name.match(/attendees\[\d\]\['acf'\]\['(.+)'\]/)
     return match ? match[1] : null;
   }
 
@@ -111,13 +111,12 @@ const Attendees = props => {
     };
   }
 
-  function createOrderUpdateRequestBody( orderId, status, attendeeIds ) {
+  function createUpdateOrderAttendeeIdsRequestBody( orderId, attendeeIds ) {
     const body = {
       path: `/wp/v2/shop_order/${orderId}`,
       method: 'PUT',
       data: {
         id: orderId,
-        status,
         meta: {
           'attendee_ids': [ ... new Set(attendeeIds) ]
         }
@@ -126,8 +125,64 @@ const Attendees = props => {
     return body;
   }
 
+  function createUpdateOrderStatusRequestBody( orderId, status ) {
+    const body = {
+      path: `/wp/v2/shop_order/${orderId}`,
+      method: 'PUT',
+      data: {
+        id: orderId,
+        status,
+      }
+    };
+    return body;
+  }
+
   function extractAttendeeIdsFromResponse( attendeeResponses ) {
-    return attendeeResponses.map( res => parseInt(res.body.id) );
+    return attendeeResponses.map( res => Object.hasOwn(res.body, 'id' ) ? parseInt( res.body.id ) : null ).filter(Boolean);
+  }
+
+  function extractEmployeeNumbersFromForm( quantity, form ) {
+    const formData = new FormData(form);
+    return range(quantity).map( ( index ) => {
+      if( formData.has(`attendees[${index}]['acf']['employee_number']`) ) {
+        return {
+          index: index,
+          value: formData.get(`attendees[${index}]['acf']['employee_number']`)
+        };
+      }
+    }).filter( employeeNumber => ! isNull( employeeNumber ) ).reverse();
+  }
+
+  function validateUniqueEmployeeNumbers( quantity, form ) {
+    const employeeNumbers = extractEmployeeNumbersFromForm( quantity, form );
+    const formData = new FormData(form);
+    let valid = true;
+    for( const employeeNumber of employeeNumbers ) {
+      const count = countOccurrencesOfEmployeeNumber( employeeNumber.value, employeeNumbers.map( obj => obj.value ) );
+      const input = document.querySelector(`input[name="attendees[${employeeNumber.index}]['acf']['employee_number']"]`);
+      if( count > 1 ) {
+        const validationErrorMsg = __('Employee number must be unique.', 'lasntgadmin' );
+        input.setCustomValidity( validationErrorMsg );
+        input.reportValidity();
+        setNotice(null);
+        setNotice({
+          status: 'error', 
+          message: validationErrorMsg
+        });
+        valid = false;
+        break;
+      } else {
+        input.setCustomValidity("");
+      }
+    }
+    return valid;
+  }
+
+  function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
+    return employeeNumbers.reduce( 
+      ( accumulator, currentValue, currentIndex  ) => {
+        return accumulator += currentValue === employeeNumber ? 1 : 0;
+      }, 0 );
   }
 
   /**
@@ -137,9 +192,16 @@ const Attendees = props => {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    if( quantity > 1 ) {
+      if( ! validateUniqueEmployeeNumbers( quantity, e.target ) ) {
+        return false;
+      }
+    }
+
     const batchReq = createBatchRequestBody( quantity, e.target, parseInt(props.groupId), props.order.id );
 
     try {
+
       setNotice(null);
       setIsLoading(true);
       setSubmitButtonDisabled(true);
@@ -151,7 +213,7 @@ const Attendees = props => {
 
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
-      const attendeesResponse = await apiFetch( 
+      const attendeesRes = await apiFetch( 
         {
           path: `/batch/v1`,
           method: 'POST',
@@ -161,35 +223,67 @@ const Attendees = props => {
         } 
       );
 
-      const attendeeIds = extractAttendeeIdsFromResponse( attendeesResponse.responses );
+      const attendeeIds = extractAttendeeIdsFromResponse( attendeesRes.responses );
 
       setNotice({
         status: 'info',
-        message: __( 'Updating order.', 'lasntgadmin' )
+        message: __( 'Adding attendees to order.', 'lasntgadmin' )
+      });
+
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+
+      const orderAttendeeIdsUpdateRes = await apiFetch( 
+        createUpdateOrderAttendeeIdsRequestBody( 
+          props.order.id, 
+          attendeeIds 
+        )
+      );
+
+      // Employee number is not unique
+      attendeesRes.responses.forEach( res => {
+        if( res.status >= 500 && res.status <= 599 ) {
+          throw new Error( res.body.message );
+        }
+      });
+
+      // Valid attendees are less than order quantity
+      if( parseInt( props?.quantity ) !== attendeeIds.length ) {
+        throw new Error( `Missing attendee ${ attendeeIds.length }/${ props?.quantity }` );
+      }
+
+      setNotice({
+        status: 'info',
+        message: __( 'Updating order status.', 'lasntgadmin' )
       });
 
       const orderRes = await apiFetch( 
-        createOrderUpdateRequestBody( 
+        createUpdateOrderStatusRequestBody( 
           props.order.id, 
-          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? props.order.status : 'wc-pending', 
-          attendeeIds 
+          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? props.order.status : 'wc-pending'
         )
       );
 
       setNotice({
         status: 'success',
-        message: __( 'Updated attendees. Redirecting...', 'lasntgadmin' )
+        message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
       });
 
       document.location.assign( isWaitingOrder( props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
       
     } catch (e) {
+      console.error(e);
       setNotice({
         status: 'error',
         message: e.message
       });
-      console.error(e);
       setIsLoading(false);
+
+      /*
+      delay( () => {
+        setIsLoading(true);
+        document.location.reload();
+      }, 3000 );
+      */
       setSubmitButtonDisabled(false);
     }
   }
@@ -208,7 +302,7 @@ const Attendees = props => {
             { props?.quantity > 0 && 
             <div class="form-field">
               { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-              <button disabled={ isSubmitButtonDisabled } type="submit" class="button alt save_order wp-element-button" name="save" value="Create">{ __( 'Save attendees', 'lasntgadmin' ) }</button>
+              <button disabled={ isSubmitButtonDisabled } type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create">{ __( 'Save attendees', 'lasntgadmin' ) }</button>
               { isLoading && <Spinner/> }
             </div>}
           </div>

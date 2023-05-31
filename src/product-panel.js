@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
-import { __, _n } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
@@ -77,7 +77,7 @@ const ProductPanel = props => {
         } else {
           setNotice({
             status: parseInt(spaces) > 0 ? "info" : "warning",
-            message: _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' )
+            message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
           });
         }
       }
