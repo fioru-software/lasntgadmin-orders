@@ -164,7 +164,6 @@ const Attendees = props => {
         const validationErrorMsg = __('Employee number must be unique.', 'lasntgadmin' );
         input.setCustomValidity( validationErrorMsg );
         input.reportValidity();
-        setNotice(null);
         setNotice({
           status: 'error', 
           message: validationErrorMsg
@@ -191,6 +190,7 @@ const Attendees = props => {
    */
   async function handleSubmit(e) {
     e.preventDefault();
+    setNotice(null);
 
     if( quantity > 1 ) {
       if( ! validateUniqueEmployeeNumbers( quantity, e.target ) ) {
@@ -278,13 +278,11 @@ const Attendees = props => {
       });
       setIsLoading(false);
 
-      /*
       delay( () => {
         setIsLoading(true);
         document.location.reload();
       }, 3000 );
-      */
-      setSubmitButtonDisabled(false);
+      //setSubmitButtonDisabled(false);
     }
   }
   
