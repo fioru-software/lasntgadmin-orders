@@ -72,9 +72,11 @@ class AdminTableView {
 	public static function handle_filter_query( WP_Query $query ): WP_Query {
 		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
-			if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && 'shop_order' === $query->query_vars['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				if ( isset( $_GET['attendee_id'] ) && ! empty( $_GET['attendee_id'] ) ) {
-					$query = self::handle_filter_by_attendee_id( $query );
+			if ( ! is_null( $screen ) ) {
+				if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && 'shop_order' === $query->query_vars['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					if ( isset( $_GET['attendee_id'] ) && ! empty( $_GET['attendee_id'] ) ) {
+						$query = self::handle_filter_by_attendee_id( $query );
+					}
 				}
 			}
 		}//end if
@@ -105,8 +107,10 @@ class AdminTableView {
 	public static function handle_filter_clauses( array $clauses, WP_Query $query ): array {
 		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
-			if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && isset( $_GET['post_type'] ) && 'shop_order' === $_GET['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$clauses = self::handle_filter_by_product_id( $clauses, $query );
+			if ( ! is_null( $screen ) ) {
+				if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && isset( $_GET['post_type'] ) && 'shop_order' === $_GET['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$clauses = self::handle_filter_by_product_id( $clauses, $query );
+				}
 			}
 		}
 		return $clauses;

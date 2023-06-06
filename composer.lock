@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3221986da7c40c4e77695d0ab08e89e",
+    "content-hash": "9b03542b15ff6c869924f5835b5ffd16",
     "packages": [
         {
             "name": "composer/installers",
@@ -527,84 +527,6 @@
                 "issues": "https://github.com/fioru-software/lasntgadmin-subscriptions/issues"
             },
             "time": "2023-05-10T11:08:07+00:00"
-        },
-        {
-            "name": "fioru/lasntgadmin-translate",
-            "version": "1.1.6",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:fioru-software/lasntgadmin-translate.git",
-                "reference": "c77fe61ab22d23bf206154756d5c68448b1cd405"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-translate/zipball/c77fe61ab22d23bf206154756d5c68448b1cd405",
-                "reference": "c77fe61ab22d23bf206154756d5c68448b1cd405",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "~2.0",
-                "fioru/lasntgadmin-attendees": "^3.1.0",
-                "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.7",
-                "fioru/lasntgadmin-groups": "^1.1",
-                "fioru/lasntgadmin-products": "^5.9.0",
-                "fioru/lasntgadmin-subscriptions": "^2.1.2",
-                "fioru/lasntgadmin-users": "^3.2.0"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-                "enlightn/security-checker": "dev-main",
-                "fakerphp/faker": "^1.19",
-                "mockery/mockery": "^1.5",
-                "overtrue/phplint": "^3.0",
-                "phpcompatibility/php-compatibility": "^9.3",
-                "phpcompatibility/phpcompatibility-wp": "*",
-                "squizlabs/php_codesniffer": "^3.7",
-                "wp-coding-standards/wpcs": "dev-develop",
-                "yoast/phpunit-polyfills": "^1.0"
-            },
-            "type": "wordpress-plugin",
-            "extra": {
-                "installer-name": "lasntgadmin-translate"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Lasntg\\Admin\\Translate\\": "lib"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Lasntg\\Admin\\Test\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit --verbose --configuration phpunit.xml.dist --prepend vendor/autoload.php --testdox --colors=always"
-                ],
-                "lint": [
-                    "phplint ./ --exclude=vendor"
-                ],
-                "check": [
-                    "phpcs -ns"
-                ],
-                "fix": [
-                    "phpcbf"
-                ],
-                "secure": [
-                    "security-checker security:check composer.lock"
-                ],
-                "all": [
-                    "@lint",
-                    "@check",
-                    "@test",
-                    "@secure"
-                ]
-            },
-            "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-translate/tree/1.1.6",
-                "issues": "https://github.com/fioru-software/lasntgadmin-translate/issues"
-            },
-            "time": "2023-05-26T11:28:43+00:00"
         },
         {
             "name": "fioru/lasntgadmin-users",
@@ -1811,12 +1733,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phar-io/manifest.git",
-                "reference": "36d8a21e851a9512db2b086dc5ac2c61308f0138"
+                "reference": "67d0f63b42125de53c26b351d10bb414bf4cf6ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phar-io/manifest/zipball/36d8a21e851a9512db2b086dc5ac2c61308f0138",
-                "reference": "36d8a21e851a9512db2b086dc5ac2c61308f0138",
+                "url": "https://api.github.com/repos/phar-io/manifest/zipball/67d0f63b42125de53c26b351d10bb414bf4cf6ec",
+                "reference": "67d0f63b42125de53c26b351d10bb414bf4cf6ec",
                 "shasum": ""
             },
             "require": {
@@ -1871,7 +1793,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-02-21T19:55:33+00:00"
+            "time": "2023-06-01T10:34:02+00:00"
         },
         {
             "name": "phar-io/version",
@@ -2562,12 +2484,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "0da2376003743c901b54aa2e7dae3d9dd49edf8c"
+                "reference": "70e8497b3c2201b3523b3c160958b3a7c696c7e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0da2376003743c901b54aa2e7dae3d9dd49edf8c",
-                "reference": "0da2376003743c901b54aa2e7dae3d9dd49edf8c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/70e8497b3c2201b3523b3c160958b3a7c696c7e6",
+                "reference": "70e8497b3c2201b3523b3c160958b3a7c696c7e6",
                 "shasum": ""
             },
             "require": {
@@ -2657,7 +2579,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-28T06:58:24+00:00"
+            "time": "2023-06-01T06:02:40+00:00"
         },
         {
             "name": "psr/container",
