@@ -338,7 +338,7 @@ class PageUtils {
 	public static function enqueue_components( string $hook ): void {
 		$post_type = property_exists( get_current_screen(), 'post_type' ) ? get_current_screen()->post_type : false;
 
-		if('shop_order' === $post_type && "edit.php" === $hook ){
+		if ( 'shop_order' === $post_type && 'edit.php' === $hook ) {
 			self::enqueue_orders();
 		}
 		// Load only on ?page=my-first-gutenberg-app.
@@ -353,9 +353,8 @@ class PageUtils {
 		self::enqueue_payment_tab();
 	}
 
-	private static function enqueue_orders()
-	{
-		$name   = sprintf( '%s-payment-orders', PluginUtils::get_kebab_case_name() );
+	private static function enqueue_orders() {
+		$name = sprintf( '%s-payment-orders', PluginUtils::get_kebab_case_name() );
 		wp_enqueue_style(
 			$name,
 			plugins_url( sprintf( '%s/assets/css/lasntgadmin-orders.css', PluginUtils::get_kebab_case_name() ) ),
