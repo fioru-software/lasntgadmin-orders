@@ -1,6 +1,7 @@
 .post-type-product .woocommerce-BlankState .woocommerce-BlankState-message::before,
 .post-type-shop_order .woocommerce-BlankState .woocommerce-BlankState-message::before,
 .woocommerce_page_wc-orders .woocommerce-BlankState .woocommerce-BlankState-message::before,
-.woocommerce-BlankState-cta {
+.woocommerce-BlankState-cta,
+.woocommerce-BlankState-buttons {
     display: none !important;
 }

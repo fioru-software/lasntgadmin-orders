@@ -3,7 +3,7 @@
  * Plugin Name:       LASNTG Orders
  * Plugin URI:        https://github.com/fioru-software/lasntgadmin-orders
  * Description:       Orders plugin
- * Version:           1.7.3
+ * Version:           1.7.4
  * Requires PHP:      7.2
  * Text Domain:       lasntgadmin
  * Domain Path:       /languages
