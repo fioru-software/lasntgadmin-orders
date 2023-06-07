@@ -189,7 +189,7 @@ const OrderForm = props => {
 
         <div class="form-wrap">
 
-          <h3>{ __( 'Order', 'lasntgadmin' ) }</h3>
+          <h3>{ __( 'Enrollment', 'lasntgadmin' ) }</h3>
 
           { ! isDraftStatus( props.status ) && 
             <div class="form-field">

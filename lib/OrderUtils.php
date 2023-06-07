@@ -38,8 +38,6 @@ class OrderUtils {
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
-
-		add_action( 'woocommerce_thankyou', [ self::class, 'autocomplete_order' ] );
 	}
 
 	public static function autocomplete_order( $order_id ) {

@@ -1,0 +1,6 @@
+.post-type-product .woocommerce-BlankState .woocommerce-BlankState-message::before,
+.post-type-shop_order .woocommerce-BlankState .woocommerce-BlankState-message::before,
+.woocommerce_page_wc-orders .woocommerce-BlankState .woocommerce-BlankState-message::before,
+.woocommerce-BlankState-cta {
+    display: none !important;
+}
