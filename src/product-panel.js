@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
@@ -61,7 +62,7 @@ const ProductPanel = props => {
       setPrice( price );
       setStock( stock );
 
-      if( spaces < 1 && stock > 0 && props.order.status === 'auto-draft') {
+      if( spaces < 1 && stock > 0 ) {
         props.setStatus("waiting-list");
       } else {
         props.setStatus(props.order.status);
@@ -71,12 +72,12 @@ const ProductPanel = props => {
         if( ! stock ) {
           setNotice({
             status: "error",
-            message: "Out of stock"
+            message: __( 'Out of stock', 'lasntgadmin' )
           });
         } else {
           setNotice({
             status: parseInt(spaces) > 0 ? "info" : "warning",
-            message: `${ spaces} spaces available.`
+            message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
           });
         }
       }
@@ -168,12 +169,12 @@ const ProductPanel = props => {
   return (
     <>
       <div class="form-wrap">
-        <h3>Course</h3>
+        <h3>{ __( 'Course', 'lasntgadmin' ) }</h3>
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
         <div class="form-field">
           <fieldset>
             <p class="form-row">
-              <label for="product">Course<span class="required"> *</span></label>
+              <label for="product">{ __( 'Course', 'lasntgadmin' ) }<span class="required"> *</span></label>
               <ProductSelector id="product" name="product" disabled={ isProductFormDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
             </p>
           </fieldset>
@@ -184,7 +185,7 @@ const ProductPanel = props => {
           <div class="form-field">
             <fieldset>
               <p class="form-row">
-                <label for="order_group">Group<span class="required"> *</span></label>
+                <label for="order_group">{ __( 'Group', 'lasntgadmin' ) }<span class="required"> *</span></label>
                 <GroupSelector productId={ productId } disabled={ isProductFormDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
               </p>
             </fieldset>
@@ -196,7 +197,7 @@ const ProductPanel = props => {
           <div class="form-field">
             <fieldset>
               <p class="form-row">
-                <label for="price">Price</label>
+                <label for="price">{ __( 'Price', 'lasntgadmin' ) }</label>
                 <input type="number" id="price" disabled placeholder="0" value={ price } />
                 <input type="hidden" name="price" value={ price } />
               </p>
@@ -206,7 +207,7 @@ const ProductPanel = props => {
           <div class="form-field">
             <fieldset>
               <p class="form-row">
-                <label for="quantity">Quantity<span class="required"> *</span></label>
+                <label for="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span class="required"> *</span></label>
                 <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
@@ -216,7 +217,7 @@ const ProductPanel = props => {
           <div class="form-field">
             <fieldset>
               <p class="form-row">
-                <label for="total">Total</label>
+                <label for="total">{ __( 'Total', 'lasntgadmin' ) }</label>
                 <input type="number" id="total" type="number" disabled placeholder="0" value={ total } />
                 <input type="hidden" name="total" value={ total } />
               </p>

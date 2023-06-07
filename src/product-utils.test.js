@@ -68,7 +68,7 @@ describe("findGroupQuota()", () => {
 
   it("group not in quotas", () => {
     const groupId = faker.datatype.number();
-    expect( findGroupQuota( groupId, [] ) ).toBe( 0 );
+    expect( findGroupQuota( groupId, [] ) ).toBe( "" );
   });
 });
 

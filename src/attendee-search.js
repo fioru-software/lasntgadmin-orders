@@ -17,7 +17,6 @@ const AttendeeSearch = props => {
 	const [ attendees, setAttendees ] = useState([]);
 	const [ options, setOptions ] = useState([]);
 
-  const [ isDisabled, setIsDisabled ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(false);
 
 	useEffect( () => {
@@ -26,7 +25,6 @@ const AttendeeSearch = props => {
 			setOptions(props.options);
 		}
 	}, [ props?.options ]);
-	
 
 	useEffect( () => {
 		if( ! isNil( props?.defaultValue ) ) {
@@ -97,6 +95,7 @@ const AttendeeSearch = props => {
 	}
 
   function handleInput( e ) {
+		e.target.setCustomValidity("");
 		textInput.current.value = e.target.value;
 		setSearchText(e.target.value);
   }
@@ -110,7 +109,7 @@ const AttendeeSearch = props => {
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readonly={ props?.readonly || false } disabled={ props?.disabled || false } onChange={ debouncedHandleInput } onBlur={ handleBlur } onFocus={ props.handleFocus } />
+			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readOnly={ props?.disabled || props?.readOnly } onChange={ debouncedHandleInput } onBlur={ handleBlur } onFocus={ props.handleFocus } />
 			{ isLoading && options.length === 0 && <Spinner/>  }
 			{ ! isLoading && options.length > 0 && <RadioControl options={ options } onChange={ handleSelect } />}
 		</>

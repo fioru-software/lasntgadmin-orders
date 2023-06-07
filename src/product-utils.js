@@ -13,7 +13,7 @@ function findGroupQuota( groupId, quotas ) {
   const group = quotas.find( quota => {
     return quota.key === `_quotas_field_${groupId}`;
   });
-  return group === undefined ? 0 : group.value;
+  return group === undefined ? '' : group.value;
 }
 
 function calculateAvailableSpaces( stockQuantity, groupQuota ) {
