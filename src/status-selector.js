@@ -44,7 +44,7 @@ const StatusSelector = props => {
         if( ! statuses.length ) {
           setNotice({
             status: 'warning',
-            message: __( 'Failed fetching enrollment statuses.', 'lasntgadmin' )
+            message: __( 'Failed fetching enrolment statuses.', 'lasntgadmin' )
           });
         }
         setStatuses( statuses );

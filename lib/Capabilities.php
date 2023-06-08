@@ -36,7 +36,6 @@ class Capabilities {
 		return array(
 			'read',
 			'view_admin_dashboard',
-			'edit_posts',
 			'read_shop_order',
 			'publish_shop_orders',
 			'edit_shop_orders',
@@ -58,7 +57,6 @@ class Capabilities {
 		return [
 			'read',
 			'view_admin_dashboard',
-			'edit_posts',
 			'read_shop_order',
 			'publish_shop_orders',
 			'edit_shop_orders',
@@ -80,7 +78,6 @@ class Capabilities {
 		return [
 			'read',
 			'view_admin_dashboard',
-			'edit_posts',
 			'read_shop_order',
 			'edit_shop_orders',
 			'edit_shop_order',

@@ -31,7 +31,7 @@ const OrderForm = props => {
   const [ isLoading, setIsLoading ] = useState(false);
   const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
-  const [ buttonText, setButtonText ] = useState("Create enrollment");
+  const [ buttonText, setButtonText ] = useState("Create enrolment");
   const oldStatus = props.order.status;
   useEffect( () => {
   }, [ props?.order ]);
@@ -43,7 +43,7 @@ const OrderForm = props => {
     if( ! isNil( props?.status ) ) {
       setStatus(props.status);
       if( ! isDraftStatus( props.status ) ) {
-        setButtonText( __( 'Update enrollment', 'lasntgadmin' ));
+        setButtonText( __( 'Update enrolment', 'lasntgadmin' ));
       }
     }
   }, [props?.status]);
@@ -53,12 +53,12 @@ const OrderForm = props => {
    */
   useEffect( () => {
     if( isWaitingStatus( status ) ) {
-      setButtonText( __( 'Add enrollment to waiting list', 'lasntgadmin' ));
+      setButtonText( __( 'Add enrolment to waiting list', 'lasntgadmin' ));
     } else {
       if( isDraftStatus( props?.status ) ) {
-        setButtonText( __( 'Create enrollment', 'lasntgadmin' ) );
+        setButtonText( __( 'Create enrolment', 'lasntgadmin' ) );
       } else {
-        setButtonText( __( 'Update enrollment', 'lasntgadmin' ) );
+        setButtonText( __( 'Update enrolment', 'lasntgadmin' ) );
       }
     }
   }, [ status ]);
@@ -134,20 +134,20 @@ const OrderForm = props => {
       );
       setNotice({
         status: 'success',
-        message: __( 'Updated enrollment. Redirecting to attendees tab...', 'lasntgadmin' )
+        message: __( 'Updated enrolment. Redirecting to attendees tab...', 'lasntgadmin' )
       });
       
       // if the order is being moved from waiting-list to pending 
       if ( isWaitingStatus( oldStatus ) && isPendingStatus( status ) ) {
         setNotice({
           status: 'success',
-          message: __( 'Updated enrollment. Client will be notified.', 'lasntgadmin' )
+          message: __( 'Updated enrolment. Client will be notified.', 'lasntgadmin' )
         });
         setIsLoading(false);
       } else {
         setNotice({
           status: 'success',
-          message: __( 'Updated enrollment. Redirecting...', 'lastngadmin' )
+          message: __( 'Updated enrolment. Redirecting...', 'lastngadmin' )
         });
       }
 
@@ -189,7 +189,7 @@ const OrderForm = props => {
 
         <div class="form-wrap">
 
-          <h3>{ __( 'Enrollment', 'lasntgadmin' ) }</h3>
+          <h3>{ __( 'Enrolment', 'lasntgadmin' ) }</h3>
 
           { ! isDraftStatus( props.status ) && 
             <div class="form-field">
