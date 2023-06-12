@@ -142,8 +142,17 @@ class PageUtils {
 		WC_Admin_Notices::add_notices();
 		WC_Admin_Notices::output_custom_notices();
 
-		echo '<div class="wrap woocommerce">';
 		$tab = isset( $_GET['tab'] ) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
+
+		// @todo Improve this hack.
+		if ( 'payment' === $tab ) {
+			$order = wc_get_order( $post->ID );
+			if ( ! $order->needs_payment() ) {
+				echo sprintf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
+			}
+		}
+
+		echo '<div class="wrap woocommerce">';
 		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
 
 		switch ( $tab ) {
