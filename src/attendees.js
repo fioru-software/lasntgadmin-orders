@@ -94,6 +94,9 @@ const Attendees = props => {
     return {
       path: attendeeId ? `/wp/v2/attendee/${attendeeId}?order_id=${orderId}` : `/wp/v2/attendee?order_id=${orderId}`,
       method: 'POST',
+      headers: {
+        "X-WP-Nonce": props.nonce
+      },
       body: {
         id: attendeeId,
         status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
