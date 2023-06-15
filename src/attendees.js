@@ -17,6 +17,7 @@ import { delay, range, isNil, isNull } from 'lodash';
  * @param { string } groupId
  * @param { string } nonce 
  * @param { object } order
+ * @param { number } productId
  */
 const Attendees = props => {
 
@@ -42,19 +43,81 @@ const Attendees = props => {
     }
   }, [ props.status ] );
 
+  function assembleAcfFieldsForRequestBody( index, formElement, formData ) {
+    return Object.assign(
+      Object.fromEntries(
+        extractAttendeeByIndex( index, formElement, formData )
+      )
+    );
+  }
+
   /**
    * @param { number } index Attendee index for HTML inputs
    * @param { HTMLElement } form
    * @return array
    */
-  function extractAttendeeByIndex( index, form ) {
+  function extractAttendeeByIndex( index, formElement, formData ) {
     return Array.from(
-      form.querySelectorAll(`[name^="attendees[${index}]['acf']"]`))
+      formElement.querySelectorAll(`[name^="attendees[${index}]['acf']"]`))
       .filter( input => input.value !== "" )
       .map( input => { 
-        return [ extractAcfInputs( input.getAttribute('name') ), determineAcfValue( input.value) ]
+        const name = extractAcfInputs( input.getAttribute('name') );
+        switch(name) {
+          case 'course_prerequisites_met':
+            return [ name,  extractCoursePrerequisitesMetFieldValue( index, formElement, formData ) ];
+            break;
+          default:
+            return [ name, determineAcfValue( input.value) ]
+        }
       }
     );
+  }
+
+  function extractCoursePrerequisitesMetFieldValue( index, formElement, formData ) {
+    const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
+    const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
+    // set ensure array values are unique
+    const set = new Set(
+      [ 
+        ... existingCoursePrerequisitesMetProductIds,
+        ... courePrerequisitesMetProductIds
+      ]
+    );
+    return [ ... set ];
+  }
+
+  function createAttendeesRequestBody( index, formElement, groupId, orderId ) {
+    const formData = new FormData(formElement);
+    const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
+    return {
+      path: attendeeId ? `/wp/v2/attendee/${attendeeId}?order_id=${orderId}` : `/wp/v2/attendee?order_id=${orderId}`,
+      method: 'POST',
+      headers: {
+        "X-WP-Nonce": props.nonce
+      },
+      body: {
+        id: attendeeId,
+        status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
+        meta: {
+          'groups-read': [ 
+            ... new Set( 
+              formData.getAll(`attendees[${index}]['meta']['groups-read']`).map(Number).filter(Number).concat( parseInt(props.groupId) ) 
+            ) 
+          ],
+          'order_ids': [ 
+            ... new Set( 
+              formData.getAll(`attendees[${index}]['meta']['order_ids']`).map(Number).filter(Number).concat( parseInt(props.order.id) ) 
+            ) 
+          ],
+          'product_ids': [ 
+            ... new Set( 
+              formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat( parseInt(props.productId) ) 
+            ) 
+          ]
+        },
+        acf: assembleAcfFieldsForRequestBody( index, formElement, formData )
+      }
+    };
   }
 
   /**
@@ -79,39 +142,10 @@ const Attendees = props => {
    * @param { number } orderId
    * @return object 
    */
-  function createBatchRequestBody( quantity, form, groupId, orderId) {
+  function createBatchRequestBody( quantity, formElement, groupId, orderId) {
     return range(quantity).map( ( index ) => {
-      return createAttendeesRequestBody( index, form, groupId, orderId );
+      return createAttendeesRequestBody( index, formElement, groupId, orderId );
     });
-  }
-
-  /**
-   * @todo refactor groups-read, order_ids and product_ids meta
-   */
-  function createAttendeesRequestBody( index, form, groupId, orderId ) {
-    const formData = new FormData(form);
-    const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
-    return {
-      path: attendeeId ? `/wp/v2/attendee/${attendeeId}?order_id=${orderId}` : `/wp/v2/attendee?order_id=${orderId}`,
-      method: 'POST',
-      headers: {
-        "X-WP-Nonce": props.nonce
-      },
-      body: {
-        id: attendeeId,
-        status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
-        meta: {
-          'groups-read': formData.has(`attendees[${index}]['meta']['groups-read']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['groups-read']`).split(',').map(Number).filter(Number).concat( parseInt(props.groupId) ) ) ] : [ parseInt(props.groupId) ],
-          'order_ids': formData.has(`attendees[${index}]['meta']['order_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['order_ids']`).split(',').map(Number).filter(Number).concat( props.order.id ) ) ] : [ props.order.id ],
-          'product_ids': formData.has(`attendees[${index}]['meta']['product_ids']`) ? [ ... new Set( formData.get(`attendees[${index}]['meta']['product_ids']`).split(',').map(Number).filter(Number).concat( parseInt(props.productId) ) ) ] : [ parseInt(props.productId) ]
-        },
-        acf: Object.assign(
-          Object.fromEntries(
-            extractAttendeeByIndex( index, form )
-          )
-        )
-      }
-    };
   }
 
   function createUpdateOrderAttendeeIdsRequestBody( orderId, attendeeIds ) {
@@ -202,7 +236,7 @@ const Attendees = props => {
     }
 
     const batchReq = createBatchRequestBody( quantity, e.target, parseInt(props.groupId), props.order.id );
-
+    
     try {
 
       setNotice(null);
@@ -296,7 +330,7 @@ const Attendees = props => {
           <div id="order_data" class="panel woocommerce-order-data">
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
-                <AttendeeFields fields={ props.fields } attendee={ props.attendees[index] } index={ index } disabled={ isSubmitButtonDisabled } nonce={ props.nonce } />
+                <AttendeeFields fields={ props.fields } productId={ props.productId } attendee={ props.attendees[index] } index={ index } disabled={ isSubmitButtonDisabled } nonce={ props.nonce } />
               );
             })}
 

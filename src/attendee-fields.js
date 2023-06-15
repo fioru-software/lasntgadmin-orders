@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 import { AttendeeSearch } from './attendee-search';
-import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CheckBox } from './acf-inputs';
+import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CoursePrerequisitesMetCheckBox, TrueFalse } from './acf-inputs';
 import { isNil } from 'lodash';
 import { __ } from '@wordpress/i18n';
 
@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  * @param { object } attendee
  * @param { number } index
  * @param { disabled } bool
+ * @param { number } productId
  */
 const AttendeeFields = props => {
 
@@ -45,9 +46,14 @@ const AttendeeFields = props => {
 
       { ( props?.attendee?.ID || attendee?.id ) && <input type="hidden" name={ `attendees[${props.index}]['id']` } value={ props?.attendee?.ID || attendee?.id } /> }
       { ( props?.attendee?.post_status || attendee?.status ) && <input type="hidden" name={ `attendees[${props.index}]['status']` } value={ props?.attendee?.post_status || attendee?.status } /> }
-      { ( props?.attendee?.meta?.order_ids || attendee?.meta?.order_ids ) && <input type="hidden" name={ `attendees[${props.index}]['meta']['order_ids']` } value={ props?.attendee?.meta?.order_ids.join(',') || attendee?.meta?.order_ids.join(',') || '' } /> }
-      { ( props?.attendee?.meta?.product_ids || attendee?.meta?.product_ids ) && <input type="hidden" name={ `attendees[${props.index}]['meta']['product_ids']` } value={ props?.attendee?.meta?.product_ids.join(',') || attendee?.meta?.product_ids.join(',') || '' } /> }
-      { ( props?.attendee?.meta['groups-read'] || attendee?.meta['groups-read'] ) && <input type="hidden" name={ `attendees[${props.index}]['meta']['groups-read']` } value={ props?.attendee?.meta['groups-read'].join(',') || attendee?.meta['groups-read'].join(',') || '' } /> }
+
+      { attendee?.meta?.order_ids && attendee?.meta?.order_ids.map( orderId => <input type="hidden" name={ `attendees[${props.index}]['meta']['order_ids']` } value={ parseInt( orderId ) } /> ) }
+
+      { attendee?.meta?.product_ids && attendee?.meta?.product_ids.map( productId => <input type="hidden" name={ `attendees[${props.index}]['meta']['product_ids']` } value={ parseInt( productId ) } /> ) }
+
+      { attendee?.meta['groups-read'] && attendee?.meta['groups-read'].map( groupId => <input type="hidden" name={ `attendees[${props.index}]['meta']['groups-read']` } value={ parseInt( groupId ) } /> ) }
+      
+      { attendee?.acf?.course_prerequisites_met && attendee?.acf?.course_prerequisites_met.map( productId => <input type="hidden" name={ `attendees[${props.index}]['meta']['course_prerequisites_met']` } value={ parseInt( productId ) } /> ) }
 
       { props?.fields.map( field => {
         return (
@@ -71,7 +77,9 @@ const AttendeeFields = props => {
 
                   { field.type === 'date_picker' && <DateInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'true_false' && <CheckBox id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={  attendee?.acf[field.name] || field.default_value } handleFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'true_false' && <TrueFalse id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={  attendee?.acf[field.name] || field.default_value } handleFocus={ handleAttendeeSearchFocus } /> }
+
+                  { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && <CoursePrerequisitesMetCheckBox id={ field.key } readOnly={ readOnly } productIds={ attendee?.acf?.course_prerequisites_met } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={ props.productId } handleFocus={ handleAttendeeSearchFocus } /> }
 
             { field.type === 'number' && <NumberInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
 
