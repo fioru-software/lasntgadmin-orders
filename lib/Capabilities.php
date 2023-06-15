@@ -41,11 +41,7 @@ class Capabilities {
 			'edit_shop_orders',
 			'edit_shop_order',
 			'edit_published_shop_orders',
-			'delete_shop_orders',
 			'edit_others_shop_orders',
-			'delete_published_shop_orders',
-			'delete_shop_order',
-			'delete_others_shop_orders',
 			'view_others_shop_orders',
 		);
 	}
@@ -62,11 +58,7 @@ class Capabilities {
 			'edit_shop_orders',
 			'edit_shop_order',
 			'edit_published_shop_orders',
-			'delete_shop_orders',
 			'edit_others_shop_orders',
-			'delete_published_shop_orders',
-			'delete_shop_order',
-			'delete_others_shop_orders',
 			'view_others_shop_orders',
 		];
 	}
@@ -82,11 +74,7 @@ class Capabilities {
 			'edit_shop_orders',
 			'edit_shop_order',
 			'edit_published_shop_orders',
-			'delete_shop_orders',
 			'edit_others_shop_orders',
-			'delete_published_shop_orders',
-			'delete_shop_order',
-			'delete_others_shop_orders',
 		];
 	}
 
@@ -103,11 +91,7 @@ class Capabilities {
 			'edit_shop_orders',
 			'edit_shop_order',
 			'edit_published_shop_orders',
-			'delete_shop_orders',
 			'edit_others_shop_orders',
-			'delete_published_shop_orders',
-			'delete_shop_order',
-			'delete_others_shop_orders',
 		];
 	}
 

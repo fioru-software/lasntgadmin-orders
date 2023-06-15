@@ -12,6 +12,7 @@ use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
+use WC_Abstract_Order;
 
 /**
  * Order Utility Class
@@ -27,6 +28,7 @@ class OrderUtils {
 		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
+		add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
 	}
 
 	private static function add_filters() {
@@ -40,11 +42,22 @@ class OrderUtils {
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
 	}
 
+	public static function remove_product_ids_from_attendees_meta( int $order_id, WC_Order $order ): void {
+		$order_attendee_ids = array_values(
+			array_map(
+				fn( $meta ) => (int) $meta->value,
+				$order->get_meta( 'attendee_ids', false )
+			)
+		);
+		foreach ( $order_attendee_ids as $attendee_id ) {
+			delete_post_meta( (int) $attendee_id, 'product_ids', self::get_product_id( $order ) );
+		}
+	}
+
 	public static function autocomplete_order( $order_id ) {
 		if ( ! $order_id ) {
 			return;
 		}
-
 		$order = wc_get_order( $order_id );
 		$order->update_status( 'completed' );
 	}
@@ -226,9 +239,18 @@ class OrderUtils {
 	}
 
 	public static function get_product_ids( array $order_ids ): array {
-		$product_ids = array_map(
-			fn( $order_id ) => self::get_product_id( wc_get_order( $order_id ) ),
-			$order_ids
+		$product_ids = array_filter(
+			array_map(
+				function( $order_id ) {
+					if ( is_int( $order_id ) ) {
+						$order = wc_get_order( $order_id );
+						if ( is_a( $order, 'WC_Abstract_Order' ) ) {
+							return self::get_product_id( wc_get_order( $order_id ) );
+						}
+					}
+				},
+				$order_ids
+			)
 		);
 		return $product_ids;
 	}
