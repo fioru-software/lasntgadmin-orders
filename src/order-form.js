@@ -8,7 +8,7 @@ import { isNil, isNull, isUndefined } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId } from './order-utils';
+import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId, getWaitingStatus, getPendingStatus, getDraftStatus, getAttendeesStatus } from './order-utils';
 
 /**
  * @param { string } nonce
@@ -63,9 +63,12 @@ const OrderForm = props => {
     }
   }, [ status ]);
 
-  function determineStatus( formData ) {
+  function determineStatus() {
     if( isDraftStatus( status ) ) {
-      return 'attendees';
+      return getAttendeesStatus();
+    }
+    if( isWaitingStatus( status ) ) {
+      return getWaitingStatus();
     }
     return status;
   }
@@ -76,7 +79,7 @@ const OrderForm = props => {
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
-      status: determineStatus( formData ),
+      status: determineStatus(),
       meta_data: [
         {
           key: 'groups-read',
@@ -153,12 +156,12 @@ const OrderForm = props => {
 
       switch( props.order.status ) {
 
-        case 'waiting-list':
-        case 'attendees':
+        case getWaitingStatus():
+        case getAttendeesStatus():
           document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
           break;
 
-        case 'pending':
+        case getPendingStatus():
           document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment`);
           break;
 

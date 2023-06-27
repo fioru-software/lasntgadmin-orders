@@ -45,7 +45,7 @@ const ProductPanel = props => {
       const groupQuota = findGroupQuota( 
         groupId, 
         findGroupQuotas( product.meta_data ) 
-      ) ;
+      );
       const availableSpaces = calculateAvailableSpaces( 
         product.stock_quantity || product.quantity, 
         groupQuota
@@ -62,7 +62,7 @@ const ProductPanel = props => {
       setPrice( price );
       setStock( stock );
 
-      if( spaces < 1 && stock > 0 ) {
+      if( spaces < 1 || stock < 1 ) {
         props.setStatus("waiting-list");
       } else {
         props.setStatus(props.order.status);
@@ -208,7 +208,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span class="required"> *</span></label>
-                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" max={ spaces > 0 ? spaces : stock } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
             </fieldset>

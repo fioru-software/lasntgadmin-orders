@@ -296,7 +296,7 @@ const Attendees = props => {
       const orderRes = await apiFetch( 
         createUpdateOrderStatusRequestBody( 
           props.order.id, 
-          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? props.order.status : 'wc-pending'
+          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? `wc-${props.order.status}` : 'wc-pending'
         )
       );
 
