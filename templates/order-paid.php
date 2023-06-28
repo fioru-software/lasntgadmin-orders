@@ -33,7 +33,7 @@
 	<fieldset>
 		<p class="form-row">
 			<label for="payment_amount">Total</label>
-			<input disabled id="payment_amount" type="text" value="<?php echo esc_html( sprintf( '%s %.2f', $order->get_currency(), number_format( $order->get_total(), 2 ) ) ); ?>">
+			<input disabled id="payment_amount" type="text" value="<?php echo esc_html( sprintf( '%s %s', $order->get_currency(), number_format( $order->get_total(), 2 ) ) ); ?>">
 		</p>
 	</fieldset>
 </div>
