@@ -18,7 +18,7 @@ services:
         - db
       volumes:
         - .:/usr/local/src
-        - ../lasntgadmin-attendees:/var/www/html/wp-content/plugins/lasntgadmin-attendees
+        #- ../lasntgadmin-attendees:/var/www/html/wp-content/plugins/lasntgadmin-attendees
         #- ../lasntgadmin-grant-funded-payment-gateway:/var/www/html/wp-content/plugins/lasntgadmin-grant-funded-payment-gateway
         #- ../lasntgadmin-products:/var/www/html/wp-content/plugins/lasntgadmin-products
         #- ../lasntgadmin-groups:/var/www/html/wp-content/plugins/lasntgadmin-groups
