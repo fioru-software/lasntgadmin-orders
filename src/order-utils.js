@@ -18,11 +18,19 @@ function isWaitingOrder( order ) {
 }
 
 function isWaitingStatus( status ) {
-  return status === 'waiting-list';
+  return status === getWaitingStatus();
+}
+
+function getWaitingStatus() {
+  return 'waiting-list';
 }
 
 function isPendingStatus( status ) {
-  return status === 'pending';
+  return status === getPendingStatus();
+}
+
+function getPendingStatus() {
+  return 'pending';
 }
 
 function isDraftOrder( order ) {
@@ -30,15 +38,27 @@ function isDraftOrder( order ) {
 }
 
 function isDraftStatus( status ) {
-  return status === 'auto-draft';
+  return status === getDraftStatus();
+}
+
+function getDraftStatus() {
+  return 'auto-draft';
 }
 
 function hasAttendees( order ) {
   return Array.isArray(order.attendees) && order.attendees > 0;
 }
 
+function getAttendeesStatus() {
+  return 'attendees';
+}
+
 export {
   getLineItemByProductId,
+  getPendingStatus,
+  getWaitingStatus,
+  getDraftStatus,
+  getAttendeesStatus,
   findOrderMetaByKey,
   isExistingOrder,
   isWaitingOrder,
