@@ -4,7 +4,7 @@ namespace Lasntg\Admin\Orders;
 
 use Lasntg\Admin\Orders\{ PluginUtils, OrderData };
 use Lasntg\Admin\Group\GroupApi;
-use Lasntg\Admin\Products\ProductApi;
+use Lasntg\Admin\Products\{ ProductApi, ProductUtils };
 use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
 
 use Groups_Access_Meta_Boxes;
@@ -225,7 +225,11 @@ class PageUtils {
 			PaymentUtils::render_gateway( $gateway );
 		}
 
-		echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >' . esc_html( __( 'Pay for order', 'lasntgadmin' ) ) . '</button>';
+		if( ProductUtils::$publish_status === $product->get_status() ) {
+			echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >' . esc_html( __( 'Pay for order', 'lasntgadmin' ) ) . '</button>';
+		} else {
+			echo '<div class="notice notice-warning is-dismissible"><p>Course is not open for enrolment.</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Course is not open for enrolment.</span></button></div>';
+		}
 
 		echo '</ul>';
 		echo '</div>';
@@ -304,10 +308,20 @@ class PageUtils {
 	 */
 	public static function attendees( WP_Post $post ) {
 		$order                   = wc_get_order( $post->ID );
-		$product_id              = OrderUtils::get_product_id( $order );
-		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product_id );
+        $product                 = OrderUtils::get_product( $order );
+		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
 		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
+
+        error_log("=== attendee ===");
+        error_log("== product ids ==");
+        error_log(print_r( get_post_meta( (int)$post->ID, 'product_ids'), true));
+        error_log("== order ids ==");
+        error_log(print_r( get_post_meta( (int)$post->ID, 'order_ids'), true));
+
+        error_log("=== order ===");
+        error_log("== attendee ids ==");
+        error_log(print_r( get_post_meta( $order->get_id(), 'attendee_ids'), true));
 
 		echo sprintf(
 			'<div
@@ -319,7 +333,7 @@ class PageUtils {
                 data-order="%s"
                 data-group-id="%s"
                 data-attendees="%s"
-                data-product-id="%d"
+                data-product="%s"
             ><p>' . esc_html( __( 'Loading attendees...', 'lasntgadmin' ) ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
@@ -336,7 +350,7 @@ class PageUtils {
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
 			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
-			esc_attr( $product_id )
+            esc_attr( json_encode( $product->get_data() ) )
 		);
 	}
 

@@ -44,7 +44,7 @@ window.addEventListener(
           order={ JSON.parse(attendeesComponent.dataset.order) }
           groupId={ JSON.parse(attendeesComponent.dataset.groupId) }
           attendees={ JSON.parse(attendeesComponent.dataset.attendees) }
-          productId={ attendeesComponent.dataset.productId }
+          product={ JSON.parse(attendeesComponent.dataset.product) }
         />,
         attendeesComponent
       );

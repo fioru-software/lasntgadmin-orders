@@ -53,7 +53,42 @@ function getAttendeesStatus() {
   return 'attendees';
 }
 
+function getUpdateOrderRequestBody( orderId, nonce, data) {
+  const body = {
+    path: `/wp/v2/shop_order/${orderId}`,
+    method: 'POST',
+    headers: {
+      "X-WP-Nonce": nonce
+    },
+    data: Object.assign( 
+      {
+        id: orderId,
+      },
+      data
+    )
+  };
+  return body;
+}
+
+function getUpdateAttendeeRequestBody( orderId, attendeeId, nonce, data ) {
+  return {
+    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
+    method: 'POST',
+    headers: {
+      'X-WP-Nonce': nonce
+    },
+    data: Object.assign(
+      {
+        id: attendeeId,
+      }, 
+      data
+    )
+  };
+}
+
 export {
+  getUpdateAttendeeRequestBody,
+  getUpdateOrderRequestBody,
   getLineItemByProductId,
   getPendingStatus,
   getWaitingStatus,

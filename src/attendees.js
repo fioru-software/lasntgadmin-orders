@@ -1,12 +1,11 @@
 
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { Notice } from '@wordpress/components';
+import { Notice, Spinner } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
-import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { AttendeeFields } from './attendee-fields';
-import { isWaitingOrder, hasAttendees } from './order-utils';
+import { getUpdateOrderRequestBody, isWaitingOrder, hasAttendees } from './order-utils';
 import { removeEmptyEntries } from './form-utils';
 
 import { delay, range, isNil, isNull } from 'lodash';
@@ -17,7 +16,7 @@ import { delay, range, isNil, isNull } from 'lodash';
  * @param { string } groupId
  * @param { string } nonce 
  * @param { object } order
- * @param { number } productId
+ * @param { object } product
  */
 const Attendees = props => {
 
@@ -42,6 +41,15 @@ const Attendees = props => {
       setSubmitButtonDisabled(false);
     }
   }, [ props.status ] );
+
+  /**
+   * @todo remove
+   */
+  useEffect( () => {
+    if( !isNil( props.order ) ) {
+      console.log(props.order);
+    }
+  }, [ props.order ]);
 
   function assembleAcfFieldsForRequestBody( index, formElement, formData ) {
     return Object.assign(
@@ -86,6 +94,9 @@ const Attendees = props => {
     return [ ... set ];
   }
 
+  /**
+   * @todo use orderUtils.getUpdateAttendeeRequestBody()
+   */
   function createAttendeesRequestBody( index, formElement, groupId, orderId ) {
     const formData = new FormData(formElement);
     const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
@@ -104,14 +115,14 @@ const Attendees = props => {
               formData.getAll(`attendees[${index}]['meta']['groups-read']`).map(Number).filter(Number).concat( parseInt(props.groupId) ) 
             ) 
           ],
-          'order_ids': [ 
+          order_ids: [ 
             ... new Set( 
               formData.getAll(`attendees[${index}]['meta']['order_ids']`).map(Number).filter(Number).concat( parseInt(props.order.id) ) 
             ) 
           ],
-          'product_ids': [ 
+          product_ids: [ 
             ... new Set( 
-              formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat( parseInt(props.productId) ) 
+              formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat( parseInt(props.product.id) ) 
             ) 
           ]
         },
@@ -146,32 +157,6 @@ const Attendees = props => {
     return range(quantity).map( ( index ) => {
       return createAttendeesRequestBody( index, formElement, groupId, orderId );
     });
-  }
-
-  function createUpdateOrderAttendeeIdsRequestBody( orderId, attendeeIds ) {
-    const body = {
-      path: `/wp/v2/shop_order/${orderId}`,
-      method: 'PUT',
-      data: {
-        id: orderId,
-        meta: {
-          'attendee_ids': [ ... new Set(attendeeIds) ]
-        }
-      }
-    };
-    return body;
-  }
-
-  function createUpdateOrderStatusRequestBody( orderId, status ) {
-    const body = {
-      path: `/wp/v2/shop_order/${orderId}`,
-      method: 'PUT',
-      data: {
-        id: orderId,
-        status,
-      }
-    };
-    return body;
   }
 
   function extractAttendeeIdsFromResponse( attendeeResponses ) {
@@ -270,10 +255,11 @@ const Attendees = props => {
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
       const orderAttendeeIdsUpdateRes = await apiFetch( 
-        createUpdateOrderAttendeeIdsRequestBody( 
-          props.order.id, 
-          attendeeIds 
-        )
+        getUpdateOrderRequestBody( props.order.id, props.nonce, {
+          meta: {
+            attendee_ids: [ ... new Set(attendeeIds) ]
+          }
+        })
       );
 
       // Employee number is not unique
@@ -294,9 +280,12 @@ const Attendees = props => {
       });
 
       const orderRes = await apiFetch( 
-        createUpdateOrderStatusRequestBody( 
+        getUpdateOrderRequestBody( 
           props.order.id, 
-          hasAttendees( props.order ) || isWaitingOrder( props.order ) ? `wc-${props.order.status}` : 'wc-pending'
+          props.nonce,
+          {
+            status: hasAttendees( props.order ) || isWaitingOrder( props.order ) ? `wc-${props.order.status}` : 'wc-pending'
+          }
         )
       );
 
@@ -330,7 +319,7 @@ const Attendees = props => {
           <div id="order_data" class="panel woocommerce-order-data">
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
-                <AttendeeFields fields={ props.fields } productId={ props.productId } attendee={ props.attendees[index] } index={ index } disabled={ isSubmitButtonDisabled } nonce={ props.nonce } />
+                <AttendeeFields product={ props.product } fields={ props.fields } order={ props.order } attendee={ props.attendees[index] } index={ index } disabled={ isSubmitButtonDisabled } nonce={ props.nonce } />
               );
             })}
 
