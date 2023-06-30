@@ -96,7 +96,7 @@ const EmailInput = props => {
   const emailInput = useRef(null);
 
   return (
-    <input name={ props.name } id={ props.id } type="email" ref={ emailInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$" } disabled={ props?.disabled || ( props?.defaultValue !== '' && props?.readOnly ) } onFocus={ props?.handleFocus } />
+    <input name={ props.name } id={ props.id } type="email" ref={ emailInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^[^@\s]+@[^@\s]+\.[^@\s]+$" } disabled={ props?.disabled || ( props?.defaultValue !== '' && props?.readOnly ) } onFocus={ props?.handleFocus } />
   );
 
 };
