@@ -5,7 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
 import { AttendeeFields } from './attendee-fields';
-import { getUpdateOrderRequestBody, isWaitingOrder, hasAttendees } from './order-utils';
+import { getUpdateShopOrderRequestBody, isWaitingOrder, hasAttendees } from './order-utils';
 import { removeEmptyEntries } from './form-utils';
 
 import { delay, range, isNil, isNull } from 'lodash';
@@ -41,15 +41,6 @@ const Attendees = props => {
       setSubmitButtonDisabled(false);
     }
   }, [ props.status ] );
-
-  /**
-   * @todo remove
-   */
-  useEffect( () => {
-    if( !isNil( props.order ) ) {
-      console.log(props.order);
-    }
-  }, [ props.order ]);
 
   function assembleAcfFieldsForRequestBody( index, formElement, formData ) {
     return Object.assign(
@@ -255,7 +246,7 @@ const Attendees = props => {
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
       const orderAttendeeIdsUpdateRes = await apiFetch( 
-        getUpdateOrderRequestBody( props.order.id, props.nonce, {
+        getUpdateShopOrderRequestBody( props.order.id, props.nonce, {
           meta: {
             attendee_ids: [ ... new Set(attendeeIds) ]
           }
@@ -280,7 +271,7 @@ const Attendees = props => {
       });
 
       const orderRes = await apiFetch( 
-        getUpdateOrderRequestBody( 
+        getUpdateShopOrderRequestBody( 
           props.order.id, 
           props.nonce,
           {
