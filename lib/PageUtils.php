@@ -313,16 +313,6 @@ class PageUtils {
 		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
 
-		error_log( '=== attendee ===' );
-		error_log( '== product ids ==' );
-		error_log( print_r( get_post_meta( (int) $post->ID, 'product_ids' ), true ) );
-		error_log( '== order ids ==' );
-		error_log( print_r( get_post_meta( (int) $post->ID, 'order_ids' ), true ) );
-
-		error_log( '=== order ===' );
-		error_log( '== attendee ids ==' );
-		error_log( print_r( get_post_meta( $order->get_id(), 'attendee_ids' ), true ) );
-
 		echo sprintf(
 			'<div
                 id="%s-attendees"

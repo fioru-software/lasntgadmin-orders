@@ -27,6 +27,7 @@ const AttendeeFields = props => {
     if( ! isNil( props.attendee ) ) {
       setAttendee( props.attendee );
       setReadOnly( true );
+      props.setRemoveButtonDisabled(false);
     }
   }, [ props.attendee ]);
 
@@ -45,12 +46,11 @@ const AttendeeFields = props => {
     setReadOnly( false );
   }
 
-  /**
-   * @todo
-   */
   async function handleRemoveAttendee(e) {
     e.preventDefault();
+
     try {
+      props.setRemoveButtonDisabled(true);
       setIsLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
@@ -143,6 +143,13 @@ const AttendeeFields = props => {
         message: 'Updated order details.'
       });
 
+      setNotice({
+        status: 'info',
+        message: 'Reloading page...'
+      });
+
+      document.location.reload();
+
     } catch (e) {
       console.error(e);
       setNotice({
@@ -151,6 +158,7 @@ const AttendeeFields = props => {
       });
       setIsLoading(false);
     }
+    props.setRemoveButtonDisabled(false);
   }
 
   return (
@@ -217,7 +225,7 @@ const AttendeeFields = props => {
       { readOnly && props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value ).map(Number).includes( attendee.ID ) && props?.order?.line_items[0]?.quantity > 1 &&
         <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button type="button" disabled={ isLoading } class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
+          <button type="button" disabled={ props.isRemoveButtonDisabled } class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
           { isLoading && <Spinner/> }
         </div>
       }

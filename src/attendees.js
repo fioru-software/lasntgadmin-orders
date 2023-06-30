@@ -23,6 +23,7 @@ const Attendees = props => {
   const [ notice, setNotice ] = useState(null);
   const [ quantity, setQuantity ] = useState(0);
   const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
+  const [ isRemoveButtonDisabled, setRemoveButtonDisabled ] = useState(true);
   const [ isLoading, setIsLoading ] = useState(false);
 
   useEffect( () => {
@@ -310,7 +311,7 @@ const Attendees = props => {
           <div id="order_data" class="panel woocommerce-order-data">
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
-                <AttendeeFields product={ props.product } fields={ props.fields } order={ props.order } attendee={ props.attendees[index] } index={ index } disabled={ isSubmitButtonDisabled } nonce={ props.nonce } />
+                <AttendeeFields product={ props.product } fields={ props.fields } order={ props.order } attendee={ props.attendees[index] } index={ index } isRemoveButtonDisabled={ isRemoveButtonDisabled } setRemoveButtonDisabled={ setRemoveButtonDisabled } nonce={ props.nonce } />
               );
             })}
 
