@@ -33,6 +33,9 @@ const OrderForm = props => {
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create enrolment");
   const oldStatus = props.order.status;
+
+
+
   useEffect( () => {
   }, [ props?.order ]);
 
@@ -208,7 +211,7 @@ const OrderForm = props => {
             </div>
           }
           
-          <ProductPanel productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } />
+          <ProductPanel max={ 12 } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } />
 
         </div>
 

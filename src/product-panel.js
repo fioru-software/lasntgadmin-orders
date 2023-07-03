@@ -214,7 +214,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span class="required"> *</span></label>
-                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" max={ props.max } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
             </fieldset>
