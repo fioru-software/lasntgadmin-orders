@@ -157,6 +157,9 @@ const OrderForm = props => {
       switch( props.order.status ) {
 
         case getWaitingStatus():
+          document.location.assign(`/wp-admin/edit.php?post_type=shop_order`);
+          break;
+
         case getAttendeesStatus():
           document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
           break;

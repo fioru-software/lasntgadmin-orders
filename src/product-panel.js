@@ -92,6 +92,18 @@ const ProductPanel = props => {
     }
   }, [ product ]);
 
+  function handleQuantitySelect(e) {
+    const quantity = parseInt(e.target.value);
+    if ( quantity > spaces || quantity > stock ) {
+      props.setStatus("waiting-list");
+    } else {
+      props.setStatus(props.order.status);
+    }
+    setQuantity(quantity);
+    setTotal(quantity*price);
+  }
+
+
   function reset() {
     setTotal(null);
     setQuantity(null);
@@ -158,12 +170,6 @@ const ProductPanel = props => {
       props.setSubmitButtonDisabled(false);
     }
 
-  }
-
-  function handleQuantitySelect(e) {
-    const quantity = parseInt(e.target.value);
-    setQuantity(quantity);
-    setTotal(quantity*price);
   }
 
   return (
