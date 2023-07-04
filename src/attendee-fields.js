@@ -1,19 +1,24 @@
+
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { Notice } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
+import { Notice, Spinner } from '@wordpress/components';
 import { AttendeeSearch } from './attendee-search';
 import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CoursePrerequisitesMetCheckBox, TrueFalse } from './acf-inputs';
 import { isNil } from 'lodash';
 import { __ } from '@wordpress/i18n';
+import { findOrderMetaByKey, getUpdateOrderRequestBody, getUpdateAttendeeRequestBody, getUpdateShopOrderRequestBody } from './order-utils';
 
 /**
  * @param { string } nonce @param { array } fields
  * @param { object } attendee
  * @param { number } index
  * @param { disabled } bool
- * @param { number } productId
+ * @param { object } product
  */
 const AttendeeFields = props => {
 
+  const [ isLoading, setIsLoading ] = useState(false);
+  const [ notice, setNotice ] = useState(null);
   const [ attendee, setAttendee ] = useState(null);
   const [ attendeeSearchOptions, setAttendeeSearchOptions ] = useState([]);
   const [ readOnly, setReadOnly ] = useState( false );
@@ -22,6 +27,7 @@ const AttendeeFields = props => {
     if( ! isNil( props.attendee ) ) {
       setAttendee( props.attendee );
       setReadOnly( true );
+      props.setRemoveButtonDisabled(false);
     }
   }, [ props.attendee ]);
 
@@ -38,6 +44,121 @@ const AttendeeFields = props => {
   function handleResetAttendee() {
     setAttendee( null );
     setReadOnly( false );
+  }
+
+  async function handleRemoveAttendee(e) {
+    e.preventDefault();
+
+    try {
+      props.setRemoveButtonDisabled(true);
+      setIsLoading(true);
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+
+      setNotice({
+        status: 'info',
+        message: 'Removing attendee...'
+      });
+
+      setNotice({
+        status: 'info',
+        message: 'Removing order from attendee...'
+      });
+
+
+      const updateAttendeeRequestBody = getUpdateAttendeeRequestBody( 
+        props.order.id, 
+        attendee.ID,
+        props.nonce,
+        {
+          meta: {
+            product_ids: Array.isArray( attendee?.meta?.product_ids ) ? [ ... new Set(
+              attendee?.meta?.product_ids.map(Number).filter(Number).filter( product_id => product_id !== parseInt( props.product.id ) )
+            )] : [],
+            order_ids: Array.isArray( attendee?.meta?.order_ids) ? [ ... new Set(
+              attendee?.meta?.order_ids.map(Number).filter(Number).filter( order_id => order_id !== parseInt( props.order.id ) )
+            )] : []
+          }
+        }
+      );
+      const attendeeRes = await apiFetch( 
+        updateAttendeeRequestBody
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Removed order form attendee.'
+      });
+
+      setNotice({
+        status: 'info',
+        message: 'Removing attendee from order...'
+      });
+
+      const updateShopOrderRequestBody = getUpdateShopOrderRequestBody(
+        props.order.id,
+        props.nonce,
+        {
+          meta: {
+            attendee_ids: Array.isArray( props?.order?.meta_data ) ? [ ... new Set(
+              props?.order?.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => parseInt(meta.value) ).filter( attendee_id => attendee_id !== parseInt( attendee.ID ) )
+            )] : []
+          }
+        }
+      );
+      const shopOrderRes = await apiFetch(
+        updateShopOrderRequestBody
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Removed attendee from order.'
+      });
+
+      setNotice({
+        status: 'info',
+        message: 'Updating order details...'
+      });
+
+      const updateOrderRequestBody = getUpdateOrderRequestBody(
+        props.order.id,
+        props.nonce,
+        {
+          total: props.order.total - props.product.price,
+          line_items: Array.isArray( props?.order?.line_items ) ? props?.order?.line_items.map( item => {
+            return {
+              id: item.id,
+              quantity: item.quantity - 1,
+              total: `${item.total - props.product.price}`,
+              subtotal: `${item.subtotal - props.product.price}`
+            };
+          }) : [],
+        }
+      );
+      const orderRes = await apiFetch(
+        updateOrderRequestBody
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Updated order details.'
+      });
+
+      setNotice({
+        status: 'info',
+        message: 'Reloading page...'
+      });
+
+      document.location.reload();
+
+    } catch (e) {
+      console.error(e);
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      setIsLoading(false);
+    }
+    props.setRemoveButtonDisabled(false);
   }
 
   return (
@@ -79,7 +200,7 @@ const AttendeeFields = props => {
 
                   { field.type === 'true_false' && <TrueFalse id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={  attendee?.acf[field.name] || field.default_value } handleFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && <CoursePrerequisitesMetCheckBox id={ field.key } readOnly={ readOnly } productIds={ attendee?.acf?.course_prerequisites_met } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={ props.productId } handleFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && <CoursePrerequisitesMetCheckBox id={ field.key } readOnly={ readOnly } productIds={ attendee?.acf?.course_prerequisites_met } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={ props.product.id } handleFocus={ handleAttendeeSearchFocus } /> }
 
             { field.type === 'number' && <NumberInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
 
@@ -95,9 +216,17 @@ const AttendeeFields = props => {
         )
       } ) }
 
-      { readOnly && 
+      { readOnly && ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee.ID ) && 
         <div class="form-field">
           <button type="button" class="button alt save_order wp-element-button" onClick={ handleResetAttendee } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>
+        </div>
+      }
+
+      { readOnly && props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value ).map(Number).includes( attendee.ID ) && props?.order?.line_items[0]?.quantity > 1 &&
+        <div class="form-field">
+          { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
+          <button type="button" disabled={ props.isRemoveButtonDisabled } class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
+          { isLoading && <Spinner/> }
         </div>
       }
 

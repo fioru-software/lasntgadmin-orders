@@ -71,5 +71,4 @@ class PaymentUtils {
 
 		<?php
 	}
-
 }

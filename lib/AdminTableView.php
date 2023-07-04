@@ -125,5 +125,4 @@ class AdminTableView {
 		}
 		return $clauses;
 	}
-
 }
