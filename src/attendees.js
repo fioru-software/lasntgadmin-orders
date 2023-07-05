@@ -92,7 +92,7 @@ const Attendees = props => {
   function createAttendeesRequestBody( index, formElement, groupId, orderId ) {
     const formData = new FormData(formElement);
     const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
-    return {
+    const body = {
       path: attendeeId ? `/wp/v2/attendee/${attendeeId}?order_id=${orderId}` : `/wp/v2/attendee?order_id=${orderId}`,
       method: 'POST',
       headers: {
@@ -121,6 +121,7 @@ const Attendees = props => {
         acf: assembleAcfFieldsForRequestBody( index, formElement, formData )
       }
     };
+    return body;
   }
 
   /**
@@ -134,7 +135,7 @@ const Attendees = props => {
    * @param { string } name ACF input field's name attribute
    */
   function extractAcfInputs( name ) {
-    const match = name.match(/attendees\[\d\]\['acf'\]\['(.+)'\]/)
+    const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/)
     return match ? match[1] : null;
   }
 
@@ -146,7 +147,7 @@ const Attendees = props => {
    * @return object 
    */
   function createBatchRequestBody( quantity, formElement, groupId, orderId) {
-    return range(quantity).map( ( index ) => {
+    return range(quantity).map( index => {
       return createAttendeesRequestBody( index, formElement, groupId, orderId );
     });
   }
@@ -213,7 +214,7 @@ const Attendees = props => {
     }
 
     const batchReq = createBatchRequestBody( quantity, e.target, parseInt(props.groupId), props.order.id );
-    
+
     try {
 
       setNotice(null);

@@ -92,6 +92,18 @@ const ProductPanel = props => {
     }
   }, [ product ]);
 
+  function handleQuantitySelect(e) {
+    const quantity = parseInt(e.target.value);
+    if ( quantity > spaces || quantity > stock ) {
+      props.setStatus("waiting-list");
+    } else {
+      props.setStatus(props.order.status);
+    }
+    setQuantity(quantity);
+    setTotal(quantity*price);
+  }
+
+
   function reset() {
     setTotal(null);
     setQuantity(null);
@@ -160,12 +172,6 @@ const ProductPanel = props => {
 
   }
 
-  function handleQuantitySelect(e) {
-    const quantity = parseInt(e.target.value);
-    setQuantity(quantity);
-    setTotal(quantity*price);
-  }
-
   return (
     <>
       <div class="form-wrap">
@@ -208,7 +214,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span class="required"> *</span></label>
-                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" max={ props.max } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
             </fieldset>
