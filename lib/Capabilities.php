@@ -74,7 +74,7 @@ class Capabilities {
 			'edit_shop_orders',
 			'edit_shop_order',
 			'edit_published_shop_orders',
-			'edit_others_shop_orders',
+			'publish_shop_orders',
 		];
 	}
 

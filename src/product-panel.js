@@ -183,6 +183,15 @@ const ProductPanel = props => {
       props.setSubmitButtonDisabled(false);
     }
 
+    if( 
+      ( 'attendees' == props.order.status || 
+        'waiting-list' == props.order.status 
+      )
+      && props?.user.ID === props.order.customer_id
+    ){
+      props.setSubmitButtonDisabled(false);
+    }
+
   }
 
   function handleFetchedProducts( products ) {
@@ -200,14 +209,15 @@ const ProductPanel = props => {
       props.setSubmitButtonDisabled(false);
     }
 
-  else{
-    if( 'attendees' == props.order.status ){
-      setQuantityIsDisabled(false);
-      setGroupId(groupId);
-      handleFetchedGroups()
+    else{
+      if( 'attendees' == props.order.status ){
+        setQuantityIsDisabled(false);
+        setGroupId(groupId);
+        handleFetchedGroups();
+        
+      }
     }
-  }
-
+    
   }
 
   return (
