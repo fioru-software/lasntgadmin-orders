@@ -1195,6 +1195,7 @@ const OrderForm = props => {
   const [status, setStatus] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const [buttonText, setButtonText] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("Create enrolment");
   const oldStatus = props.order.status;
+  const user_can_edit = ('attendees' == props.order.status || 'waiting-list' == props.order.status) && props?.user.ID === props.order.customer_id;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {}, [props?.order]);
 
   /**
@@ -1382,7 +1383,7 @@ const OrderForm = props => {
     isDismissable: true,
     onDismiss: () => setNotice(null)
   }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
-    disabled: isSubmitButtonDisabled,
+    disabled: isSubmitButtonDisabled && !user_can_edit,
     type: "submit",
     class: "button save_order wp-element-button button-primary",
     name: "save",
@@ -1569,6 +1570,10 @@ const ProductPanel = props => {
     }
   }, [groupId]);
   const handleNotice = () => {
+    if (!productId) {
+      setNotice(null);
+      return;
+    }
     if (!(0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isExistingOrder)(props.order) || 'attendees' == props.order.status || 'attendees' === props.status || 'waiting-list' === props.status) {
       if (!stock) {
         setNotice({
@@ -1672,9 +1677,6 @@ const ProductPanel = props => {
     const orderMeta = (0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.findOrderMetaByKey)('groups-read', props.order.meta_data);
     handlePreselectedGroup(orderMeta?.value);
     if (props?.user?.allcaps?.view_others_shop_orders) {
-      props.setSubmitButtonDisabled(false);
-    }
-    if (('attendees' == props.order.status || 'waiting-list' == props.order.status) && props?.user.ID === props.order.customer_id) {
       props.setSubmitButtonDisabled(false);
     }
   }

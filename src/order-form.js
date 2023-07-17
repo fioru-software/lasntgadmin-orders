@@ -35,6 +35,10 @@ const OrderForm = props => {
   const oldStatus = props.order.status;
 
 
+ const user_can_edit = ( 'attendees' == props.order.status || 
+        'waiting-list' == props.order.status 
+      )
+      && props?.user.ID === props.order.customer_id;
 
   useEffect( () => {
   }, [ props?.order ]);
@@ -219,7 +223,7 @@ const OrderForm = props => {
         <div class="form-wrap">
           <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ isSubmitButtonDisabled } type="submit" class="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
+          <button disabled={ isSubmitButtonDisabled && !user_can_edit } type="submit" class="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
           </div>
         </div>

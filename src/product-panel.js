@@ -57,6 +57,10 @@ const ProductPanel = props => {
   }, [ groupId ]);
 
   const handleNotice = () => {
+    if(!productId){
+      setNotice(null);
+      return;
+    }
     if( ! isExistingOrder( props.order ) 
           || 
         ( 'attendees' == props.order.status 
@@ -180,15 +184,6 @@ const ProductPanel = props => {
     handlePreselectedGroup( orderMeta?.value );
 
     if( props?.user?.allcaps?.view_others_shop_orders ) {
-      props.setSubmitButtonDisabled(false);
-    }
-
-    if( 
-      ( 'attendees' == props.order.status || 
-        'waiting-list' == props.order.status 
-      )
-      && props?.user.ID === props.order.customer_id
-    ){
       props.setSubmitButtonDisabled(false);
     }
 
