@@ -26,6 +26,7 @@ const ProductPanel = props => {
   const [ productId, setProductId ] = useState(null);
   const [ groupId, setGroupId ] = useState(null);
   const [ product, setProduct ] = useState(null);
+  const [ isQuantityDisabled, setQuantityIsDisabled ] = useState(true);
   const [ isProductFormDisabled, setProductFormDisabled ] = useState(true);
 
   /**
@@ -55,6 +56,34 @@ const ProductPanel = props => {
     }
   }, [ groupId ]);
 
+  const handleNotice = () => {
+    if(!productId){
+      setNotice(null);
+      return;
+    }
+    if( ! isExistingOrder( props.order ) 
+          || 
+        ( 'attendees' == props.order.status 
+        || 'attendees' === props.status
+        ||'waiting-list' === props.status) 
+      ) {
+        if( ! stock ) {
+          setNotice({
+            status: "error",
+            message: __( 'Out of stock', 'lasntgadmin' )
+          });
+        } else {
+          setNotice({
+            status: parseInt(spaces) > 0 ? "info" : "warning",
+            message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
+          });
+        }
+      }
+      else{
+        setNotice(null);
+      }
+  }
+
   useEffect( () => {
     if( ! isNil(spaces) ) {
       const stock = parseInt( product.stock_quantity );
@@ -68,22 +97,25 @@ const ProductPanel = props => {
         props.setStatus(props.order.status);
       }
 
-      if( ! isExistingOrder( props.order ) ) {
-        if( ! stock ) {
-          setNotice({
-            status: "error",
-            message: __( 'Out of stock', 'lasntgadmin' )
-          });
-        } else {
-          setNotice({
-            status: parseInt(spaces) > 0 ? "info" : "warning",
-            message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
-          });
-        }
-      }
+      handleNotice();
+
+      
     }
   }, [ spaces ]);
-
+  useEffect(() => {
+    if( 
+        'attendees' == props.status ||
+        'waiting-list' == props.status
+      ){
+      setQuantityIsDisabled(false);
+      setGroupId(groupId);
+      handleFetchedGroups()
+    }
+    else{
+      setQuantityIsDisabled(true);
+    }
+    handleNotice();
+  }, [props.status, stock]);
   useEffect( () => {
     if( isObject(product) && isExistingOrder( props.order ) ) {
       const lineItem = getLineItemByProductId( product.id, props.order );
@@ -164,12 +196,23 @@ const ProductPanel = props => {
 
     const orderMeta = findOrderMetaByKey( 'groups-read', props.order.meta_data );
     handlePreselectedGroup( orderMeta?.value );
-
+    
     if( ! isExistingOrder( props.order ) ) {
+      
+      setQuantityIsDisabled(false)
       setProductFormDisabled(false);
       props.setSubmitButtonDisabled(false);
     }
 
+    else{
+      if( 'attendees' == props.order.status ){
+        setQuantityIsDisabled(false);
+        setGroupId(groupId);
+        handleFetchedGroups();
+        
+      }
+    }
+    
   }
 
   return (
@@ -214,7 +257,7 @@ const ProductPanel = props => {
             <fieldset>
               <p class="form-row">
                 <label for="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span class="required"> *</span></label>
-                <input type="number" id="quantity" disabled={ isProductFormDisabled } step="1" min="1" max={ props.max } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+                <input type="number" id="quantity" disabled={ isProductFormDisabled && isQuantityDisabled } step="1" min="1" max={ props.max } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
                 <input type="hidden" name="quantity" value={ quantity } />
               </p>
             </fieldset>
