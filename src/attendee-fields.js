@@ -222,7 +222,7 @@ const AttendeeFields = props => {
         </div>
       }
 
-      { readOnly && props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value ).map(Number).includes( attendee.ID ) && props?.order?.line_items[0]?.quantity > 1 &&
+      { readOnly && props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value ).map(Number).includes( attendee.ID ) && props?.order?.line_items[0]?.quantity > 1 && ! isNil( props?.order?.status ) && ! ['on-hold', 'completed'].includes( props?.order?.status ) &&
         <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
           <button type="button" disabled={ props.isRemoveButtonDisabled } class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
