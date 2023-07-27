@@ -5,7 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
 import { AttendeeFields } from './attendee-fields';
-import { getUpdateShopOrderRequestBody, isWaitingOrder, hasAttendees } from './order-utils';
+import { isPaidOrder, getUpdateShopOrderRequestBody, isWaitingOrder, hasAttendees } from './order-utils';
 import { removeEmptyEntries } from './form-utils';
 
 import { delay, range, isNil, isNull } from 'lodash';
@@ -23,7 +23,7 @@ const Attendees = props => {
   const [ notice, setNotice ] = useState(null);
   const [ quantity, setQuantity ] = useState(0);
   const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
-  const [ isRemoveButtonDisabled, setRemoveButtonDisabled ] = useState(true);
+  const [ isRemoveButtonDisabled, setRemoveButtonDisabled ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(false);
 
   useEffect( () => {
@@ -310,9 +310,10 @@ const Attendees = props => {
       <div class="form-wrap">
         <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
           <div id="order_data" class="panel woocommerce-order-data">
+
             { props?.quantity > 0 && range(quantity).map( ( index ) => {
               return (
-                <AttendeeFields product={ props.product } fields={ props.fields } order={ props.order } attendee={ props.attendees[index] } index={ index } isRemoveButtonDisabled={ isRemoveButtonDisabled } setRemoveButtonDisabled={ setRemoveButtonDisabled } nonce={ props.nonce } />
+                <AttendeeFields product={ props.product } fields={ props.fields } order={ props.order } attendee={ props.attendees[index] } index={ index } isRemoveButtonDisabled={ isRemoveButtonDisabled } setRemoveButtonDisabled={ setRemoveButtonDisabled } nonce={ props.nonce } disabled={ isPaidOrder( props.order ) } />
               );
             })}
 
@@ -322,6 +323,7 @@ const Attendees = props => {
               <button disabled={ isSubmitButtonDisabled } type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create">{ __( 'Save attendees', 'lasntgadmin' ) }</button>
               { isLoading && <Spinner/> }
             </div>}
+
           </div>
         </form>
       </div> 

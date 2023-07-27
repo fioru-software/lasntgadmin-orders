@@ -242,12 +242,10 @@ class OrderUtils {
 		$product_ids = array_filter(
 			array_map(
 				function( $order_id ) {
-					if ( is_int( $order_id ) ) {
-						$order = wc_get_order( $order_id );
-						if ( is_a( $order, 'WC_Abstract_Order' ) ) {
-							return self::get_product_id( wc_get_order( $order_id ) );
-						}
-					}
+                    $order = wc_get_order( (int)$order_id );
+                    if ( is_a( $order, 'WC_Abstract_Order' ) ) {
+                        return self::get_product_id( $order );
+                    }
 				},
 				$order_ids
 			)

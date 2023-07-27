@@ -81,22 +81,22 @@ const TextInput = props => {
 
 };
 
-const TextArea = props => {
-
-  const textInput = useRef(null);
-
-  return (
-    <textarea id={ props?.id } ref={ textInput } disabled={ props?.disabled || ( props?.defaultValue !== '' && props?.readOnly ) } name={ props?.name } defaultValue={  props?.defaultValue } required={ props?.required } handleFocus={ props?.handleFocus } /> 
-  );
-
-};
-
 const EmailInput = props => {
 
   const emailInput = useRef(null);
 
   return (
     <input name={ props.name } id={ props.id } type="email" ref={ emailInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^[^@\s]+@[^@\s]+\.[^@\s]+$" } disabled={ props?.disabled || ( props?.defaultValue !== '' && props?.readOnly ) } onFocus={ props?.handleFocus } />
+  );
+
+};
+
+const TextArea = props => {
+
+  const textInput = useRef(null);
+
+  return (
+    <textarea id={ props?.id } ref={ textInput } disabled={ props?.disabled || props?.readOnly } name={ props?.name } defaultValue={  props?.defaultValue } required={ props?.required } handleFocus={ props?.handleFocus } /> 
   );
 
 };

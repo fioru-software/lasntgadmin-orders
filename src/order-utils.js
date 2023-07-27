@@ -13,6 +13,14 @@ function isExistingOrder( order ) {
   return order.line_items.find( item => isNumber(item?.product_id) );
 }
 
+function isPaidStatus( status ) {
+  return ['on-hold', 'completed'].includes( status );
+}
+
+function isPaidOrder( order ) {
+  return isPaidStatus( order.status );
+}
+
 function isWaitingOrder( order ) {
   return isWaitingStatus( order.status );
 }
@@ -111,6 +119,8 @@ export {
   isWaitingStatus, 
   isPendingStatus,
   isDraftOrder,
+  isPaidStatus,
+  isPaidOrder,
   isDraftStatus,
   hasAttendees
 };

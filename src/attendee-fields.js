@@ -6,7 +6,7 @@ import { AttendeeSearch } from './attendee-search';
 import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CoursePrerequisitesMetCheckBox, TrueFalse } from './acf-inputs';
 import { isNil } from 'lodash';
 import { __ } from '@wordpress/i18n';
-import { findOrderMetaByKey, getUpdateOrderRequestBody, getUpdateAttendeeRequestBody, getUpdateShopOrderRequestBody } from './order-utils';
+import { isPaidOrder, findOrderMetaByKey, getUpdateOrderRequestBody, getUpdateAttendeeRequestBody, getUpdateShopOrderRequestBody } from './order-utils';
 
 /**
  * @param { string } nonce @param { array } fields
@@ -14,6 +14,7 @@ import { findOrderMetaByKey, getUpdateOrderRequestBody, getUpdateAttendeeRequest
  * @param { number } index
  * @param { disabled } bool
  * @param { object } product
+ * @param { object } order
  */
 const AttendeeFields = props => {
 
@@ -27,7 +28,6 @@ const AttendeeFields = props => {
     if( ! isNil( props.attendee ) ) {
       setAttendee( props.attendee );
       setReadOnly( true );
-      props.setRemoveButtonDisabled(false);
     }
   }, [ props.attendee ]);
 
@@ -59,60 +59,64 @@ const AttendeeFields = props => {
         message: 'Removing attendee...'
       });
 
-      setNotice({
-        status: 'info',
-        message: 'Removing order from attendee...'
-      });
+      if( attendee && Object.hasOwn( attendee, 'ID' ) ) {
+
+        setNotice({
+          status: 'info',
+          message: 'Removing order from attendee...'
+        });
 
 
-      const updateAttendeeRequestBody = getUpdateAttendeeRequestBody( 
-        props.order.id, 
-        attendee.ID,
-        props.nonce,
-        {
-          meta: {
-            product_ids: Array.isArray( attendee?.meta?.product_ids ) ? [ ... new Set(
-              attendee?.meta?.product_ids.map(Number).filter(Number).filter( product_id => product_id !== parseInt( props.product.id ) )
-            )] : [],
-            order_ids: Array.isArray( attendee?.meta?.order_ids) ? [ ... new Set(
-              attendee?.meta?.order_ids.map(Number).filter(Number).filter( order_id => order_id !== parseInt( props.order.id ) )
-            )] : []
+        const updateAttendeeRequestBody = getUpdateAttendeeRequestBody( 
+          props.order.id, 
+          attendee.ID,
+          props.nonce,
+          {
+            meta: {
+              product_ids: Array.isArray( attendee?.meta?.product_ids ) ? [ ... new Set(
+                attendee?.meta?.product_ids.map(Number).filter(Number).filter( product_id => product_id !== parseInt( props.product.id ) )
+              )] : [],
+              order_ids: Array.isArray( attendee?.meta?.order_ids) ? [ ... new Set(
+                attendee?.meta?.order_ids.map(Number).filter(Number).filter( order_id => order_id !== parseInt( props.order.id ) )
+              )] : []
+            }
           }
-        }
-      );
-      const attendeeRes = await apiFetch( 
-        updateAttendeeRequestBody
-      );
+        );
+        const attendeeRes = await apiFetch( 
+          updateAttendeeRequestBody
+        );
 
-      setNotice({
-        status: 'success',
-        message: 'Removed order form attendee.'
-      });
+        setNotice({
+          status: 'success',
+          message: 'Removed order form attendee.'
+        });
 
-      setNotice({
-        status: 'info',
-        message: 'Removing attendee from order...'
-      });
+        setNotice({
+          status: 'info',
+          message: 'Removing attendee from order...'
+        });
 
-      const updateShopOrderRequestBody = getUpdateShopOrderRequestBody(
-        props.order.id,
-        props.nonce,
-        {
-          meta: {
-            attendee_ids: Array.isArray( props?.order?.meta_data ) ? [ ... new Set(
-              props?.order?.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => parseInt(meta.value) ).filter( attendee_id => attendee_id !== parseInt( attendee.ID ) )
-            )] : []
+        const updateShopOrderRequestBody = getUpdateShopOrderRequestBody(
+          props.order.id,
+          props.nonce,
+          {
+            meta: {
+              attendee_ids: Array.isArray( props?.order?.meta_data ) ? [ ... new Set(
+                props?.order?.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => parseInt(meta.value) ).filter( attendee_id => attendee_id !== parseInt( attendee.ID ) )
+              )] : []
+            }
           }
-        }
-      );
-      const shopOrderRes = await apiFetch(
-        updateShopOrderRequestBody
-      );
+        );
+        const shopOrderRes = await apiFetch(
+          updateShopOrderRequestBody
+        );
 
-      setNotice({
-        status: 'success',
-        message: 'Removed attendee from order.'
-      });
+        setNotice({
+          status: 'success',
+          message: 'Removed attendee from order.'
+        });
+
+      }
 
       setNotice({
         status: 'info',
@@ -183,7 +187,6 @@ const AttendeeFields = props => {
               <p class="form-row">
                   <label for={ field.key }>{ field.label }{ !!field.required && <span class="required"> *</span> }</label>
 
-
                   { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && <TextInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } handleFocus={ handleAttendeeSearchFocus } readOnly={ readOnly } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
 
                   { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch readOnly={ readOnly } options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing employee numbers" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
@@ -216,13 +219,13 @@ const AttendeeFields = props => {
         )
       } ) }
 
-      { readOnly && ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee.ID ) && 
+      { readOnly && ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
         <div class="form-field">
           <button type="button" class="button alt save_order wp-element-button" onClick={ handleResetAttendee } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>
         </div>
       }
 
-      { readOnly && props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value ).map(Number).includes( attendee.ID ) && props?.order?.line_items[0]?.quantity > 1 && ! isNil( props?.order?.status ) && ! ['on-hold', 'completed'].includes( props?.order?.status ) &&
+      { props?.order?.line_items[0]?.quantity > 1 && ! isPaidOrder( props?.order ) &&
         <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
           <button type="button" disabled={ props.isRemoveButtonDisabled } class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
