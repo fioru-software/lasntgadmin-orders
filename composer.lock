@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9cd6398d266ba963f90383f34c58b76e",
+    "content-hash": "65b36de59a6a8fe54ebddf6947e3ce95",
     "packages": [
         {
             "name": "composer/installers",
@@ -215,16 +215,16 @@
         },
         {
             "name": "fioru/lasntgadmin-attendees",
-            "version": "3.7.6",
+            "version": "3.7.8-rc1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-attendees.git",
-                "reference": "bab8b8ec4dab46b77949fafd24da76997b1a4519"
+                "reference": "229da571db3a7601b41e720b8f674d9f2c48ed50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/bab8b8ec4dab46b77949fafd24da76997b1a4519",
-                "reference": "bab8b8ec4dab46b77949fafd24da76997b1a4519",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/229da571db3a7601b41e720b8f674d9f2c48ed50",
+                "reference": "229da571db3a7601b41e720b8f674d9f2c48ed50",
                 "shasum": ""
             },
             "require": {
@@ -285,10 +285,88 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.7.6",
+                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.7.8-rc1",
                 "issues": "https://github.com/fioru-software/lasntgadmin-attendees/issues"
             },
-            "time": "2023-07-04T10:37:46+00:00"
+            "time": "2023-07-20T10:54:22+00:00"
+        },
+        {
+            "name": "fioru/lasntgadmin-dashboard",
+            "version": "1.0.13-rc2",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:fioru-software/lasntgadmin-dashboard.git",
+                "reference": "9368981da913f76b236024712a76704373194b6b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-dashboard/zipball/9368981da913f76b236024712a76704373194b6b",
+                "reference": "9368981da913f76b236024712a76704373194b6b",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "~2.0",
+                "fioru/lasntgadmin-attendees": "^3.1.0",
+                "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.4",
+                "fioru/lasntgadmin-groups": "^1.5",
+                "fioru/lasntgadmin-products": "^5.4.2",
+                "fioru/lasntgadmin-subscriptions": "^2.1.2",
+                "fioru/lasntgadmin-users": "^3.2.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+                "enlightn/security-checker": "dev-main",
+                "fakerphp/faker": "^1.19",
+                "mockery/mockery": "^1.5",
+                "overtrue/phplint": "^3.0",
+                "phpcompatibility/php-compatibility": "^9.3",
+                "phpcompatibility/phpcompatibility-wp": "*",
+                "squizlabs/php_codesniffer": "^3.7",
+                "wp-coding-standards/wpcs": "dev-develop",
+                "yoast/phpunit-polyfills": "^1.0"
+            },
+            "type": "wordpress-plugin",
+            "extra": {
+                "installer-name": "lasntgadmin-dashboard"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lasntg\\Admin\\Dashboard\\": "lib"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Lasntg\\Admin\\Test\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --verbose --configuration phpunit.xml.dist --prepend vendor/autoload.php --testdox --colors=always"
+                ],
+                "lint": [
+                    "phplint ./ --exclude=vendor"
+                ],
+                "check": [
+                    "phpcs -ns"
+                ],
+                "fix": [
+                    "phpcbf"
+                ],
+                "secure": [
+                    "security-checker security:check composer.lock"
+                ],
+                "all": [
+                    "@lint",
+                    "@check",
+                    "@test",
+                    "@secure"
+                ]
+            },
+            "support": {
+                "source": "https://github.com/fioru-software/lasntgadmin-dashboard/tree/1.0.13-rc2",
+                "issues": "https://github.com/fioru-software/lasntgadmin-dashboard/issues"
+            },
+            "time": "2023-07-25T10:42:44+00:00"
         },
         {
             "name": "fioru/lasntgadmin-grant-funded-payment-gateway",
@@ -365,16 +443,16 @@
         },
         {
             "name": "fioru/lasntgadmin-groups",
-            "version": "1.5.4-rc4",
+            "version": "1.5.5",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-groups.git",
-                "reference": "d26d30ab2173c4053c25ac00ef030a4dff8d1253"
+                "reference": "84a2a1e2823729e10755f2ad25b7833fb6d107a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-groups/zipball/d26d30ab2173c4053c25ac00ef030a4dff8d1253",
-                "reference": "d26d30ab2173c4053c25ac00ef030a4dff8d1253",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-groups/zipball/84a2a1e2823729e10755f2ad25b7833fb6d107a6",
+                "reference": "84a2a1e2823729e10755f2ad25b7833fb6d107a6",
                 "shasum": ""
             },
             "require": {
@@ -430,23 +508,23 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-groups/tree/1.5.4-rc4",
+                "source": "https://github.com/fioru-software/lasntgadmin-groups/tree/1.5.5",
                 "issues": "https://github.com/fioru-software/lasntgadmin-groups/issues"
             },
-            "time": "2023-07-12T10:36:22+00:00"
+            "time": "2023-07-18T09:55:07+00:00"
         },
         {
             "name": "fioru/lasntgadmin-products",
-            "version": "5.9.19-rc1",
+            "version": "5.9.20-rc1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-products.git",
-                "reference": "fe3cd8289507520f4e91c0a61716e019534436fd"
+                "reference": "3110fc854bf2e67b0f82959829eaa4328810f88c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/fe3cd8289507520f4e91c0a61716e019534436fd",
-                "reference": "fe3cd8289507520f4e91c0a61716e019534436fd",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/3110fc854bf2e67b0f82959829eaa4328810f88c",
+                "reference": "3110fc854bf2e67b0f82959829eaa4328810f88c",
                 "shasum": ""
             },
             "require": {
@@ -507,23 +585,23 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.9.19-rc1",
+                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.9.20-rc1",
                 "issues": "https://github.com/fioru-software/lasntgadmin-products/issues"
             },
-            "time": "2023-07-07T15:05:38+00:00"
+            "time": "2023-07-25T08:38:24+00:00"
         },
         {
             "name": "fioru/lasntgadmin-subscriptions",
-            "version": "2.1.10-rc2",
+            "version": "2.1.11",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-subscriptions.git",
-                "reference": "923ae719ca742e5e8d92594f46193d9839d02984"
+                "reference": "820d7a4ecc51d4373896681a2d7cb8fcfb09145c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-subscriptions/zipball/923ae719ca742e5e8d92594f46193d9839d02984",
-                "reference": "923ae719ca742e5e8d92594f46193d9839d02984",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-subscriptions/zipball/820d7a4ecc51d4373896681a2d7cb8fcfb09145c",
+                "reference": "820d7a4ecc51d4373896681a2d7cb8fcfb09145c",
                 "shasum": ""
             },
             "require": {
@@ -585,10 +663,162 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-subscriptions/tree/2.1.10-rc2",
+                "source": "https://github.com/fioru-software/lasntgadmin-subscriptions/tree/2.1.11",
                 "issues": "https://github.com/fioru-software/lasntgadmin-subscriptions/issues"
             },
-            "time": "2023-07-04T14:56:51+00:00"
+            "time": "2023-07-18T09:33:22+00:00"
+        },
+        {
+            "name": "fioru/lasntgadmin-theme",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:fioru-software/lasntgadmin-theme.git",
+                "reference": "f0036d459b745d649b20ffdb4c7dd5fa107c8dc1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-theme/zipball/f0036d459b745d649b20ffdb4c7dd5fa107c8dc1",
+                "reference": "f0036d459b745d649b20ffdb4c7dd5fa107c8dc1",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "~2.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+                "enlightn/security-checker": "dev-main",
+                "fakerphp/faker": "^1.19",
+                "mockery/mockery": "^1.5",
+                "overtrue/phplint": "^3.0",
+                "phpcompatibility/php-compatibility": "^9.3",
+                "phpcompatibility/phpcompatibility-wp": "*",
+                "squizlabs/php_codesniffer": "^3.7",
+                "wp-coding-standards/wpcs": "dev-develop",
+                "yoast/phpunit-polyfills": "^1.0"
+            },
+            "type": "wordpress-theme",
+            "extra": {
+                "installer-name": "lasntgadmin-theme"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lasntg\\Admin\\Theme\\": "lib"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Lasntg\\Admin\\Test\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --verbose --configuration phpunit.xml.dist --prepend vendor/autoload.php --testdox --colors=always"
+                ],
+                "lint": [
+                    "phplint ./ --exclude=vendor"
+                ],
+                "check": [
+                    "phpcs -ns"
+                ],
+                "fix": [
+                    "phpcbf"
+                ],
+                "secure": [
+                    "security-checker security:check composer.lock"
+                ],
+                "all": [
+                    "@lint",
+                    "@check",
+                    "@test",
+                    "@secure"
+                ]
+            },
+            "support": {
+                "source": "https://github.com/fioru-software/lasntgadmin-theme/tree/1.0.0",
+                "issues": "https://github.com/fioru-software/lasntgadmin-theme/issues"
+            },
+            "time": "2023-07-25T09:41:10+00:00"
+        },
+        {
+            "name": "fioru/lasntgadmin-translate",
+            "version": "1.2.3",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:fioru-software/lasntgadmin-translate.git",
+                "reference": "fbd7ec85cb35f9d7bb8fab1f86f5d6426c38c863"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-translate/zipball/fbd7ec85cb35f9d7bb8fab1f86f5d6426c38c863",
+                "reference": "fbd7ec85cb35f9d7bb8fab1f86f5d6426c38c863",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "~2.0",
+                "fioru/lasntgadmin-attendees": "^3.1.0",
+                "fioru/lasntgadmin-dashboard": "^1.0.2",
+                "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.7",
+                "fioru/lasntgadmin-groups": "^1.1",
+                "fioru/lasntgadmin-orders": "^1.7.0",
+                "fioru/lasntgadmin-products": "^5.9.0",
+                "fioru/lasntgadmin-subscriptions": "^2.1.2",
+                "fioru/lasntgadmin-users": "^3.2.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+                "enlightn/security-checker": "dev-main",
+                "fakerphp/faker": "^1.19",
+                "mockery/mockery": "^1.5",
+                "overtrue/phplint": "^3.0",
+                "phpcompatibility/php-compatibility": "^9.3",
+                "phpcompatibility/phpcompatibility-wp": "*",
+                "squizlabs/php_codesniffer": "^3.7",
+                "wp-coding-standards/wpcs": "dev-develop",
+                "yoast/phpunit-polyfills": "^1.0"
+            },
+            "type": "wordpress-plugin",
+            "extra": {
+                "installer-name": "lasntgadmin-translate"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lasntg\\Admin\\Translate\\": "lib"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Lasntg\\Admin\\Test\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --verbose --configuration phpunit.xml.dist --prepend vendor/autoload.php --testdox --colors=always"
+                ],
+                "lint": [
+                    "phplint ./ --exclude=vendor"
+                ],
+                "check": [
+                    "phpcs -ns"
+                ],
+                "fix": [
+                    "phpcbf"
+                ],
+                "secure": [
+                    "security-checker security:check composer.lock"
+                ],
+                "all": [
+                    "@lint",
+                    "@check",
+                    "@test",
+                    "@secure"
+                ]
+            },
+            "support": {
+                "source": "https://github.com/fioru-software/lasntgadmin-translate/tree/1.2.3",
+                "issues": "https://github.com/fioru-software/lasntgadmin-translate/issues"
+            },
+            "time": "2023-06-12T13:48:00+00:00"
         },
         {
             "name": "fioru/lasntgadmin-users",
@@ -2135,22 +2365,22 @@
         },
         {
             "name": "mockery/mockery",
-            "version": "dev-main",
+            "version": "1.6.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mockery/mockery.git",
-                "reference": "c322a33e9461d0c02514b815593131d825bb1de3"
+                "reference": "f14c1b124e7c8901bf70dc6eafa290179dfac319"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mockery/mockery/zipball/c322a33e9461d0c02514b815593131d825bb1de3",
-                "reference": "c322a33e9461d0c02514b815593131d825bb1de3",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/f14c1b124e7c8901bf70dc6eafa290179dfac319",
+                "reference": "f14c1b124e7c8901bf70dc6eafa290179dfac319",
                 "shasum": ""
             },
             "require": {
                 "hamcrest/hamcrest-php": "^2.0.1",
                 "lib-pcre": ">=7.0",
-                "php": "^7.4 || ^8.0"
+                "php": ">=7.4,<8.3"
             },
             "conflict": {
                 "phpunit/phpunit": "<8.0"
@@ -2158,15 +2388,11 @@
             "require-dev": {
                 "phpunit/phpunit": "^8.5 || ^9.3",
                 "psalm/plugin-phpunit": "^0.18.4",
+                "symplify/easy-coding-standard": "^11.5.0",
                 "vimeo/psalm": "^5.13.1"
             },
             "default-branch": true,
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.6.x-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "library/helpers.php",
@@ -2184,12 +2410,20 @@
                 {
                     "name": "Pádraic Brady",
                     "email": "padraic.brady@gmail.com",
-                    "homepage": "http://blog.astrumfutura.com"
+                    "homepage": "https://github.com/padraic",
+                    "role": "Author"
                 },
                 {
                     "name": "Dave Marshall",
                     "email": "dave.marshall@atstsolutions.co.uk",
-                    "homepage": "http://davedevelopment.co.uk"
+                    "homepage": "https://davedevelopment.co.uk",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nathanael Esayeas",
+                    "email": "nathanael.esayeas@protonmail.com",
+                    "homepage": "https://github.com/ghostwriter",
+                    "role": "Lead Developer"
                 }
             ],
             "description": "Mockery is a simple yet flexible PHP mock object framework",
@@ -2207,10 +2441,13 @@
                 "testing"
             ],
             "support": {
+                "docs": "https://docs.mockery.io/",
                 "issues": "https://github.com/mockery/mockery/issues",
-                "source": "https://github.com/mockery/mockery/tree/main"
+                "rss": "https://github.com/mockery/mockery/releases.atom",
+                "security": "https://github.com/mockery/mockery/security/advisories",
+                "source": "https://github.com/mockery/mockery"
             },
-            "time": "2023-06-29T12:23:45+00:00"
+            "time": "2023-07-24T19:21:28+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -2747,17 +2984,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "843a9d65ad6c36fb049f55d3cc3129372e47ad98"
+                "reference": "64b81d1ff23bb0b6f682189169ab823e4489df0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/843a9d65ad6c36fb049f55d3cc3129372e47ad98",
-                "reference": "843a9d65ad6c36fb049f55d3cc3129372e47ad98",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/64b81d1ff23bb0b6f682189169ab823e4489df0e",
+                "reference": "64b81d1ff23bb0b6f682189169ab823e4489df0e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
-                "phpcsstandards/phpcsutils": "^1.0.7",
+                "phpcsstandards/phpcsutils": "^1.0.8",
                 "squizlabs/php_codesniffer": "^3.7.1"
             },
             "require-dev": {
@@ -2803,7 +3040,7 @@
                 "issues": "https://github.com/PHPCSStandards/PHPCSExtra/issues",
                 "source": "https://github.com/PHPCSStandards/PHPCSExtra"
             },
-            "time": "2023-07-10T15:22:37+00:00"
+            "time": "2023-07-20T12:24:28+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -2811,12 +3048,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "aa23fbf1cbdfa15ac381eec08169b8cb8dea1e49"
+                "reference": "69465cab9d12454e5e7767b9041af0cd8cd13be7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/aa23fbf1cbdfa15ac381eec08169b8cb8dea1e49",
-                "reference": "aa23fbf1cbdfa15ac381eec08169b8cb8dea1e49",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/69465cab9d12454e5e7767b9041af0cd8cd13be7",
+                "reference": "69465cab9d12454e5e7767b9041af0cd8cd13be7",
                 "shasum": ""
             },
             "require": {
@@ -2877,7 +3114,7 @@
                 "issues": "https://github.com/PHPCSStandards/PHPCSUtils/issues",
                 "source": "https://github.com/PHPCSStandards/PHPCSUtils"
             },
-            "time": "2023-07-10T14:25:40+00:00"
+            "time": "2023-07-16T21:39:41+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2885,12 +3122,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "bf35465b14a46f592a314e77c2aba4ded0c04138"
+                "reference": "f1564623dc5330085a73cefcf824b48cdec997b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/bf35465b14a46f592a314e77c2aba4ded0c04138",
-                "reference": "bf35465b14a46f592a314e77c2aba4ded0c04138",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f1564623dc5330085a73cefcf824b48cdec997b2",
+                "reference": "f1564623dc5330085a73cefcf824b48cdec997b2",
                 "shasum": ""
             },
             "require": {
@@ -2955,7 +3192,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-07-06T09:16:17+00:00"
+            "time": "2023-07-17T04:56:01+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3204,12 +3441,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "d64ea7dbc7aa495c64fd035298302c48ce27be18"
+                "reference": "19c72d49bfdecc2dac983f3cd4b5b1aff30df7a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d64ea7dbc7aa495c64fd035298302c48ce27be18",
-                "reference": "d64ea7dbc7aa495c64fd035298302c48ce27be18",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/19c72d49bfdecc2dac983f3cd4b5b1aff30df7a1",
+                "reference": "19c72d49bfdecc2dac983f3cd4b5b1aff30df7a1",
                 "shasum": ""
             },
             "require": {
@@ -3299,7 +3536,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-10T06:39:22+00:00"
+            "time": "2023-07-18T12:32:17+00:00"
         },
         {
             "name": "psr/container",
@@ -4369,12 +4606,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "276f68cc74a3e4e1855bab6d01f0089337d00ae0"
+                "reference": "354b4c5ee114a9d10b72f6d311d5d18152162ad0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/276f68cc74a3e4e1855bab6d01f0089337d00ae0",
-                "reference": "276f68cc74a3e4e1855bab6d01f0089337d00ae0",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/354b4c5ee114a9d10b72f6d311d5d18152162ad0",
+                "reference": "354b4c5ee114a9d10b72f6d311d5d18152162ad0",
                 "shasum": ""
             },
             "require": {
@@ -4419,7 +4656,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2023-07-11T20:18:21+00:00"
+            "time": "2023-07-16T10:58:04+00:00"
         },
         {
             "name": "symfony/console",
@@ -4427,12 +4664,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "560fc3ed7a43e6d30ea94a07d77f9a60b8ed0fb8"
+                "reference": "b504a3d266ad2bb632f196c0936ef2af5ff6e273"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/560fc3ed7a43e6d30ea94a07d77f9a60b8ed0fb8",
-                "reference": "560fc3ed7a43e6d30ea94a07d77f9a60b8ed0fb8",
+                "url": "https://api.github.com/repos/symfony/console/zipball/b504a3d266ad2bb632f196c0936ef2af5ff6e273",
+                "reference": "b504a3d266ad2bb632f196c0936ef2af5ff6e273",
                 "shasum": ""
             },
             "require": {
@@ -4518,7 +4755,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-26T05:13:16+00:00"
+            "time": "2023-07-19T20:11:33+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -4593,12 +4830,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "a5d572c7b4cb0d087ea5f026d1424b87cfa6fb11"
+                "reference": "01ef6b2391a59bb4c5d3c59e2ef9b99c7d335d17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/a5d572c7b4cb0d087ea5f026d1424b87cfa6fb11",
-                "reference": "a5d572c7b4cb0d087ea5f026d1424b87cfa6fb11",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/01ef6b2391a59bb4c5d3c59e2ef9b99c7d335d17",
+                "reference": "01ef6b2391a59bb4c5d3c59e2ef9b99c7d335d17",
                 "shasum": ""
             },
             "require": {
@@ -4648,7 +4885,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-07T05:57:40+00:00"
+            "time": "2023-07-09T13:55:15+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -5473,19 +5710,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
-                "reference": "0734364f65df0cfb9e8d858b47f9c98fb0743372"
+                "reference": "2c593e4a6c8c7d71aac1f8682448417527874200"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/0734364f65df0cfb9e8d858b47f9c98fb0743372",
-                "reference": "0734364f65df0cfb9e8d858b47f9c98fb0743372",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/2c593e4a6c8c7d71aac1f8682448417527874200",
+                "reference": "2c593e4a6c8c7d71aac1f8682448417527874200",
                 "shasum": ""
             },
             "require": {
                 "ext-filter": "*",
                 "php": ">=5.4",
-                "phpcsstandards/phpcsextra": "^1.0",
-                "phpcsstandards/phpcsutils": "^1.0.7",
+                "phpcsstandards/phpcsextra": "^1.1.0",
+                "phpcsstandards/phpcsutils": "^1.0.8",
                 "squizlabs/php_codesniffer": "^3.7.2"
             },
             "require-dev": {
@@ -5522,7 +5759,7 @@
                 "source": "https://github.com/WordPress/WordPress-Coding-Standards",
                 "wiki": "https://github.com/WordPress/WordPress-Coding-Standards/wiki"
             },
-            "time": "2023-07-11T09:36:30+00:00"
+            "time": "2023-07-24T08:58:06+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",
