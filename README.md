@@ -48,7 +48,7 @@ Visit [http://localhost:8080/wp-login.php](localhost:8080/wp-login.php)
 ### React
 
 ```sh
-docker run --rm -u node:node -v $(pwd):/usr/local/src -w /usr/local/src -ti node:lts-alpine ash
+docker run --rm -u node:node -v $(pwd):/usr/local/src -w /usr/local/src -ti node:14-alpine ash
 npm install
 npm start
 npm build

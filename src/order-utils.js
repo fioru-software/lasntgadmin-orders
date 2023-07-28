@@ -17,6 +17,14 @@ function isPaidStatus( status ) {
   return ['on-hold', 'completed'].includes( status );
 }
 
+/**
+ * @todo clarify
+ */
+function isOrderAttendee( order, attendee ) {
+  //{ ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
+  return order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee.ID );
+}
+
 function isPaidOrder( order ) {
   return isPaidStatus( order.status );
 }
@@ -120,6 +128,7 @@ export {
   isPendingStatus,
   isDraftOrder,
   isPaidStatus,
+  isOrderAttendee,
   isPaidOrder,
   isDraftStatus,
   hasAttendees

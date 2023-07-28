@@ -8,18 +8,23 @@ const SelectInput = props => {
   const [ value, setValue ] = useState("");
 
   useEffect( () => {
-    setValue(props.defaultValue);
-  }, [ props.defaultValue]);
+    if( ! isNil( props?.value ) ) {
+      setValue( props.value );
+    }
+  }, [ props.value ]);
 
   function handleChange(e) {
     setValue(e.target.value);
   }
 
   return (
-    <select id={ props.id } name={ props.name } disabled={ props?.disabled || ( props?.defaultValue !== '' && props?.readOnly ) } required={ props?.required || false } value={ value } onChange={ handleChange } onFocus={ props?.handleFocus }>
-      { ! props.value && ! props.defaultValue && <option disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option> }
-      { props.children }
-    </select> 
+    <>
+      <select id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } value={ value } onChange={ handleChange } onFocus={ props?.handleFocus }>
+        { ! props.value && <option disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option> }
+        { props.children }
+      </select> 
+      { props?.disabled && <input type="hidden" name={ props.name } value={ value } />}
+    </>
   );
 
 }
@@ -57,10 +62,10 @@ const CoursePrerequisitesMetCheckBox = props => {
       const productIds = props.productIds.map( Number );
       if( productIds.includes( parseInt(props.defaultValue) ) ) {
         setChecked(true);
-        setDisabled( props?.disabled || props?.readOnly );
+        setDisabled( props?.disabled );
       }
     }
-  }, [ props?.disabled, props?.readOnly ]);
+  }, [ props?.disabled ]);
 
   function handleClick(e) {
     setChecked(e.target.checked);
@@ -96,7 +101,11 @@ const TextArea = props => {
   const textInput = useRef(null);
 
   return (
-    <textarea id={ props?.id } ref={ textInput } disabled={ props?.disabled || props?.readOnly } name={ props?.name } defaultValue={  props?.defaultValue } required={ props?.required } handleFocus={ props?.handleFocus } /> 
+    <>
+      <textarea id={ props?.id } ref={ textInput } disabled={ props?.disabled || props?.readOnly } name={ props?.name } defaultValue={  props?.defaultValue } required={ props?.required } handleFocus={ props?.handleFocus } /> 
+      { props?.disabled && <input type="hidden" name={ name } defaultValue={ props?.defaultValue } /> }
+    </>
+
   );
 
 };

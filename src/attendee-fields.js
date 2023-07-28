@@ -6,7 +6,7 @@ import { AttendeeSearch } from './attendee-search';
 import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CoursePrerequisitesMetCheckBox, TrueFalse } from './acf-inputs';
 import { isNil } from 'lodash';
 import { __ } from '@wordpress/i18n';
-import { isPaidOrder, findOrderMetaByKey, getUpdateOrderRequestBody, getUpdateAttendeeRequestBody, getUpdateShopOrderRequestBody } from './order-utils';
+import { isOrderAttendee, isPaidOrder, findOrderMetaByKey, getUpdateOrderRequestBody, getUpdateAttendeeRequestBody, getUpdateShopOrderRequestBody } from './order-utils';
 
 /**
  * @param { string } nonce @param { array } fields
@@ -22,18 +22,27 @@ const AttendeeFields = props => {
   const [ notice, setNotice ] = useState(null);
   const [ attendee, setAttendee ] = useState(null);
   const [ attendeeSearchOptions, setAttendeeSearchOptions ] = useState([]);
-  const [ readOnly, setReadOnly ] = useState( false );
+  const [ disabled, setDisabled ] = useState( false );
 
+  useEffect( () => {
+    if( ! isNil( props.disabled ) ) {
+      setDisabled( props.disabled );
+    }
+  }, [ props.disabled ] );
+
+  /**
+   * Inputs are disabled for existing users
+   */
   useEffect( () => {
     if( ! isNil( props.attendee ) ) {
       setAttendee( props.attendee );
-      setReadOnly( true );
+      setDisabled( true );
     }
   }, [ props.attendee ]);
 
   function handleAttendeeSearchSelect( attendee ) {
     setAttendee( attendee );
-    setReadOnly( true );
+    setDisabled( true );
     setAttendeeSearchOptions([]);
   }
 
@@ -43,7 +52,7 @@ const AttendeeFields = props => {
 
   function handleResetAttendee() {
     setAttendee( null );
-    setReadOnly( false );
+    setDisabled( false );
   }
 
   async function handleRemoveAttendee(e) {
@@ -187,27 +196,27 @@ const AttendeeFields = props => {
               <p class="form-row">
                   <label for={ field.key }>{ field.label }{ !!field.required && <span class="required"> *</span> }</label>
 
-                  { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && <TextInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } handleFocus={ handleAttendeeSearchFocus } readOnly={ readOnly } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
+                  { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && <TextInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } handleFocus={ handleAttendeeSearchFocus } disabled={ disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> }
 
-                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch readOnly={ readOnly } options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing employee numbers" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
+                  { field.type === 'text' && field.name === 'employee_number' && <AttendeeSearch options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing employee numbers" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 
-                  { field.type === 'text' && field.name === 'last_name' && <AttendeeSearch readOnly={ readOnly } options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } acfClarifyingFieldName="first_name" handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing last names" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }/> }
+                  { field.type === 'text' && field.name === 'last_name' && <AttendeeSearch options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } acfClarifyingFieldName="first_name" handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing last names" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }/> }
 
-                  { field.type === 'text' && field.name === 'first_name' && <AttendeeSearch readOnly={ readOnly } options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } acfClarifyingFieldName="last_name" handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing first names" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }/> }
+                  { field.type === 'text' && field.name === 'first_name' && <AttendeeSearch options={ attendeeSearchOptions } handleFocus={ handleAttendeeSearchFocus } nonce={ props.nonce } acfFieldName={ field.name } acfClarifyingFieldName="last_name" handleSelect={ handleAttendeeSearchSelect } helpText="Enter or search for existing first names" name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }/> }
 
-                  { field.type === 'email' && <EmailInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } onFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } onFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'textarea' && <TextArea id={ field.key } readOnly={ readOnly } disabled={ props.disabled } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'textarea' && <TextArea id={ field.key } disabled={ disabled } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'date_picker' && <DateInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'date_picker' && <DateInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'true_false' && <TrueFalse id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={  attendee?.acf[field.name] || field.default_value } handleFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'true_false' && <TrueFalse id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } required={ !!field.required } defaultValue={  attendee?.acf[field.name] || field.default_value } handleFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && <CoursePrerequisitesMetCheckBox id={ field.key } readOnly={ readOnly } productIds={ attendee?.acf?.course_prerequisites_met } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={ props.product.id } handleFocus={ handleAttendeeSearchFocus } /> }
+                  { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && <CoursePrerequisitesMetCheckBox id={ field.key } productIds={ attendee?.acf?.course_prerequisites_met } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } required={ !!field.required } defaultValue={ props.product.id } handleFocus={ handleAttendeeSearchFocus } /> }
 
-            { field.type === 'number' && <NumberInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
+            { field.type === 'number' && <NumberInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } handleFocus={ handleAttendeeSearchFocus } /> }
 
-                  { field.type === 'select' && <SelectInput id={ field.key } readOnly={ readOnly } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ props.disabled } required={ !!field.required } defaultValue={ attendee?.acf[field.name] || field.default_value || "" } handleFocus={ handleAttendeeSearchFocus }>
+                  { field.type === 'select' && <SelectInput id={ field.key } name={ `attendees[${props.index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } required={ !!field.required } value={ attendee?.acf[field.name] || field.default_value || "" } handleFocus={ handleAttendeeSearchFocus }>
                     { Object.keys(field.choices).map( ( key, index ) => {
                       return <option key={ key } value={ field.name === 'local_authority' ? key : field.choices[key] }>{ field.choices[key] }</option>
                     } ) }
@@ -219,7 +228,7 @@ const AttendeeFields = props => {
         )
       } ) }
 
-      { readOnly && ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
+      { ! isPaidOrder( props?.order ) && ! isOrderAttendee( props.order, attendee ) && 
         <div class="form-field">
           <button type="button" class="button alt save_order wp-element-button" onClick={ handleResetAttendee } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>
         </div>

@@ -35,23 +35,29 @@ __webpack_require__.r(__webpack_exports__);
 const SelectInput = props => {
   const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    setValue(props.defaultValue);
-  }, [props.defaultValue]);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.value)) {
+      setValue(props.value);
+    }
+  }, [props.value]);
   function handleChange(e) {
     setValue(e.target.value);
   }
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
     id: props.id,
     name: props.name,
-    disabled: props?.disabled || props?.defaultValue !== '' && props?.readOnly,
+    disabled: props?.disabled || false,
     required: props?.required || false,
     value: value,
     onChange: handleChange,
     onFocus: props?.handleFocus
-  }, !props.value && !props.defaultValue && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
+  }, !props.value && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
     disabled: true,
     value: ""
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Please select', 'lasntgadmin')), props.children);
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Please select', 'lasntgadmin')), props.children), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: value
+  }));
 };
 const TrueFalse = props => {
   const [checked, setChecked] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -88,10 +94,10 @@ const CoursePrerequisitesMetCheckBox = props => {
       const productIds = props.productIds.map(Number);
       if (productIds.includes(parseInt(props.defaultValue))) {
         setChecked(true);
-        setDisabled(props?.disabled || props?.readOnly);
+        setDisabled(props?.disabled);
       }
     }
-  }, [props?.disabled, props?.readOnly]);
+  }, [props?.disabled]);
   function handleClick(e) {
     setChecked(e.target.checked);
   }
@@ -143,7 +149,7 @@ const EmailInput = props => {
 };
 const TextArea = props => {
   const textInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("textarea", {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("textarea", {
     id: props?.id,
     ref: textInput,
     disabled: props?.disabled || props?.readOnly,
@@ -151,7 +157,11 @@ const TextArea = props => {
     defaultValue: props?.defaultValue,
     required: props?.required,
     handleFocus: props?.handleFocus
-  });
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: name,
+    defaultValue: props?.defaultValue
+  }));
 };
 const DateInput = props => {
   const dateInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
@@ -271,16 +281,25 @@ const AttendeeFields = props => {
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [attendee, setAttendee] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [attendeeSearchOptions, setAttendeeSearchOptions] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
-  const [readOnly, setReadOnly] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [disabled, setDisabled] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_5__.isNil)(props.disabled)) {
+      setDisabled(props.disabled);
+    }
+  }, [props.disabled]);
+
+  /**
+   * Inputs are disabled for existing users
+   */
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_5__.isNil)(props.attendee)) {
       setAttendee(props.attendee);
-      setReadOnly(true);
+      setDisabled(true);
     }
   }, [props.attendee]);
   function handleAttendeeSearchSelect(attendee) {
     setAttendee(attendee);
-    setReadOnly(true);
+    setDisabled(true);
     setAttendeeSearchOptions([]);
   }
   function handleAttendeeSearchFocus() {
@@ -288,7 +307,7 @@ const AttendeeFields = props => {
   }
   function handleResetAttendee() {
     setAttendee(null);
-    setReadOnly(false);
+    setDisabled(false);
   }
   async function handleRemoveAttendee(e) {
     e.preventDefault();
@@ -403,14 +422,12 @@ const AttendeeFields = props => {
       id: field.key,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
       handleFocus: handleAttendeeSearchFocus,
-      readOnly: readOnly,
-      disabled: props.disabled,
+      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
       required: !!field.required
     }), field.type === 'text' && field.name === 'employee_number' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_search__WEBPACK_IMPORTED_MODULE_3__.AttendeeSearch, {
-      readOnly: readOnly,
       options: attendeeSearchOptions,
       handleFocus: handleAttendeeSearchFocus,
       nonce: props.nonce,
@@ -418,13 +435,12 @@ const AttendeeFields = props => {
       handleSelect: handleAttendeeSearchSelect,
       helpText: "Enter or search for existing employee numbers",
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
       required: !!field.required
     }), field.type === 'text' && field.name === 'last_name' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_search__WEBPACK_IMPORTED_MODULE_3__.AttendeeSearch, {
-      readOnly: readOnly,
       options: attendeeSearchOptions,
       handleFocus: handleAttendeeSearchFocus,
       nonce: props.nonce,
@@ -433,13 +449,12 @@ const AttendeeFields = props => {
       handleSelect: handleAttendeeSearchSelect,
       helpText: "Enter or search for existing last names",
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
       required: !!field.required
     }), field.type === 'text' && field.name === 'first_name' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_search__WEBPACK_IMPORTED_MODULE_3__.AttendeeSearch, {
-      readOnly: readOnly,
       options: attendeeSearchOptions,
       handleFocus: handleAttendeeSearchFocus,
       nonce: props.nonce,
@@ -448,16 +463,15 @@ const AttendeeFields = props => {
       handleSelect: handleAttendeeSearchSelect,
       helpText: "Enter or search for existing first names",
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
       required: !!field.required
     }), field.type === 'email' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.EmailInput, {
       id: field.key,
-      readOnly: readOnly,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
@@ -465,52 +479,46 @@ const AttendeeFields = props => {
       onFocus: handleAttendeeSearchFocus
     }), field.type === 'textarea' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.TextArea, {
       id: field.key,
-      readOnly: readOnly,
-      disabled: props.disabled,
+      disabled: disabled,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       handleFocus: handleAttendeeSearchFocus
     }), field.type === 'date_picker' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.DateInput, {
       id: field.key,
-      readOnly: readOnly,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       handleFocus: handleAttendeeSearchFocus
     }), field.type === 'true_false' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.TrueFalse, {
       id: field.key,
-      readOnly: readOnly,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       required: !!field.required,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       handleFocus: handleAttendeeSearchFocus
     }), field.type === 'checkbox' && field.name === 'course_prerequisites_met' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.CoursePrerequisitesMetCheckBox, {
       id: field.key,
-      readOnly: readOnly,
       productIds: attendee?.acf?.course_prerequisites_met,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       required: !!field.required,
       defaultValue: props.product.id,
       handleFocus: handleAttendeeSearchFocus
     }), field.type === 'number' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.NumberInput, {
       id: field.key,
-      readOnly: readOnly,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       handleFocus: handleAttendeeSearchFocus
     }), field.type === 'select' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_4__.SelectInput, {
       id: field.key,
-      readOnly: readOnly,
       name: `attendees[${props.index}]['${field.prefix}']['${field.name}']`,
-      disabled: props.disabled,
+      disabled: disabled,
       required: !!field.required,
-      defaultValue: attendee?.acf[field.name] || field.default_value || "",
+      value: attendee?.acf[field.name] || field.default_value || "",
       handleFocus: handleAttendeeSearchFocus
     }, Object.keys(field.choices).map((key, index) => {
       return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
@@ -518,7 +526,7 @@ const AttendeeFields = props => {
         value: field.name === 'local_authority' ? key : field.choices[key]
       }, field.choices[key]);
     })))));
-  }), readOnly && !props.order.meta_data.filter(meta => meta.key === 'attendee_ids').map(meta => meta.value).map(Number).includes(attendee?.ID) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  }), !(0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isPaidOrder)(props?.order) && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isOrderAttendee)(props.order, attendee) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     type: "button",
@@ -662,10 +670,14 @@ const AttendeeSearch = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    readOnly: props?.disabled || props?.readOnly,
+    disabled: props?.disabled,
     onChange: debouncedHandleInput,
     onBlur: handleBlur,
     onFocus: props.handleFocus
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: props?.defaultValue
   }), isLoading && options.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null), !isLoading && options.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
     options: options,
     onChange: handleSelect
@@ -1418,6 +1430,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   isDraftOrder: () => (/* binding */ isDraftOrder),
 /* harmony export */   isDraftStatus: () => (/* binding */ isDraftStatus),
 /* harmony export */   isExistingOrder: () => (/* binding */ isExistingOrder),
+/* harmony export */   isOrderAttendee: () => (/* binding */ isOrderAttendee),
 /* harmony export */   isPaidOrder: () => (/* binding */ isPaidOrder),
 /* harmony export */   isPaidStatus: () => (/* binding */ isPaidStatus),
 /* harmony export */   isPendingStatus: () => (/* binding */ isPendingStatus),
@@ -1438,6 +1451,14 @@ function isExistingOrder(order) {
 }
 function isPaidStatus(status) {
   return ['on-hold', 'completed'].includes(status);
+}
+
+/**
+ * @todo clarify
+ */
+function isOrderAttendee(order, attendee) {
+  //{ ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
+  return order.meta_data.filter(meta => meta.key === 'attendee_ids').map(meta => meta.value).map(Number).includes(attendee.ID);
 }
 function isPaidOrder(order) {
   return isPaidStatus(order.status);

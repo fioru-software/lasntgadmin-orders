@@ -109,7 +109,8 @@ const AttendeeSearch = props => {
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } readOnly={ props?.disabled || props?.readOnly } onChange={ debouncedHandleInput } onBlur={ handleBlur } onFocus={ props.handleFocus } />
+			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled } onChange={ debouncedHandleInput } onBlur={ handleBlur } onFocus={ props.handleFocus } />
+      { props?.disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
 			{ isLoading && options.length === 0 && <Spinner/>  }
 			{ ! isLoading && options.length > 0 && <RadioControl options={ options } onChange={ handleSelect } />}
 		</>
