@@ -1,8 +1,8 @@
 
 import { render } from '@wordpress/element';
 
-import { OrderForm } from './order-form';
-import { Attendees } from './attendees';
+import { OrderForm } from './enrolment-tab/order-form';
+import { AttendeesForm } from './attendees-tab/attendees-form';
 
 /**
  * Render components
@@ -33,10 +33,10 @@ window.addEventListener(
       );
     }
 
-    const attendeesComponent = document.querySelector( '#lasntgadmin-orders-attendees' );
+    const attendeesComponent = document.querySelector( '#lasntgadmin-orders-attendees-form' );
     if( attendeesComponent ) {
       render(
-        <Attendees 
+        <AttendeesForm
           quantity={ attendeesComponent.dataset.quantity }
           nonce={ attendeesComponent.dataset.nonce } 
           fields={ JSON.parse( attendeesComponent.dataset.fields ) }

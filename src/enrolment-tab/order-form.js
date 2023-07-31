@@ -202,16 +202,10 @@ const OrderForm = props => {
 
         <div class="form-wrap">
 
-          <h3>{ __( 'Enrolment', 'lasntgadmin' ) }</h3>
-
           { ! isDraftStatus( props.status ) && 
-            <div class="form-field">
-              <fieldset>
-                <p class="form-row">
-                  <label for="order_status">{ __( 'Status', 'lasntgadmin' ) }<span class="required"> *</span></label>
-                  <StatusSelector id="order_status" disabled={ isSubmitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
-                </p>
-              </fieldset>
+            <div class="form-field form-row">
+              <label for="order_status">{ __( 'Status', 'lasntgadmin' ) }<span class="required"> *</span></label>
+              <StatusSelector id="order_status" disabled={ isSubmitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
             </div>
           }
           

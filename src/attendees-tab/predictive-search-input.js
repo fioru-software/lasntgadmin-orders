@@ -7,7 +7,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { RadioControl } from '@wordpress/components';
 import { isNil } from "lodash";
 
-const AttendeeSearch = props => {
+const PredictiveSearchInput = props => {
 
 	const debouncedHandleInput = useCallback( debounce( handleInput, 500) );
 
@@ -118,6 +118,6 @@ const AttendeeSearch = props => {
 };
 
 export {
-  AttendeeSearch
+  PredictiveSearchInput
 };
 

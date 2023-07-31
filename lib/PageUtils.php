@@ -317,7 +317,7 @@ class PageUtils {
 
 		echo sprintf(
 			'<div
-                id="%s-attendees"
+                id="%s-attendees-form"
                 data-nonce="%s"
                 data-quantity="%d"
                 data-fields="%s"
