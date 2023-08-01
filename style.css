@@ -1,3 +1,8 @@
+.wp-core-ui .button-link:disabled {
+    color: #777;
+    cursor: text;
+}
+
 fieldset {
     margin-top: 20px;
     margin-bottom: 20px;

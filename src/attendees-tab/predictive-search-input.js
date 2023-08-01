@@ -1,7 +1,6 @@
 
 import { Spinner } from '@wordpress/components';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import { debounce } from 'lodash';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { RadioControl } from '@wordpress/components';
@@ -9,11 +8,8 @@ import { isNil } from "lodash";
 
 const PredictiveSearchInput = props => {
 
-	const debouncedHandleInput = useCallback( debounce( handleInput, 500) );
-
   const textInput = useRef(null);
 
-	const [ searchText, setSearchText ] = useState("");
 	const [ attendees, setAttendees ] = useState([]);
 	const [ options, setOptions ] = useState([]);
 
@@ -42,28 +38,22 @@ const PredictiveSearchInput = props => {
 		}
 	}, [ attendees ]);
 
-	useEffect( () => {
-		if( ! isNil(searchText) ) {
-			if(searchText.length > 0) {
-				async function runFetch() {
-					setIsLoading(true);
-					const res = await fetchAttendees( searchText );
-					setIsLoading(false);
-					if(textInput.current.value && textInput.current.matches(':focus')) {
-						setAttendees( res );
-					}
-				}
-				runFetch();
-			} else {
-				debouncedHandleInput.cancel();
-				setOptions([]);
-				setIsLoading(false);
-			}
-		}
-	}, [ searchText ]);
-
-  function handleBlur(e) {
-    setIsLoading(false);
+  function handleSearch( e ) {
+    const searchText = textInput.current.value;
+    if( ! isNil(searchText) ) {
+      if(searchText.length > 0) {
+        async function runFetch() {
+          setIsLoading(true);
+          const res = await fetchAttendees( searchText );
+          setIsLoading(false);
+					setAttendees( res );
+        }
+        runFetch();
+      } else {
+        setOptions([]);
+        setIsLoading(false);
+      }
+    }
   }
 
 	function formatAttendeesIntoOptions( attendees ) {
@@ -94,25 +84,48 @@ const PredictiveSearchInput = props => {
 		});
 	}
 
-  function handleInput( e ) {
-		e.target.setCustomValidity("");
-		textInput.current.value = e.target.value;
-		setSearchText(e.target.value);
+	function handleSelect( value ) {
+		const attendee = attendees.find( attendee => attendee.id === parseInt(value) );
+		props.onChange( attendee );
+		textInput.current.value = attendee.acf[props.acfFieldName]
+    setOptions([]);
+	}
+
+  function handleCancel() {
+    setOptions([]);
   }
 
-	function handleSelect( value ) {
-		textInput.current.value = value;
-		const attendee = attendees.find( attendee => attendee.id === parseInt(value) );
-		props.handleSelect( attendee );
-	}
+  function showSearchButton() {
+    return options.length == 0;
+  }
+
+  function isSearchButtonDisabled() {
+    return isLoading;
+  }
+
+  function showCancelButton() {
+    return options.length > 0;
+  }
+
+  function showSpinner() {
+    return isLoading && options.length === 0;
+  }
+
+  function showSearchResult() {
+    return ! isLoading && options.length > 0;
+  }
 
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled } onChange={ debouncedHandleInput } onBlur={ handleBlur } onFocus={ props.handleFocus } />
+			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled } />
       { props?.disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
-			{ isLoading && options.length === 0 && <Spinner/>  }
-			{ ! isLoading && options.length > 0 && <RadioControl options={ options } onChange={ handleSelect } />}
+
+			{ showSearchResult() && <RadioControl options={ options } onChange={ handleSelect } />}
+
+      { showSearchButton() && <button class="button-link" disabled={ isSearchButtonDisabled() } onClick={ handleSearch }>Search</button> }
+      { showCancelButton() && <button class="button-link" onClick={ handleCancel }>Cancel</button> }
+			{ showSpinner() && <Spinner/>  }
 		</>
   );
 };

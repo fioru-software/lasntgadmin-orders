@@ -1,6 +1,18 @@
 
 import { isNumber } from "lodash";
 
+function isPurchaseOrderPaid( paymentMethod ) {
+  return paymentMethod === 'woocommerce_gateway_purchase_order';
+}
+
+function isGrantPaid( paymentMethod ) {
+  return paymentMethod === 'lasntgadmin_grant_funded_payment_gateway';
+}
+
+function isPaidStatus( status ) {
+  return ['on-hold', 'completed'].includes( status );
+}
+
 function findOrderMetaByKey( key, orderMeta ) {
   return orderMeta.find( item => item.key === key );
 }
@@ -11,10 +23,6 @@ function getLineItemByProductId( productId, order ) {
 
 function isExistingOrder( order ) {
   return order.line_items.find( item => isNumber(item?.product_id) );
-}
-
-function isPaidStatus( status ) {
-  return ['on-hold', 'completed'].includes( status );
 }
 
 /**
@@ -128,6 +136,8 @@ export {
   isPendingStatus,
   isDraftOrder,
   isPaidStatus,
+  isGrantPaid,
+  isPurchaseOrderPaid,
   isOrderAttendee,
   isPaidOrder,
   isDraftStatus,

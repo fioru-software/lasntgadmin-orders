@@ -8,7 +8,7 @@ import { isNil, isNull, isUndefined } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId, getWaitingStatus, getPendingStatus, getDraftStatus, getAttendeesStatus } from './order-utils';
+import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId, getWaitingStatus, getPendingStatus, getDraftStatus, getAttendeesStatus } from '../order-utils';
 
 /**
  * @param { string } nonce

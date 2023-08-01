@@ -23,6 +23,7 @@
 		"@wordpress/scripts": "^26.9.0"
 	},
 	"dependencies": {
+		"@wordpress/components": "^25.4.0",
 		"@wordpress/i18n": "^4.38.0",
 		"lodash": "^4.17.21",
 		"luxon": "^3.3.0"

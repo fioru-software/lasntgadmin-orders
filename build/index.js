@@ -251,6 +251,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _attendees_form__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./attendees-form */ "./src/attendees-tab/attendees-form.js");
+/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
+/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../order-utils */ "./src/order-utils.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
+
+
+
+
 
 
 
@@ -258,14 +267,35 @@ __webpack_require__.r(__webpack_exports__);
 
 /**
  * Decides which actions are available per attendee.
+ * Product statuses open_for_enrollment
  */
 const AttendeeFormFieldsetButtons = props => {
+  const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendees_form__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
+  const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendees_form__WEBPACK_IMPORTED_MODULE_3__.OrderContext);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  function handleResetAttendee() {
+
+  /**
+   * Reset button is disabled when the course has a status considered to be closed
+   */
+  function isResetButtonDisabled() {
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status);
+  }
+
+  /**
+   * Remove button is disabled 
+   * when the course has a status considered to be closed 
+   * or payment method is not grant and purchase order
+   */
+  function isRemoveButtonDisabled() {
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || !(0,_order_utils__WEBPACK_IMPORTED_MODULE_5__.isGrantPaid)(order.payment_method) && (0,_order_utils__WEBPACK_IMPORTED_MODULE_5__.isPurchaseOrderPaid)(order.payment_method);
+  }
+  function handleResetAttendee(e) {
+    e.preventDefault();
     console.log('TODO: reset attendee');
   }
-  function handleRemoveAttendee() {
+  function handleRemoveAttendee(e) {
+    e.preventDefault();
     console.log('TODO: remove attendee');
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -276,10 +306,12 @@ const AttendeeFormFieldsetButtons = props => {
     onDismiss: () => setNotice(null)
   }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     class: "button alt save_order wp-element-button",
-    onClick: handleResetAttendee
+    onClick: handleResetAttendee,
+    disabled: isResetButtonDisabled()
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Reset Attendee', 'lasntgadmin')), "\xA0", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     class: "button alt save_order wp-element-button",
-    onClick: handleRemoveAttendee
+    onClick: handleRemoveAttendee,
+    disabled: isRemoveButtonDisabled()
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Remove Attendee', 'lasntgadmin')), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)));
 };
 
@@ -302,8 +334,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _attendees_form__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./attendees-form */ "./src/attendees-tab/attendees-form.js");
-/* harmony import */ var _attendee_form_fieldset_hidden_fields__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./attendee-form-fieldset-hidden-fields */ "./src/attendees-tab/attendee-form-fieldset-hidden-fields.js");
-/* harmony import */ var _attendee_form_fieldset_predictive_search_fields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./attendee-form-fieldset-predictive-search-fields */ "./src/attendees-tab/attendee-form-fieldset-predictive-search-fields.js");
+/* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
+/* harmony import */ var _attendee_form_fieldset_hidden_fields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./attendee-form-fieldset-hidden-fields */ "./src/attendees-tab/attendee-form-fieldset-hidden-fields.js");
+/* harmony import */ var _attendee_form_fieldset_predictive_search_fields__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./attendee-form-fieldset-predictive-search-fields */ "./src/attendees-tab/attendee-form-fieldset-predictive-search-fields.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_7__);
 
 
 
@@ -311,23 +346,32 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const AttendeeFormFieldsetFields = ({
-  attendee,
-  index,
-  disabled
-}) => {
+
+
+const AttendeeFormFieldsetFields = props => {
+  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__.AttendeeContext);
   const fields = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendees_form__WEBPACK_IMPORTED_MODULE_3__.AcfFieldsContext);
   const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendees_form__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_hidden_fields__WEBPACK_IMPORTED_MODULE_4__.HiddenFields, null), fields.map(field => {
-    console.log(field);
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_predictive_search_fields__WEBPACK_IMPORTED_MODULE_5__.PredictiveSearchFields, {
-      field: field
+  const index = props.index;
+
+  /**
+   * @todo remove
+   */
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNil)(attendee)) {
+      console.log('attendee');
+      console.log(attendee);
+    }
+  }, [attendee]);
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_hidden_fields__WEBPACK_IMPORTED_MODULE_5__.HiddenFields, null), fields.map(field => {
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_predictive_search_fields__WEBPACK_IMPORTED_MODULE_6__.PredictiveSearchFields, {
+      field: field,
+      onChange: props.setAttendee
     }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
       class: "form-field form-row"
     }, field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.TextInput, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
-      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
@@ -335,7 +379,6 @@ const AttendeeFormFieldsetFields = ({
     }), field.type === 'email' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.EmailInput, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
-      disabled: disabled,
       placeholder: field.placeholder,
       defaultValue: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
@@ -416,31 +459,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _predictive_search_input__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./predictive-search-input */ "./src/attendees-tab/predictive-search-input.js");
+/* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
 
 
-const PredictiveSearchFields = ({
-  field,
-  index,
-  nonce,
-  disabled,
-  attendee
-}) => {
+
+
+const PredictiveSearchFields = props => {
+  const field = props.field;
+  const index = props.index;
+  const nonce = props.nonce;
+  const disabled = props.disabled;
+  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_2__.AttendeeContext);
+  function handleSelect(value) {
+    props.onChange(value);
+  }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field form-row"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", {
     for: field.key
   }, field.label, !!field.required && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
     class: "required"
-  }, " *")), field.type === 'text' && field.name === 'employee_number' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_predictive_search_input__WEBPACK_IMPORTED_MODULE_1__.PredictiveSearchInput, {
+  }, " *")), field.type === 'text' && field.name === 'first_name' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_predictive_search_input__WEBPACK_IMPORTED_MODULE_1__.PredictiveSearchInput, {
     nonce: nonce,
     acfFieldName: field.name,
-    helpText: "Enter or search for existing employee numbers",
+    acfClarifyingFieldName: "last_name",
+    helpText: "Enter or search for existing first names",
     name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
     disabled: disabled,
     placeholder: field.placeholder,
     defaultValue: attendee?.acf[field.name] || field.default_value,
     maxlength: field.maxlength,
-    required: !!field.required
+    required: !!field.required,
+    onChange: handleSelect
   }), field.type === 'text' && field.name === 'last_name' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_predictive_search_input__WEBPACK_IMPORTED_MODULE_1__.PredictiveSearchInput, {
     nonce: nonce,
     acfFieldName: field.name,
@@ -451,18 +501,19 @@ const PredictiveSearchFields = ({
     placeholder: field.placeholder,
     defaultValue: attendee?.acf[field.name] || field.default_value,
     maxlength: field.maxlength,
-    required: !!field.required
-  }), field.type === 'text' && field.name === 'first_name' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_predictive_search_input__WEBPACK_IMPORTED_MODULE_1__.PredictiveSearchInput, {
+    required: !!field.required,
+    onChange: handleSelect
+  }), field.type === 'text' && field.name === 'employee_number' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_predictive_search_input__WEBPACK_IMPORTED_MODULE_1__.PredictiveSearchInput, {
     nonce: nonce,
     acfFieldName: field.name,
-    acfClarifyingFieldName: "last_name",
-    helpText: "Enter or search for existing first names",
+    helpText: "Enter or search for existing employee numbers",
     name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
     disabled: disabled,
     placeholder: field.placeholder,
     defaultValue: attendee?.acf[field.name] || field.default_value,
     maxlength: field.maxlength,
-    required: !!field.required
+    required: !!field.required,
+    onChange: handleSelect
   }));
 };
 
@@ -477,6 +528,7 @@ const PredictiveSearchFields = ({
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AttendeeContext: () => (/* binding */ AttendeeContext),
 /* harmony export */   AttendeeFormFieldset: () => (/* binding */ AttendeeFormFieldset)
 /* harmony export */ });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
@@ -486,8 +538,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+const AttendeeContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createContext)();
 const AttendeeFormFieldset = props => {
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "Attendee ", props.index + 1), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_fields__WEBPACK_IMPORTED_MODULE_1__.AttendeeFormFieldsetFields, null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__.AttendeeFormFieldsetButtons, null));
+  const index = props.index;
+  const [attendee, setAttendee] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(props.attendee);
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(AttendeeContext.Provider, {
+    value: attendee
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "Attendee ", index + 1), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_fields__WEBPACK_IMPORTED_MODULE_1__.AttendeeFormFieldsetFields, {
+    index: index,
+    setAttendee: setAttendee
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__.AttendeeFormFieldsetButtons, null)));
 };
 
 
@@ -515,6 +576,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
+/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
+
 
 
 
@@ -536,17 +599,12 @@ const AcfFieldsContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.crea
 const AttendeesForm = props => {
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-
-  /**
-   * @todo remove
-   */
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    console.log('=== attendees ===');
-    console.log(props.attendees);
-  }, [props.attendees]);
   function handleSubmit(e) {
     e.preventDefault();
     console.log('TODO: handle submit');
+  }
+  function isSubmitButtonDisabled() {
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.isCourseClosed)(props.product.status);
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-wrap"
@@ -577,7 +635,8 @@ const AttendeesForm = props => {
     type: "submit",
     class: "button alt save_order wp-element-button button-primary",
     name: "save",
-    value: "Create"
+    value: "Create",
+    disabled: isSubmitButtonDisabled()
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Save attendees', 'lasntgadmin')), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null))))));
 };
 
@@ -598,13 +657,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
-/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/url */ "@wordpress/url");
-/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_url__WEBPACK_IMPORTED_MODULE_4__);
-
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/url */ "@wordpress/url");
+/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_url__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
 
 
 
@@ -613,20 +671,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const PredictiveSearchInput = props => {
-  const debouncedHandleInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useCallback)((0,lodash__WEBPACK_IMPORTED_MODULE_2__.debounce)(handleInput, 500));
   const textInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  const [searchText, setSearchText] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const [attendees, setAttendees] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [options, setOptions] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.options)) {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_4__.isNil)(props?.options)) {
       setIsLoading(false);
       setOptions(props.options);
     }
   }, [props?.options]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.defaultValue)) {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_4__.isNil)(props?.defaultValue)) {
       textInput.current.value = props.defaultValue;
     }
   }, [props?.defaultValue]);
@@ -635,27 +691,22 @@ const PredictiveSearchInput = props => {
       setOptions(formatAttendeesIntoOptions(attendees));
     }
   }, [attendees]);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(searchText)) {
+  function handleSearch(e) {
+    const searchText = textInput.current.value;
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_4__.isNil)(searchText)) {
       if (searchText.length > 0) {
         async function runFetch() {
           setIsLoading(true);
           const res = await fetchAttendees(searchText);
           setIsLoading(false);
-          if (textInput.current.value && textInput.current.matches(':focus')) {
-            setAttendees(res);
-          }
+          setAttendees(res);
         }
         runFetch();
       } else {
-        debouncedHandleInput.cancel();
         setOptions([]);
         setIsLoading(false);
       }
     }
-  }, [searchText]);
-  function handleBlur(e) {
-    setIsLoading(false);
   }
   function formatAttendeesIntoOptions(attendees) {
     return attendees.map(attendee => {
@@ -676,20 +727,34 @@ const PredictiveSearchInput = props => {
       acf_field_name: props.acfFieldName,
       acf_field_value: searchText
     } : {};
-    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default().createNonceMiddleware(props.nonce));
-    return await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default()({
-      path: (0,_wordpress_url__WEBPACK_IMPORTED_MODULE_4__.addQueryArgs)('/wp/v2/attendee', query)
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().createNonceMiddleware(props.nonce));
+    return await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
+      path: (0,_wordpress_url__WEBPACK_IMPORTED_MODULE_3__.addQueryArgs)('/wp/v2/attendee', query)
     });
   }
-  function handleInput(e) {
-    e.target.setCustomValidity("");
-    textInput.current.value = e.target.value;
-    setSearchText(e.target.value);
-  }
   function handleSelect(value) {
-    textInput.current.value = value;
     const attendee = attendees.find(attendee => attendee.id === parseInt(value));
-    props.handleSelect(attendee);
+    props.onChange(attendee);
+    textInput.current.value = attendee.acf[props.acfFieldName];
+    setOptions([]);
+  }
+  function handleCancel() {
+    setOptions([]);
+  }
+  function showSearchButton() {
+    return options.length == 0;
+  }
+  function isSearchButtonDisabled() {
+    return isLoading;
+  }
+  function showCancelButton() {
+    return options.length > 0;
+  }
+  function showSpinner() {
+    return isLoading && options.length === 0;
+  }
+  function showSearchResult() {
+    return !isLoading && options.length > 0;
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
     class: "description"
@@ -705,18 +770,22 @@ const PredictiveSearchInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    disabled: props?.disabled,
-    onChange: debouncedHandleInput,
-    onBlur: handleBlur,
-    onFocus: props.handleFocus
+    disabled: props?.disabled
   }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: props.name,
     value: props?.defaultValue
-  }), isLoading && options.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null), !isLoading && options.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
+  }), showSearchResult() && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
     options: options,
     onChange: handleSelect
-  }));
+  }), showSearchButton() && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    class: "button-link",
+    disabled: isSearchButtonDisabled(),
+    onClick: handleSearch
+  }, "Search"), showCancelButton() && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    class: "button-link",
+    onClick: handleCancel
+  }, "Cancel"), showSpinner() && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null));
 };
 
 
@@ -886,7 +955,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _product_panel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./product-panel */ "./src/enrolment-tab/product-panel.js");
 /* harmony import */ var _status_selector__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./status-selector */ "./src/enrolment-tab/status-selector.js");
-/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./order-utils */ "./src/enrolment-tab/order-utils.js");
+/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../order-utils */ "./src/order-utils.js");
 
 
 
@@ -1116,128 +1185,6 @@ const OrderForm = props => {
 
 /***/ }),
 
-/***/ "./src/enrolment-tab/order-utils.js":
-/*!******************************************!*\
-  !*** ./src/enrolment-tab/order-utils.js ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   findOrderMetaByKey: () => (/* binding */ findOrderMetaByKey),
-/* harmony export */   getAttendeesStatus: () => (/* binding */ getAttendeesStatus),
-/* harmony export */   getDraftStatus: () => (/* binding */ getDraftStatus),
-/* harmony export */   getLineItemByProductId: () => (/* binding */ getLineItemByProductId),
-/* harmony export */   getPendingStatus: () => (/* binding */ getPendingStatus),
-/* harmony export */   getUpdateAttendeeRequestBody: () => (/* binding */ getUpdateAttendeeRequestBody),
-/* harmony export */   getUpdateOrderRequestBody: () => (/* binding */ getUpdateOrderRequestBody),
-/* harmony export */   getUpdateShopOrderRequestBody: () => (/* binding */ getUpdateShopOrderRequestBody),
-/* harmony export */   getWaitingStatus: () => (/* binding */ getWaitingStatus),
-/* harmony export */   hasAttendees: () => (/* binding */ hasAttendees),
-/* harmony export */   isDraftOrder: () => (/* binding */ isDraftOrder),
-/* harmony export */   isDraftStatus: () => (/* binding */ isDraftStatus),
-/* harmony export */   isExistingOrder: () => (/* binding */ isExistingOrder),
-/* harmony export */   isOrderAttendee: () => (/* binding */ isOrderAttendee),
-/* harmony export */   isPaidOrder: () => (/* binding */ isPaidOrder),
-/* harmony export */   isPaidStatus: () => (/* binding */ isPaidStatus),
-/* harmony export */   isPendingStatus: () => (/* binding */ isPendingStatus),
-/* harmony export */   isWaitingOrder: () => (/* binding */ isWaitingOrder),
-/* harmony export */   isWaitingStatus: () => (/* binding */ isWaitingStatus)
-/* harmony export */ });
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-
-function findOrderMetaByKey(key, orderMeta) {
-  return orderMeta.find(item => item.key === key);
-}
-function getLineItemByProductId(productId, order) {
-  return order.line_items.find(item => item.product_id === productId);
-}
-function isExistingOrder(order) {
-  return order.line_items.find(item => (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isNumber)(item?.product_id));
-}
-function isPaidStatus(status) {
-  return ['on-hold', 'completed'].includes(status);
-}
-
-/**
- * @todo clarify
- */
-function isOrderAttendee(order, attendee) {
-  //{ ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
-  return order.meta_data.filter(meta => meta.key === 'attendee_ids').map(meta => meta.value).map(Number).includes(attendee.ID);
-}
-function isPaidOrder(order) {
-  return isPaidStatus(order.status);
-}
-function isWaitingOrder(order) {
-  return isWaitingStatus(order.status);
-}
-function isWaitingStatus(status) {
-  return status === getWaitingStatus();
-}
-function getWaitingStatus() {
-  return 'waiting-list';
-}
-function isPendingStatus(status) {
-  return status === getPendingStatus();
-}
-function getPendingStatus() {
-  return 'pending';
-}
-function isDraftOrder(order) {
-  return isDraftStatus(order.status);
-}
-function isDraftStatus(status) {
-  return status === getDraftStatus();
-}
-function getDraftStatus() {
-  return 'auto-draft';
-}
-function hasAttendees(order) {
-  return Array.isArray(order.attendees) && order.attendees > 0;
-}
-function getAttendeesStatus() {
-  return 'attendees';
-}
-function getUpdateShopOrderRequestBody(orderId, nonce, data) {
-  return {
-    path: `/wp/v2/shop_order/${orderId}`,
-    method: 'PUT',
-    headers: {
-      "X-WP-Nonce": nonce
-    },
-    data: Object.assign({
-      id: orderId
-    }, data)
-  };
-}
-function getUpdateOrderRequestBody(orderId, nonce, data) {
-  return {
-    path: `/wc/v3/orders/${orderId}`,
-    method: 'PUT',
-    headers: {
-      "X-WP-Nonce": nonce
-    },
-    data
-  };
-}
-function getUpdateAttendeeRequestBody(orderId, attendeeId, nonce, data) {
-  return {
-    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
-    method: 'PUT',
-    headers: {
-      'X-WP-Nonce': nonce
-    },
-    data: Object.assign({
-      id: attendeeId
-    }, data)
-  };
-}
-
-
-/***/ }),
-
 /***/ "./src/enrolment-tab/product-panel.js":
 /*!********************************************!*\
   !*** ./src/enrolment-tab/product-panel.js ***!
@@ -1258,8 +1205,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _product_selector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./product-selector */ "./src/enrolment-tab/product-selector.js");
 /* harmony import */ var _group_selector__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./group-selector */ "./src/enrolment-tab/group-selector.js");
-/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./product-utils */ "./src/enrolment-tab/product-utils.js");
-/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./order-utils */ "./src/enrolment-tab/order-utils.js");
+/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
+/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../order-utils */ "./src/order-utils.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_8__);
 
@@ -1642,57 +1589,6 @@ const ProductSelector = props => {
 
 /***/ }),
 
-/***/ "./src/enrolment-tab/product-utils.js":
-/*!********************************************!*\
-  !*** ./src/enrolment-tab/product-utils.js ***!
-  \********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   calculateAvailableSpaces: () => (/* binding */ calculateAvailableSpaces),
-/* harmony export */   findGroupQuota: () => (/* binding */ findGroupQuota),
-/* harmony export */   findGroupQuotas: () => (/* binding */ findGroupQuotas),
-/* harmony export */   findProductById: () => (/* binding */ findProductById)
-/* harmony export */ });
-function findProductById(productId, products) {
-  return products.find(product => product.id === parseInt(productId));
-}
-function findGroupQuotas(metaData) {
-  return metaData.filter(item => {
-    return /_quotas_field_[\d]+/.test(item.key);
-  });
-}
-function findGroupQuota(groupId, quotas) {
-  const group = quotas.find(quota => {
-    return quota.key === `_quotas_field_${groupId}`;
-  });
-  return group === undefined ? '' : group.value;
-}
-function calculateAvailableSpaces(stockQuantity, groupQuota) {
-  stockQuantity = parseInt(stockQuantity);
-  groupQuota = parseInt(groupQuota);
-  if (isNaN(stockQuantity)) {
-    return 0;
-  }
-  if (isNaN(groupQuota)) {
-    return stockQuantity;
-  }
-  if (groupQuota === 0) {
-    return groupQuota;
-  }
-  if (groupQuota > stockQuantity) {
-    return stockQuantity;
-  }
-  if (groupQuota <= stockQuantity) {
-    return groupQuota;
-  }
-  return groupQuota;
-}
-
-
-/***/ }),
-
 /***/ "./src/enrolment-tab/status-selector.js":
 /*!**********************************************!*\
   !*** ./src/enrolment-tab/status-selector.js ***!
@@ -1712,7 +1608,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _option_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./option.js */ "./src/enrolment-tab/option.js");
-/* harmony import */ var _order_utils_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./order-utils.js */ "./src/enrolment-tab/order-utils.js");
+/* harmony import */ var _order_utils_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../order-utils.js */ "./src/order-utils.js");
 
 
 
@@ -1799,6 +1695,219 @@ const StatusSelector = props => {
     value: props?.status
   }));
 };
+
+
+/***/ }),
+
+/***/ "./src/order-utils.js":
+/*!****************************!*\
+  !*** ./src/order-utils.js ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   findOrderMetaByKey: () => (/* binding */ findOrderMetaByKey),
+/* harmony export */   getAttendeesStatus: () => (/* binding */ getAttendeesStatus),
+/* harmony export */   getDraftStatus: () => (/* binding */ getDraftStatus),
+/* harmony export */   getLineItemByProductId: () => (/* binding */ getLineItemByProductId),
+/* harmony export */   getPendingStatus: () => (/* binding */ getPendingStatus),
+/* harmony export */   getUpdateAttendeeRequestBody: () => (/* binding */ getUpdateAttendeeRequestBody),
+/* harmony export */   getUpdateOrderRequestBody: () => (/* binding */ getUpdateOrderRequestBody),
+/* harmony export */   getUpdateShopOrderRequestBody: () => (/* binding */ getUpdateShopOrderRequestBody),
+/* harmony export */   getWaitingStatus: () => (/* binding */ getWaitingStatus),
+/* harmony export */   hasAttendees: () => (/* binding */ hasAttendees),
+/* harmony export */   isDraftOrder: () => (/* binding */ isDraftOrder),
+/* harmony export */   isDraftStatus: () => (/* binding */ isDraftStatus),
+/* harmony export */   isExistingOrder: () => (/* binding */ isExistingOrder),
+/* harmony export */   isGrantPaid: () => (/* binding */ isGrantPaid),
+/* harmony export */   isOrderAttendee: () => (/* binding */ isOrderAttendee),
+/* harmony export */   isPaidOrder: () => (/* binding */ isPaidOrder),
+/* harmony export */   isPaidStatus: () => (/* binding */ isPaidStatus),
+/* harmony export */   isPendingStatus: () => (/* binding */ isPendingStatus),
+/* harmony export */   isPurchaseOrderPaid: () => (/* binding */ isPurchaseOrderPaid),
+/* harmony export */   isWaitingOrder: () => (/* binding */ isWaitingOrder),
+/* harmony export */   isWaitingStatus: () => (/* binding */ isWaitingStatus)
+/* harmony export */ });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+
+function isPurchaseOrderPaid(paymentMethod) {
+  return paymentMethod === 'woocommerce_gateway_purchase_order';
+}
+function isGrantPaid(paymentMethod) {
+  return paymentMethod === 'lasntgadmin_grant_funded_payment_gateway';
+}
+function isPaidStatus(status) {
+  return ['on-hold', 'completed'].includes(status);
+}
+function findOrderMetaByKey(key, orderMeta) {
+  return orderMeta.find(item => item.key === key);
+}
+function getLineItemByProductId(productId, order) {
+  return order.line_items.find(item => item.product_id === productId);
+}
+function isExistingOrder(order) {
+  return order.line_items.find(item => (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isNumber)(item?.product_id));
+}
+
+/**
+ * @todo clarify
+ */
+function isOrderAttendee(order, attendee) {
+  //{ ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
+  return order.meta_data.filter(meta => meta.key === 'attendee_ids').map(meta => meta.value).map(Number).includes(attendee.ID);
+}
+function isPaidOrder(order) {
+  return isPaidStatus(order.status);
+}
+function isWaitingOrder(order) {
+  return isWaitingStatus(order.status);
+}
+function isWaitingStatus(status) {
+  return status === getWaitingStatus();
+}
+function getWaitingStatus() {
+  return 'waiting-list';
+}
+function isPendingStatus(status) {
+  return status === getPendingStatus();
+}
+function getPendingStatus() {
+  return 'pending';
+}
+function isDraftOrder(order) {
+  return isDraftStatus(order.status);
+}
+function isDraftStatus(status) {
+  return status === getDraftStatus();
+}
+function getDraftStatus() {
+  return 'auto-draft';
+}
+function hasAttendees(order) {
+  return Array.isArray(order.attendees) && order.attendees > 0;
+}
+function getAttendeesStatus() {
+  return 'attendees';
+}
+function getUpdateShopOrderRequestBody(orderId, nonce, data) {
+  return {
+    path: `/wp/v2/shop_order/${orderId}`,
+    method: 'PUT',
+    headers: {
+      "X-WP-Nonce": nonce
+    },
+    data: Object.assign({
+      id: orderId
+    }, data)
+  };
+}
+function getUpdateOrderRequestBody(orderId, nonce, data) {
+  return {
+    path: `/wc/v3/orders/${orderId}`,
+    method: 'PUT',
+    headers: {
+      "X-WP-Nonce": nonce
+    },
+    data
+  };
+}
+function getUpdateAttendeeRequestBody(orderId, attendeeId, nonce, data) {
+  return {
+    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
+    method: 'PUT',
+    headers: {
+      'X-WP-Nonce': nonce
+    },
+    data: Object.assign({
+      id: attendeeId
+    }, data)
+  };
+}
+
+
+/***/ }),
+
+/***/ "./src/product-utils.js":
+/*!******************************!*\
+  !*** ./src/product-utils.js ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   calculateAvailableSpaces: () => (/* binding */ calculateAvailableSpaces),
+/* harmony export */   findGroupQuota: () => (/* binding */ findGroupQuota),
+/* harmony export */   findGroupQuotas: () => (/* binding */ findGroupQuotas),
+/* harmony export */   findProductById: () => (/* binding */ findProductById),
+/* harmony export */   isCourseClosed: () => (/* binding */ isCourseClosed),
+/* harmony export */   isCourseOpen: () => (/* binding */ isCourseOpen)
+/* harmony export */ });
+function isCourseOpen(status) {
+  return isOpenForEnrolmentStatus(status);
+}
+function isCourseClosed(status) {
+  return !isCourseOpen(status);
+}
+function isDraftStatus(status) {
+  return status === 'draft';
+}
+function isOpenForEnrolmentStatus(status) {
+  return status === 'open_for_enrollment';
+}
+function isClosedStatus(status) {
+  return status === 'closed';
+}
+function isCancelledStatus(status) {
+  return status === 'cancelled';
+}
+function isTemplateStatus(status) {
+  return status === 'template';
+}
+function isEnrolmentClosedStatus(status) {
+  return status === 'enrollment_closed';
+}
+function isDatePassedStatus(status) {
+  return status === 'date_passed';
+}
+function isArchivedStatus(status) {
+  return status === 'archived';
+}
+function findProductById(productId, products) {
+  return products.find(product => product.id === parseInt(productId));
+}
+function findGroupQuotas(metaData) {
+  return metaData.filter(item => {
+    return /_quotas_field_[\d]+/.test(item.key);
+  });
+}
+function findGroupQuota(groupId, quotas) {
+  const group = quotas.find(quota => {
+    return quota.key === `_quotas_field_${groupId}`;
+  });
+  return group === undefined ? '' : group.value;
+}
+function calculateAvailableSpaces(stockQuantity, groupQuota) {
+  stockQuantity = parseInt(stockQuantity);
+  groupQuota = parseInt(groupQuota);
+  if (isNaN(stockQuantity)) {
+    return 0;
+  }
+  if (isNaN(groupQuota)) {
+    return stockQuantity;
+  }
+  if (groupQuota === 0) {
+    return groupQuota;
+  }
+  if (groupQuota > stockQuantity) {
+    return stockQuantity;
+  }
+  if (groupQuota <= stockQuantity) {
+    return groupQuota;
+  }
+  return groupQuota;
+}
 
 
 /***/ }),

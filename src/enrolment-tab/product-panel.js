@@ -6,8 +6,8 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
-import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from './product-utils';
-import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder } from './order-utils';
+import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from '../product-utils';
+import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder } from '../order-utils';
 
 import { isObject, isNil, isNull, isUndefined } from "lodash";
 

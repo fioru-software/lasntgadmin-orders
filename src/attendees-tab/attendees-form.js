@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { range } from 'lodash';
 
 import { AttendeeFormFieldset } from './attendee-form-fieldset';
+import { isCourseClosed, isCourseOpen } from '../product-utils';
 
 const ProductContext = createContext();
 const OrderContext = createContext();
@@ -24,17 +25,13 @@ const AttendeesForm = props => {
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
 
-  /**
-   * @todo remove
-   */
-  useEffect( () => {
-    console.log('=== attendees ===');
-    console.log(props.attendees);
-  }, [ props.attendees ]);
-
   function handleSubmit( e ) {
     e.preventDefault();
     console.log('TODO: handle submit');
+  }
+
+  function isSubmitButtonDisabled() {
+    return isCourseClosed( props.product.status );
   }
 
   return (
@@ -59,7 +56,7 @@ const AttendeesForm = props => {
             { props?.quantity > 0 && 
             <div class="form-field">
               { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-              <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create">{ __( 'Save attendees', 'lasntgadmin' ) }</button>
+              <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
               { isLoading && <Spinner/> }
             </div>}
 

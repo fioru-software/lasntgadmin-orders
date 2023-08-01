@@ -1,22 +1,34 @@
 
+import { createContext, useState } from '@wordpress/element';
+
 import { AttendeeFormFieldsetFields } from './attendee-form-fieldset-fields';
 import { AttendeeFormFieldsetButtons } from './attendee-form-fieldset-buttons';
 
+const AttendeeContext = createContext();
+
 const AttendeeFormFieldset = props => {
 
+  const index = props.index;
+
+  const [ attendee, setAttendee ] = useState( props.attendee );
+
   return (
-    <fieldset>
 
-      <legend>Attendee { props.index + 1 }</legend>
+    <AttendeeContext.Provider value={ attendee }>
+      <fieldset>
 
-      <AttendeeFormFieldsetFields />
+        <legend>Attendee { index + 1 }</legend>
 
-      <AttendeeFormFieldsetButtons />
+        <AttendeeFormFieldsetFields index={ index } setAttendee={ setAttendee }/>
 
-    </fieldset>
+        <AttendeeFormFieldsetButtons />
+
+      </fieldset>
+    </AttendeeContext.Provider>
   );
 };
 
 export {
-  AttendeeFormFieldset
+  AttendeeFormFieldset,
+  AttendeeContext
 };

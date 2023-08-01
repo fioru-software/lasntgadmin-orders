@@ -1,3 +1,42 @@
+function isCourseOpen( status ) {
+  return isOpenForEnrolmentStatus(status);
+}
+
+function isCourseClosed( status ) {
+  return ! isCourseOpen(status);
+}
+
+function isDraftStatus( status ) {
+  return status === 'draft';
+}
+
+function isOpenForEnrolmentStatus( status ) {
+  return status === 'open_for_enrollment';
+}
+
+function isClosedStatus( status ) {
+  return status === 'closed';
+}
+
+function isCancelledStatus( status ) {
+  return status === 'cancelled';
+}
+
+function isTemplateStatus( status ) {
+  return status === 'template';
+}
+
+function isEnrolmentClosedStatus( status ) {
+  return status === 'enrollment_closed';
+}
+
+function isDatePassedStatus( status ) {
+  return status === 'date_passed';
+}
+
+function isArchivedStatus( status ) {
+  return status === 'archived';
+}
 
 function findProductById( productId, products ) {
   return products.find( product => product.id === parseInt(productId) );
@@ -41,5 +80,7 @@ export {
   findProductById,
   findGroupQuotas,
   findGroupQuota,
-  calculateAvailableSpaces
+  calculateAvailableSpaces,
+  isCourseClosed,
+  isCourseOpen
 };

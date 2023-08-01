@@ -6,35 +6,48 @@ import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, C
 import { __ } from '@wordpress/i18n';
 
 import { AcfFieldsContext, ProductContext } from './attendees-form';
+import { AttendeeContext } from './attendee-form-fieldset';
 
 import { HiddenFields } from './attendee-form-fieldset-hidden-fields';
 import { PredictiveSearchFields } from './attendee-form-fieldset-predictive-search-fields';
 
-const AttendeeFormFieldsetFields = ({ 
-  attendee, index, disabled
-}) => {
+import { isNil } from 'lodash';
 
+const AttendeeFormFieldsetFields = props => {
+
+  const attendee = useContext( AttendeeContext );
   const fields = useContext( AcfFieldsContext );
   const product = useContext( ProductContext );
+
+  const index = props.index;
+
+  /**
+   * @todo remove
+   */
+  useEffect( () => {
+    if( ! isNil( attendee ) ) {
+      console.log('attendee');
+      console.log(attendee);
+    }
+  }, [ attendee ]);
 
   return (
     <>
       <HiddenFields />
 
       { fields.map( field => {
-        console.log(field);
         return (
           <>
 
-            <PredictiveSearchFields field={ field }/>
+            <PredictiveSearchFields field={ field } onChange={ props.setAttendee } />
 
             <div class="form-field form-row">
 
               { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && 
-                <TextInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> 
+                <TextInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required }  /> 
               }
 
-               { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ disabled } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
+               { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={  attendee?.acf[field.name] || field.default_value } maxlength={ field.maxlength} required={ !!field.required } /> }
 
               { field.type === 'textarea' && 
               <TextArea id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } defaultValue={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } /> 

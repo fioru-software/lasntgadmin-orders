@@ -1,21 +1,47 @@
 
-import { useState } from '@wordpress/element';
+import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { ProductContext, OrderContext } from './attendees-form';
+import { isCourseClosed, isCourseOpen } from '../product-utils';
+import { isPaidStatus, isGrantPaid, isPurchaseOrderPaid } from '../order-utils';
+import { isNil } from 'lodash';
 
 /**
  * Decides which actions are available per attendee.
+ * Product statuses open_for_enrollment
  */
 const AttendeeFormFieldsetButtons = props => {
+
+  const product = useContext( ProductContext );
+  const order = useContext( OrderContext );
 
   const [ isLoading, setIsLoading ] = useState(false);
   const [ notice, setNotice ] = useState(null);
 
-  function handleResetAttendee() {
+  /**
+   * Reset button is disabled when the course has a status considered to be closed
+   */
+  function isResetButtonDisabled() {
+    return isCourseClosed( product.status )
+  }
+
+  /**
+   * Remove button is disabled 
+   * when the course has a status considered to be closed 
+   * or payment method is not grant and purchase order
+   */
+  function isRemoveButtonDisabled() {
+    return isCourseClosed( product.status ) || ( ! isGrantPaid( order.payment_method ) && isPurchaseOrderPaid( order.payment_method ) );
+  }
+
+  function handleResetAttendee( e ) {
+    e.preventDefault();
     console.log('TODO: reset attendee');
   }
 
-  function handleRemoveAttendee() {
+  function handleRemoveAttendee( e ) {
+    e.preventDefault();
     console.log('TODO: remove attendee');
   }
 
@@ -23,8 +49,8 @@ const AttendeeFormFieldsetButtons = props => {
     <>
       <div class="form-field">
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-        <button class="button alt save_order wp-element-button" onClick={ handleResetAttendee } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>&nbsp;
-        <button class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
+        <button class="button alt save_order wp-element-button" onClick={ handleResetAttendee } disabled={ isResetButtonDisabled() } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>&nbsp;
+        <button class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } disabled={ isRemoveButtonDisabled() } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
         { isLoading && <Spinner/> }
       </div>
     </>
