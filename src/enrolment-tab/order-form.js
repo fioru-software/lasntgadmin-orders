@@ -4,7 +4,7 @@ import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-import { isNil, isNull, isUndefined } from "lodash";
+import { isNil } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
@@ -29,16 +29,10 @@ const OrderForm = props => {
 
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
-  const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
+  const [ submitButtonDisabled, setSubmitButtonDisabled ] = useState(false);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create enrolment");
   const oldStatus = props.order.status;
-
-
- const user_can_edit = ( 'attendees' == props.order.status || 
-        'waiting-list' == props.order.status 
-      )
-      && props?.user.ID === props.order.customer_id;
 
   useEffect( () => {
   }, [ props?.order ]);
@@ -69,6 +63,10 @@ const OrderForm = props => {
       }
     }
   }, [ status ]);
+  
+  function canUserEdit() {
+    return ['attendees', 'waiting-list'].includes( props.order.status ) && props?.user.ID === props.order.customer_id;
+  }
 
   function determineStatus() {
     if( isDraftStatus( status ) ) {
@@ -190,7 +188,7 @@ const OrderForm = props => {
       setSubmitButtonDisabled(false);
     }
   }
-  
+
   return (
     <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
 
@@ -205,7 +203,7 @@ const OrderForm = props => {
           { ! isDraftStatus( props.status ) && 
             <div class="form-field form-row">
               <label for="order_status">{ __( 'Status', 'lasntgadmin' ) }<span class="required"> *</span></label>
-              <StatusSelector id="order_status" disabled={ isSubmitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+              <StatusSelector id="order_status" disabled={ submitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
             </div>
           }
           
@@ -217,7 +215,7 @@ const OrderForm = props => {
         <div class="form-wrap">
           <div class="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ isSubmitButtonDisabled && !user_can_edit } type="submit" class="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
+          <button disabled={ submitButtonDisabled && ! canUserEdit() } type="submit" class="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
           </div>
         </div>

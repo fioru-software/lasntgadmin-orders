@@ -12,6 +12,7 @@ const PredictiveSearchInput = props => {
 
 	const [ attendees, setAttendees ] = useState([]);
 	const [ options, setOptions ] = useState([]);
+  const [ disabled, setDisabled ] = useState(false);
 
   const [ isLoading, setIsLoading ] = useState(false);
 
@@ -25,8 +26,9 @@ const PredictiveSearchInput = props => {
 	useEffect( () => {
 		if( ! isNil( props?.defaultValue ) ) {
 			textInput.current.value = props.defaultValue;
+      props.defaultValue === "" ? setDisabled(false) : setDisabled(true);
 		}
-	}, [ props?.defaultValue ]);
+	}, [ props.defaultValue ]);
 
 	useEffect( () => {
 		if( attendees?.length ) {
@@ -89,6 +91,7 @@ const PredictiveSearchInput = props => {
 		props.onChange( attendee );
 		textInput.current.value = attendee.acf[props.acfFieldName]
     setOptions([]);
+    setDisabled(true);
 	}
 
   function handleCancel() {
@@ -118,8 +121,8 @@ const PredictiveSearchInput = props => {
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
+			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } />
+      { disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
 
 			{ showSearchResult() && <RadioControl options={ options } onChange={ handleSelect } />}
 

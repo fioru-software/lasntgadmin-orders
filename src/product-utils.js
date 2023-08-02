@@ -1,9 +1,6 @@
-function isCourseOpen( status ) {
-  return isOpenForEnrolmentStatus(status);
-}
 
 function isCourseClosed( status ) {
-  return ! isCourseOpen(status);
+  return isClosedStatus(status) || isCancelledStatus( status ) || isArchivedStatus(status);
 }
 
 function isDraftStatus( status ) {
@@ -81,6 +78,5 @@ export {
   findGroupQuotas,
   findGroupQuota,
   calculateAvailableSpaces,
-  isCourseClosed,
-  isCourseOpen
+  isCourseClosed
 };

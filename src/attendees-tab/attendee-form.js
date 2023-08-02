@@ -1,0 +1,176 @@
+
+import { useState, useEffect, useRef } from '@wordpress/element';
+import { Notice, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
+import { range } from 'lodash';
+
+import { AttendeeFormFieldset } from './attendee-form-fieldset';
+import { isCourseClosed } from '../product-utils';
+
+import { ProductContext, OrderContext, AcfFieldContext } from './attendee-context';
+
+/**
+ * @param { number } quantity
+ * @param { array } fields
+ * @param { string } groupId
+ * @param { string } nonce 
+ * @param { object } order
+ * @param { object } product
+ */
+const AttendeeForm = props => {
+
+  const [ notice, setNotice ] = useState(null);
+  const [ isLoading, setIsLoading ] = useState(false);
+
+  /**
+   * @requires ACF Field group settings for additional groups: when post_type = 'post' and rest_api = true;
+   * @see https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
+   */
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setNotice(null);
+
+    if( quantity > 1 ) {
+      console.log(quantity);
+      console.log(e.target);
+      if( ! validateUniqueEmployeeNumbers( quantity, e.target ) ) {
+        return false;
+      }
+    }
+
+    // @todo continue from here
+    return;
+
+    const batchReq = createBatchRequestBody( quantity, e.target, parseInt(props.groupId), props.order.id );
+
+    try {
+
+      setNotice(null);
+      setIsLoading(true);
+      setSubmitButtonDisabled(true);
+
+      setNotice({
+        status: 'info',
+        message: __( 'Updating attendees.', 'lasntgadmin' )
+      });
+
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+
+      const attendeesRes = await apiFetch(
+        {
+          path: `/batch/v1`,
+          method: 'POST',
+          data: {
+            requests: batchReq
+          }
+        }
+      );
+
+      const attendeeIds = extractAttendeeIdsFromResponse( attendeesRes.responses );
+
+      setNotice({
+        status: 'info',
+        message: __( 'Adding attendees to order.', 'lasntgadmin' )
+      });
+
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+
+      const orderAttendeeIdsUpdateRes = await apiFetch(
+        getUpdateShopOrderRequestBody( props.order.id, props.nonce, {
+          meta: {
+            attendee_ids: [ ... new Set(attendeeIds) ]
+          }
+        })
+      );
+
+      // Employee number is not unique
+      attendeesRes.responses.forEach( res => {
+        if( res.status >= 500 && res.status <= 599 ) {
+          throw new Error( res.body.message );
+        }
+      });
+
+      // Valid attendees are less than order quantity
+      if( parseInt( props?.quantity ) !== attendeeIds.length ) {
+        throw new Error( `Missing attendee ${ attendeeIds.length }/${ props?.quantity }` );
+      }
+
+      setNotice({
+        status: 'info',
+        message: __( 'Updating order status.', 'lasntgadmin' )
+      });
+
+      const orderRes = await apiFetch(
+        getUpdateShopOrderRequestBody(
+          props.order.id,
+          props.nonce,
+          {
+            status: hasAttendees( props.order ) || isWaitingOrder( props.order ) ? `wc-${props.order.status}` : 'wc-pending'
+          }
+        )
+      );
+
+      setNotice({
+        status: 'success',
+        message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
+      });
+
+      document.location.assign( isWaitingOrder( props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
+
+    } catch (e) {
+      console.error(e);
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      setIsLoading(false);
+
+      delay( () => {
+        setIsLoading(true);
+        document.location.reload();
+      }, 3000 );
+      //setSubmitButtonDisabled(false);
+    }
+  }
+
+  function isSubmitButtonDisabled() {
+    return isCourseClosed( props.product.status );
+  }
+
+  return (
+    <>
+      <div class="form-wrap">
+        <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
+          <div id="order_data" class="panel woocommerce-order-data">
+            <ProductContext.Provider value={ props.product }>
+              <OrderContext.Provider value={ props.order }>
+                <AcfFieldsContext.Provider value={ props.fields }>
+
+                { props?.quantity > 0 && range( props.quantity ).map( ( index ) => {
+                  return (
+                    <AttendeeFormFieldset index={ index } attendee={ props.attendees[index] } />
+                  );
+                })}
+
+                </AcfFieldsContext.Provider>
+              </OrderContext.Provider>
+            </ProductContext.Provider>
+
+            { props?.quantity > 0 && 
+            <div class="form-field">
+              { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
+              <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
+              { isLoading && <Spinner/> }
+            </div>}
+
+          </div>
+        </form>
+      </div> 
+    </>
+  );
+};
+
+export { 
+  AttendeeForm, 
+};

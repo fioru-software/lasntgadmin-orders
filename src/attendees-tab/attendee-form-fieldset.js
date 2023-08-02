@@ -4,6 +4,8 @@ import { createContext, useState } from '@wordpress/element';
 import { AttendeeFormFieldsetFields } from './attendee-form-fieldset-fields';
 import { AttendeeFormFieldsetButtons } from './attendee-form-fieldset-buttons';
 
+import { isNil } from 'lodash';
+
 const AttendeeContext = createContext();
 
 const AttendeeFormFieldset = props => {
@@ -21,7 +23,7 @@ const AttendeeFormFieldset = props => {
 
         <AttendeeFormFieldsetFields index={ index } setAttendee={ setAttendee }/>
 
-        <AttendeeFormFieldsetButtons />
+        <AttendeeFormFieldsetButtons setAttendee={ setAttendee }/>
 
       </fieldset>
     </AttendeeContext.Provider>

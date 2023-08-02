@@ -5,7 +5,7 @@ import '@testing-library/jest-dom'
 
 import { faker } from "@faker-js/faker";
 
-import { ProductContext } from './attendees-form';
+import { ProductContext } from './attendee-context';
 import { AttendeeFormFieldsetButtons } from './attendee-form-fieldset-buttons';
 
 describe("AttendeeFormFieldsetButtons", () => {

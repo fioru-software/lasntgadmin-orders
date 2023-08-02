@@ -2,7 +2,7 @@
 import { render } from '@wordpress/element';
 
 import { OrderForm } from './enrolment-tab/order-form';
-import { AttendeesForm } from './attendees-tab/attendees-form';
+import { AttendeeForm } from './attendees-tab/attendee-form';
 
 /**
  * Render components
@@ -36,7 +36,7 @@ window.addEventListener(
     const attendeesComponent = document.querySelector( '#lasntgadmin-orders-attendees-form' );
     if( attendeesComponent ) {
       render(
-        <AttendeesForm
+        <AttendeeForm
           quantity={ attendeesComponent.dataset.quantity }
           nonce={ attendeesComponent.dataset.nonce } 
           fields={ JSON.parse( attendeesComponent.dataset.fields ) }

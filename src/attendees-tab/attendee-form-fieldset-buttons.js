@@ -2,8 +2,8 @@
 import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ProductContext, OrderContext } from './attendees-form';
-import { isCourseClosed, isCourseOpen } from '../product-utils';
+import { ProductContext, OrderContext } from './attendee-context';
+import { isCourseClosed } from '../product-utils';
 import { isPaidStatus, isGrantPaid, isPurchaseOrderPaid } from '../order-utils';
 import { isNil } from 'lodash';
 
@@ -32,12 +32,12 @@ const AttendeeFormFieldsetButtons = props => {
    * or payment method is not grant and purchase order
    */
   function isRemoveButtonDisabled() {
-    return isCourseClosed( product.status ) || ( ! isGrantPaid( order.payment_method ) && isPurchaseOrderPaid( order.payment_method ) );
+    return isCourseClosed( product.status ) || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
   }
 
   function handleResetAttendee( e ) {
     e.preventDefault();
-    console.log('TODO: reset attendee');
+    props.setAttendee(null);
   }
 
   function handleRemoveAttendee( e ) {
