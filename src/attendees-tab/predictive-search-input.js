@@ -1,12 +1,14 @@
 
 import { Spinner } from '@wordpress/components';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { useContext, useState, useEffect, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { RadioControl } from '@wordpress/components';
 import { isNil } from "lodash";
 
 const PredictiveSearchInput = props => {
+
+  const quantity = props.quantity;
 
   const textInput = useRef(null);
 
@@ -121,7 +123,7 @@ const PredictiveSearchInput = props => {
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } />
+			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ props?.onInput } />
       { disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
 
 			{ showSearchResult() && <RadioControl options={ options } onChange={ handleSelect } />}

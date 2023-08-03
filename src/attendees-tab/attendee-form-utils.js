@@ -1,4 +1,6 @@
 
+import { range, isNull } from "lodash";
+
 function assembleAcfFieldsForRequestBody( index, formElement, formData ) {
   return Object.assign(
     Object.fromEntries(
@@ -112,42 +114,49 @@ function extractAttendeeIdsFromResponse( attendeeResponses ) {
   return attendeeResponses.map( res => Object.hasOwn(res.body, 'id' ) ? parseInt( res.body.id ) : null ).filter(Boolean);
 }
 
-function extractEmployeeNumbersFromForm( quantity, form ) {
-  const formData = new FormData(form);
-  return range(quantity).map( ( index ) => {
+/**
+ * Extracts indexed employee numbers from FormData object.
+ * Indexes are preserved.
+ *
+ * @param {Number} quantity
+ * @param {FormData} formData
+ * @return {Object} Object with original attendee indexes as props.
+ */
+function extractIndexedEmployeeNumbersFromForm( quantity, formData ) {
+  let indexedEmployeeNumbers = {};
+  for( let index=0; index<quantity; index++) {
     if( formData.has(`attendees[${index}]['acf']['employee_number']`) ) {
-      return {
-        index: index,
-        value: formData.get(`attendees[${index}]['acf']['employee_number']`)
-      };
-    }
-  }).filter( employeeNumber => ! isNull( employeeNumber ) ).reverse();
-}
-
-function validateUniqueEmployeeNumbers( quantity, form ) {
-  const employeeNumbers = extractEmployeeNumbersFromForm( quantity, form );
-  const formData = new FormData(form);
-  let valid = true;
-  for( const employeeNumber of employeeNumbers ) {
-    const count = countOccurrencesOfEmployeeNumber( employeeNumber.value, employeeNumbers.map( obj => obj.value ) );
-    const input = document.querySelector(`input[name="attendees[${employeeNumber.index}]['acf']['employee_number']"]`);
-    if( count > 1 ) {
-      const validationErrorMsg = __('Employee number must be unique.', 'lasntgadmin' );
-      input.setCustomValidity( validationErrorMsg );
-      input.reportValidity();
-      setNotice({
-        status: 'error',
-        message: validationErrorMsg
-      });
-      valid = false;
-      break;
-    } else {
-      input.setCustomValidity("");
+      const employeeNumber = formData.get(`attendees[${index}]['acf']['employee_number']`);
+      if( employeeNumber ) {
+        indexedEmployeeNumbers[index] = employeeNumber;
+      }
     }
   }
-  return valid;
+  return indexedEmployeeNumbers;
 }
 
+/**
+ * @param {Object} employeeNumbers An object with attendee indexes as props
+ * @return {Number|false} Index of the employee or false
+ */
+function extractLastIndexOfDuplicateEmployeeNumberField( employeeNumbers ) {
+  for (const [index, employeeNumber] of (Object.entries(employeeNumbers)).reverse() ) {
+    const count = countOccurrencesOfEmployeeNumber( 
+      employeeNumber, 
+      Object.values( employeeNumbers ) 
+    );
+    if( count > 1 ) {
+      return parseInt(index);
+    }
+  }
+  return false;
+}
+
+/**
+ * @param {String} employeeNumber
+ * @param {String[]} employeeNumbers
+ * @return {Number} Number of occurrences 
+ */
 function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
   return employeeNumbers.reduce(
     ( accumulator, currentValue, currentIndex  ) => {
@@ -164,7 +173,7 @@ export {
   extractAcfInputs,
   createBatchRequestBody,
   extractAttendeeIdsFromResponse,
-  extractEmployeeNumbersFromForm,
-  validateUniqueEmployeeNumbers,
+  extractIndexedEmployeeNumbersFromForm,
+  extractLastIndexOfDuplicateEmployeeNumberField,
   countOccurrencesOfEmployeeNumber
 }

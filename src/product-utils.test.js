@@ -9,24 +9,24 @@ describe("findGroupQuotas()", () => {
 
     const metaData = [
       {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         key: `groups-read`,
-        value: faker.datatype.number()
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         key: `groups-read`,
-        value: faker.datatype.number()
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       }
     ];
     expect( findGroupQuotas( metaData ) ).toEqual( [metaData[1], metaData[3] ] );
@@ -41,24 +41,24 @@ describe("findGroupQuotas()", () => {
 describe("findGroupQuota()", () => {
   it("group in quotas", () => {
 
-    const groupId = faker.datatype.number();
-    const quota = faker.datatype.number();
+    const groupId = faker.number.int();
+    const quota = faker.number.int();
 
     const quotas = [
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         key: `_quotas_field_${ groupId }`,
         value: quota
       },
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       }
     ];
 
@@ -67,7 +67,7 @@ describe("findGroupQuota()", () => {
   });
 
   it("group not in quotas", () => {
-    const groupId = faker.datatype.number();
+    const groupId = faker.number.int();
     expect( findGroupQuota( groupId, [] ) ).toBe( "" );
   });
 });

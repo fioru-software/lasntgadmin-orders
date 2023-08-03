@@ -244,6 +244,7 @@ const TelInput = props => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AcfFieldsContext: () => (/* binding */ AcfFieldsContext),
+/* harmony export */   AttendeeContext: () => (/* binding */ AttendeeContext),
 /* harmony export */   OrderContext: () => (/* binding */ OrderContext),
 /* harmony export */   ProductContext: () => (/* binding */ ProductContext)
 /* harmony export */ });
@@ -253,6 +254,7 @@ __webpack_require__.r(__webpack_exports__);
 const ProductContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createContext)();
 const OrderContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createContext)();
 const AcfFieldsContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createContext)();
+const AttendeeContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createContext)();
 
 
 /***/ }),
@@ -377,6 +379,7 @@ const AttendeeFormFieldsetFields = props => {
   const fields = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AcfFieldsContext);
   const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
   const index = props.index;
+  const quantity = props.quantity;
   function isFieldDisabled() {
     return (0,_product_utils__WEBPACK_IMPORTED_MODULE_8__.isCourseClosed)(product.status);
   }
@@ -384,6 +387,7 @@ const AttendeeFormFieldsetFields = props => {
     index: index
   }), fields.map(field => {
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_predictive_search_fields__WEBPACK_IMPORTED_MODULE_6__.PredictiveSearchFields, {
+      quantity: quantity,
       index: index,
       field: field,
       onChange: props.setAttendee
@@ -516,7 +520,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _predictive_search_input__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./predictive-search-input */ "./src/attendees-tab/predictive-search-input.js");
-/* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
+/* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
 
 
 
@@ -525,9 +529,37 @@ const PredictiveSearchFields = props => {
   const field = props.field;
   const index = props.index;
   const nonce = props.nonce;
-  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_2__.AttendeeContext);
+  const quantity = props.quantity;
+  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_2__.AttendeeContext);
   function handleSelect(value) {
     props.onChange(value);
+  }
+
+  /**
+   * The AttendeeForm runs a client side check for duplicate employee numbers on it's submit event.
+   * If a duplicate employee number is found the AttendeeForm sets a custom client side validation error on the relevant input.
+   * This component is clearing the custom validation error on it's input event, because the
+   * AttendeeForm's submit event will not fire when a custom validation error is present.
+   *
+   * @see AttendeeForm
+   */
+  function handleInput(e) {
+    if (!e.target.validity.valid) {
+      clearCustomValidationErrors(quantity, field.name);
+    }
+  }
+
+  /**
+   * @param {Number} quantity Order quantity
+   * @param {String} name Name of acf field
+   */
+  function clearCustomValidationErrors(quantity, name) {
+    for (let index = 0; index < quantity; index++) {
+      const input = document.querySelector(`input[name="attendees[${index}]['acf']['${name}']"]`);
+      if (input) {
+        input.setCustomValidity("");
+      }
+    }
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field form-row"
@@ -566,7 +598,8 @@ const PredictiveSearchFields = props => {
     defaultValue: attendee?.acf[field.name] || field.default_value,
     maxlength: field.maxlength,
     required: !!field.required,
-    onChange: handleSelect
+    onChange: handleSelect,
+    onInput: handleInput
   }));
 };
 
@@ -581,33 +614,194 @@ const PredictiveSearchFields = props => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   AttendeeContext: () => (/* binding */ AttendeeContext),
+/* harmony export */   AttendeeContext: () => (/* reexport safe */ _attendee_context__WEBPACK_IMPORTED_MODULE_3__.AttendeeContext),
 /* harmony export */   AttendeeFormFieldset: () => (/* binding */ AttendeeFormFieldset)
 /* harmony export */ });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _attendee_form_fieldset_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./attendee-form-fieldset-fields */ "./src/attendees-tab/attendee-form-fieldset-fields.js");
 /* harmony import */ var _attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attendee-form-fieldset-buttons */ "./src/attendees-tab/attendee-form-fieldset-buttons.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
 
 
 
 
 
-const AttendeeContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createContext)();
+
 const AttendeeFormFieldset = props => {
   const index = props.index;
+  const quantity = props.quantity;
   const [attendee, setAttendee] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(props.attendee);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(AttendeeContext.Provider, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AttendeeContext.Provider, {
     value: attendee
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "Attendee ", index + 1), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_fields__WEBPACK_IMPORTED_MODULE_1__.AttendeeFormFieldsetFields, {
+    quantity: quantity,
     index: index,
     setAttendee: setAttendee
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__.AttendeeFormFieldsetButtons, {
     setAttendee: setAttendee
   })));
 };
+
+
+/***/ }),
+
+/***/ "./src/attendees-tab/attendee-form-utils.js":
+/*!**************************************************!*\
+  !*** ./src/attendees-tab/attendee-form-utils.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   assembleAcfFieldsForRequestBody: () => (/* binding */ assembleAcfFieldsForRequestBody),
+/* harmony export */   countOccurrencesOfEmployeeNumber: () => (/* binding */ countOccurrencesOfEmployeeNumber),
+/* harmony export */   createAttendeesRequestBody: () => (/* binding */ createAttendeesRequestBody),
+/* harmony export */   createBatchRequestBody: () => (/* binding */ createBatchRequestBody),
+/* harmony export */   determineAcfValue: () => (/* binding */ determineAcfValue),
+/* harmony export */   extractAcfInputs: () => (/* binding */ extractAcfInputs),
+/* harmony export */   extractAttendeeByIndex: () => (/* binding */ extractAttendeeByIndex),
+/* harmony export */   extractAttendeeIdsFromResponse: () => (/* binding */ extractAttendeeIdsFromResponse),
+/* harmony export */   extractCoursePrerequisitesMetFieldValue: () => (/* binding */ extractCoursePrerequisitesMetFieldValue),
+/* harmony export */   extractIndexedEmployeeNumbersFromForm: () => (/* binding */ extractIndexedEmployeeNumbersFromForm),
+/* harmony export */   extractLastIndexOfDuplicateEmployeeNumberField: () => (/* binding */ extractLastIndexOfDuplicateEmployeeNumberField)
+/* harmony export */ });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+
+function assembleAcfFieldsForRequestBody(index, formElement, formData) {
+  return Object.assign(Object.fromEntries(extractAttendeeByIndex(index, formElement, formData)));
+}
+
+/**
+ * @param { number } index Attendee index for HTML inputs
+ * @param { HTMLElement } form
+ * @return array
+ */
+function extractAttendeeByIndex(index, formElement, formData) {
+  return Array.from(formElement.querySelectorAll(`[name^="attendees[${index}]['acf']"]`)).filter(input => input.value !== "").map(input => {
+    const name = extractAcfInputs(input.getAttribute('name'));
+    switch (name) {
+      case 'course_prerequisites_met':
+        return [name, extractCoursePrerequisitesMetFieldValue(index, formElement, formData)];
+        break;
+      default:
+        return [name, determineAcfValue(input.value)];
+    }
+  });
+}
+function extractCoursePrerequisitesMetFieldValue(index, formElement, formData) {
+  const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
+  const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
+  // set ensure array values are unique
+  const set = new Set([...existingCoursePrerequisitesMetProductIds, ...courePrerequisitesMetProductIds]);
+  return [...set];
+}
+
+/**
+ * @todo use orderUtils.getUpdateAttendeeRequestBody()
+ */
+function createAttendeesRequestBody(index, formElement, groupId, orderId) {
+  const formData = new FormData(formElement);
+  const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
+  const body = {
+    path: attendeeId ? `/wp/v2/attendee/${attendeeId}?order_id=${orderId}` : `/wp/v2/attendee?order_id=${orderId}`,
+    method: 'POST',
+    headers: {
+      "X-WP-Nonce": props.nonce
+    },
+    body: {
+      id: attendeeId,
+      status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
+      meta: {
+        'groups-read': [...new Set(formData.getAll(`attendees[${index}]['meta']['groups-read']`).map(Number).filter(Number).concat(parseInt(props.groupId)))],
+        order_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['order_ids']`).map(Number).filter(Number).concat(parseInt(props.order.id)))],
+        product_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat(parseInt(props.product.id)))]
+      },
+      acf: assembleAcfFieldsForRequestBody(index, formElement, formData)
+    }
+  };
+  return body;
+}
+
+/**
+ * Checkboxes require boolean
+ */
+function determineAcfValue(value) {
+  return value === "true" ? true : value === "false" ? false : value;
+}
+
+/**
+ * @param { string } name ACF input field's name attribute
+ */
+function extractAcfInputs(name) {
+  const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/);
+  return match ? match[1] : null;
+}
+
+/**
+ * @param { number } quantity Number of attendees
+ * @param { HTMLElement } form
+ * @param { number } groupId
+ * @param { number } orderId
+ * @return object
+ */
+function createBatchRequestBody(quantity, formElement, groupId, orderId) {
+  return (0,lodash__WEBPACK_IMPORTED_MODULE_0__.range)(quantity).map(index => {
+    return createAttendeesRequestBody(index, formElement, groupId, orderId);
+  });
+}
+function extractAttendeeIdsFromResponse(attendeeResponses) {
+  return attendeeResponses.map(res => Object.hasOwn(res.body, 'id') ? parseInt(res.body.id) : null).filter(Boolean);
+}
+
+/**
+ * Extracts indexed employee numbers from FormData object.
+ * Indexes are preserved.
+ *
+ * @param {Number} quantity
+ * @param {FormData} formData
+ * @return {Object} Object with original attendee indexes as props.
+ */
+function extractIndexedEmployeeNumbersFromForm(quantity, formData) {
+  let indexedEmployeeNumbers = {};
+  for (let index = 0; index < quantity; index++) {
+    if (formData.has(`attendees[${index}]['acf']['employee_number']`)) {
+      const employeeNumber = formData.get(`attendees[${index}]['acf']['employee_number']`);
+      if (employeeNumber) {
+        indexedEmployeeNumbers[index] = employeeNumber;
+      }
+    }
+  }
+  return indexedEmployeeNumbers;
+}
+
+/**
+ * @param {Object} employeeNumbers An object with attendee indexes as props
+ * @return {Number|false} Index of the employee or false
+ */
+function extractLastIndexOfDuplicateEmployeeNumberField(employeeNumbers) {
+  for (const [index, employeeNumber] of Object.entries(employeeNumbers).reverse()) {
+    const count = countOccurrencesOfEmployeeNumber(employeeNumber, Object.values(employeeNumbers));
+    if (count > 1) {
+      return parseInt(index);
+    }
+  }
+  return false;
+}
+
+/**
+ * @param {String} employeeNumber
+ * @param {String[]} employeeNumbers
+ * @return {Number} Number of occurrences 
+ */
+function countOccurrencesOfEmployeeNumber(employeeNumber, employeeNumbers) {
+  return employeeNumbers.reduce((accumulator, currentValue, currentIndex) => {
+    return accumulator += currentValue === employeeNumber ? 1 : 0;
+  }, 0);
+}
 
 
 /***/ }),
@@ -633,6 +827,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
 /* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
 /* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
+/* harmony import */ var _attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./attendee-form-utils */ "./src/attendees-tab/attendee-form-utils.js");
+
 
 
 
@@ -651,8 +847,36 @@ __webpack_require__.r(__webpack_exports__);
  * @param { object } product
  */
 const AttendeeForm = props => {
+  const quantity = parseInt(props.quantity);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+
+  /**
+   * @param {Number} quantity Order quantity
+   * @param {Number} index Attendee index
+   */
+  function showDuplicateEmployeeNumberValidationError(quantity, index) {
+    if (index !== false) {
+      const input = document.querySelector(`input[name="attendees[${index}]['acf']['employee_number']"]`);
+      const validationErrorMsg = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Employee number must be unique.', 'lasntgadmin');
+      input.setCustomValidity(validationErrorMsg);
+      input.reportValidity();
+    }
+  }
+
+  /**
+   * Check for duplicate employee numbers. 
+   * The custom validation error is cleared onInput by the PredictiveSearchFields component.
+   *
+   * @param {Number} quantity
+   * @param {FormData} formData
+   * @see PredictiveSearchFields
+   */
+  function checkForDuplicateEmployeeNumbers(quantity, formData) {
+    const indexedEmployeeNumbers = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__.extractIndexedEmployeeNumbersFromForm)(quantity, formData);
+    const indexOfDuplicateEmployeeNumberField = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__.extractLastIndexOfDuplicateEmployeeNumberField)(indexedEmployeeNumbers);
+    showDuplicateEmployeeNumberValidationError(quantity, indexOfDuplicateEmployeeNumberField);
+  }
 
   /**
    * @requires ACF Field group settings for additional groups: when post_type = 'post' and rest_api = true;
@@ -660,13 +884,10 @@ const AttendeeForm = props => {
    */
   async function handleSubmit(e) {
     e.preventDefault();
+    const formData = new FormData(e.target);
     setNotice(null);
     if (quantity > 1) {
-      console.log(quantity);
-      console.log(e.target);
-      if (!validateUniqueEmployeeNumbers(quantity, e.target)) {
-        return false;
-      }
+      checkForDuplicateEmployeeNumbers(quantity, formData);
     }
 
     // @todo continue from here
@@ -707,9 +928,9 @@ const AttendeeForm = props => {
         }
       });
 
-      // Valid attendees are less than order quantity
-      if (parseInt(props?.quantity) !== attendeeIds.length) {
-        throw new Error(`Missing attendee ${attendeeIds.length}/${props?.quantity}`);
+      // Valid attendees are less than order order quantity
+      if (parseInt(quantity) !== attendeeIds.length) {
+        throw new Error(`Missing attendee ${attendeeIds.length}/${quantity}`);
       }
       setNotice({
         status: 'info',
@@ -753,14 +974,15 @@ const AttendeeForm = props => {
     value: props.product
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.OrderContext.Provider, {
     value: props.order
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(AcfFieldsContext.Provider, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.AcfFieldsContext.Provider, {
     value: props.fields
-  }, props?.quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_3__.range)(props.quantity).map(index => {
+  }, quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_3__.range)(quantity).map(index => {
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__.AttendeeFormFieldset, {
+      quantity: quantity,
       index: index,
       attendee: props.attendees[index]
     });
-  })))), props?.quantity > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  })))), quantity > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
   }, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
     status: notice.status,
@@ -806,6 +1028,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const PredictiveSearchInput = props => {
+  const quantity = props.quantity;
   const textInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const [attendees, setAttendees] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [options, setOptions] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
@@ -908,7 +1131,8 @@ const PredictiveSearchInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    disabled: disabled
+    disabled: disabled,
+    onInput: props?.onInput
   }), disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: props.name,

@@ -22,6 +22,7 @@ const AttendeeFormFieldsetFields = props => {
   const product = useContext( ProductContext );
 
   const index = props.index;
+  const quantity = props.quantity;
 
   function isFieldDisabled() {
     return isCourseClosed( product.status );
@@ -35,7 +36,7 @@ const AttendeeFormFieldsetFields = props => {
         return (
           <>
 
-            <PredictiveSearchFields index={ index } field={ field } onChange={ props.setAttendee } />
+            <PredictiveSearchFields quantity={ quantity } index={ index } field={ field } onChange={ props.setAttendee } />
 
             <div class="form-field form-row">
 

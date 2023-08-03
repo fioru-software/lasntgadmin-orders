@@ -8,7 +8,12 @@ import { range } from 'lodash';
 import { AttendeeFormFieldset } from './attendee-form-fieldset';
 import { isCourseClosed } from '../product-utils';
 
-import { ProductContext, OrderContext, AcfFieldContext } from './attendee-context';
+import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-context';
+
+import { 
+  extractIndexedEmployeeNumbersFromForm,
+  extractLastIndexOfDuplicateEmployeeNumberField
+} from "./attendee-form-utils";
 
 /**
  * @param { number } quantity
@@ -20,8 +25,37 @@ import { ProductContext, OrderContext, AcfFieldContext } from './attendee-contex
  */
 const AttendeeForm = props => {
 
+  const quantity = parseInt( props.quantity );
+
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
+
+  /**
+   * @param {Number} quantity Order quantity
+   * @param {Number} index Attendee index
+   */
+  function showDuplicateEmployeeNumberValidationError( quantity, index ) {
+    if( index !== false ) {
+      const input = document.querySelector(`input[name="attendees[${index}]['acf']['employee_number']"]`);
+      const validationErrorMsg = __('Employee number must be unique.', 'lasntgadmin' );
+      input.setCustomValidity( validationErrorMsg );
+      input.reportValidity();
+    }
+  }
+
+  /**
+   * Check for duplicate employee numbers. 
+   * The custom validation error is cleared onInput by the PredictiveSearchFields component.
+   *
+   * @param {Number} quantity
+   * @param {FormData} formData
+   * @see PredictiveSearchFields
+   */
+  function checkForDuplicateEmployeeNumbers( quantity, formData ) {
+    const indexedEmployeeNumbers = extractIndexedEmployeeNumbersFromForm( quantity, formData );
+    const indexOfDuplicateEmployeeNumberField = extractLastIndexOfDuplicateEmployeeNumberField( indexedEmployeeNumbers );
+    showDuplicateEmployeeNumberValidationError( quantity, indexOfDuplicateEmployeeNumberField );
+  }
 
   /**
    * @requires ACF Field group settings for additional groups: when post_type = 'post' and rest_api = true;
@@ -29,14 +63,13 @@ const AttendeeForm = props => {
    */
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const formData = new FormData(e.target);
+
     setNotice(null);
 
     if( quantity > 1 ) {
-      console.log(quantity);
-      console.log(e.target);
-      if( ! validateUniqueEmployeeNumbers( quantity, e.target ) ) {
-        return false;
-      }
+      checkForDuplicateEmployeeNumbers( quantity, formData );
     }
 
     // @todo continue from here
@@ -91,9 +124,9 @@ const AttendeeForm = props => {
         }
       });
 
-      // Valid attendees are less than order quantity
-      if( parseInt( props?.quantity ) !== attendeeIds.length ) {
-        throw new Error( `Missing attendee ${ attendeeIds.length }/${ props?.quantity }` );
+      // Valid attendees are less than order order quantity
+      if( parseInt( quantity ) !== attendeeIds.length ) {
+        throw new Error( `Missing attendee ${ attendeeIds.length }/${ quantity }` );
       }
 
       setNotice({
@@ -141,15 +174,18 @@ const AttendeeForm = props => {
   return (
     <>
       <div class="form-wrap">
+
         <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
+
           <div id="order_data" class="panel woocommerce-order-data">
+
             <ProductContext.Provider value={ props.product }>
               <OrderContext.Provider value={ props.order }>
                 <AcfFieldsContext.Provider value={ props.fields }>
 
-                { props?.quantity > 0 && range( props.quantity ).map( ( index ) => {
+                { quantity > 0 && range( quantity ).map( ( index ) => {
                   return (
-                    <AttendeeFormFieldset index={ index } attendee={ props.attendees[index] } />
+                    <AttendeeFormFieldset quantity={ quantity } index={ index } attendee={ props.attendees[index] } />
                   );
                 })}
 
@@ -157,7 +193,7 @@ const AttendeeForm = props => {
               </OrderContext.Provider>
             </ProductContext.Provider>
 
-            { props?.quantity > 0 && 
+            { quantity > 0 && 
             <div class="form-field">
               { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
               <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
