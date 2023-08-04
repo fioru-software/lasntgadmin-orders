@@ -9,8 +9,9 @@ import { isNil } from 'lodash';
 
 const AttendeeFormFieldset = props => {
 
-  const index = props.index;
-  const quantity = props.quantity;
+  const index = parseInt( props.index );
+  const quantity = parseInt( props.quantity );
+  const groupId = parseInt( props.groupId );
 
   const [ attendee, setAttendee ] = useState( props.attendee );
 
@@ -21,7 +22,7 @@ const AttendeeFormFieldset = props => {
 
         <legend>Attendee { index + 1 }</legend>
 
-        <AttendeeFormFieldsetFields quantity={ quantity } index={ index } setAttendee={ setAttendee }/>
+        <AttendeeFormFieldsetFields groupId={ groupId } quantity={ quantity } index={ index } setAttendee={ setAttendee }/>
 
         <AttendeeFormFieldsetButtons setAttendee={ setAttendee }/>
 

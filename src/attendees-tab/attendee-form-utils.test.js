@@ -2,12 +2,58 @@
 import { 
   extractIndexedEmployeeNumbersFromForm, 
   extractLastIndexOfDuplicateEmployeeNumberField,
-  countOccurrencesOfEmployeeNumber
+  extractCoursePrerequisitesMetFieldValue,
+  countOccurrencesOfEmployeeNumber,
+  createAttendeeRequestBody
 } from "./attendee-form-utils";
 
-import { generateAcfFormData } from "./attendee-form-test-helper";
+import { generateAcfFormData, generateMetaFormData } from "./attendee-form-test-helper";
 
 import { faker } from "@faker-js/faker";
+
+describe("createBatchRequestBody()", () => {
+
+  it.todo("todo");
+
+  describe("createAttendeeRequestBody()", () => {
+    it.todo("todo");
+  });
+
+  describe("extractAttendeeByIndex()", () => {
+    it.todo("todo");
+  });
+
+  describe("extractAcfInputs()", () => {
+    it.todo("todo");
+  });
+
+  describe("extractCoursePrerequisitesMetFieldValue()", () => {
+    it.only("wip", () => {
+
+      const meta = [
+        {
+          course_prerequisites_met: faker.number.int()
+        },
+        {
+          course_prerequisites_met: faker.number.int()
+        }
+      ];
+      const formData = generateMetaFormData( meta );
+      
+      // @todo continue from here
+      const values = extractCoursePrerequisitesMetFieldValue( 1, formData );
+      console.log(values);
+      //const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
+      //const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
+
+    });
+  });
+
+  describe("determineAcfValue()", () => {
+    it.todo("todo");
+  });
+});
+
 
 describe("extractIndexedEmployeeNumbersFromForm()", () => {
 
@@ -34,20 +80,22 @@ describe("extractIndexedEmployeeNumbersFromForm()", () => {
 
 });
 
-describe("countOccurrencesOfEmployeeNumber()", () => {
-  describe("contains a duplicate employee number", () => {
-    it("returns count > 1", () => {
-      const duplicateEmployeeNumber = faker.string.uuid();
-      const count = countOccurrencesOfEmployeeNumber(
-        duplicateEmployeeNumber,
-        [ faker.string.uuid(), duplicateEmployeeNumber, faker.string.uuid(), duplicateEmployeeNumber ]
-      );
-      expect( count ).toEqual(2);
-    });
-  });
-});
 
 describe("extractLastIndexOfDuplicateEmployeeNumberfield()", () => {
+
+  describe("countOccurrencesOfEmployeeNumber()", () => {
+    describe("contains a duplicate employee number", () => {
+      it("returns count > 1", () => {
+        const duplicateEmployeeNumber = faker.string.uuid();
+        const count = countOccurrencesOfEmployeeNumber(
+          duplicateEmployeeNumber,
+          [ faker.string.uuid(), duplicateEmployeeNumber, faker.string.uuid(), duplicateEmployeeNumber ]
+        );
+        expect( count ).toEqual(2);
+      });
+    });
+  });
+
   describe("with a duplicate", () => {
     it("returns index", () => {
       const duplicateEmployeeNumber = faker.string.uuid();

@@ -21,8 +21,9 @@ const AttendeeFormFieldsetFields = props => {
   const fields = useContext( AcfFieldsContext );
   const product = useContext( ProductContext );
 
-  const index = props.index;
-  const quantity = props.quantity;
+  const index = parseInt( props.index );
+  const quantity = parseInt( props.quantity );
+  const groupId = parseInt( props.groupId );
 
   function isFieldDisabled() {
     return isCourseClosed( product.status );
@@ -30,7 +31,7 @@ const AttendeeFormFieldsetFields = props => {
 
   return (
     <>
-      <HiddenFields index={ index } />
+      <HiddenFields index={ index } groupId={ groupId }/>
 
       { fields.map( field => {
         return (

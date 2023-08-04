@@ -104,24 +104,7 @@ function getUpdateOrderRequestBody( orderId, nonce, data) {
   };
 }
 
-function getUpdateAttendeeRequestBody( orderId, attendeeId, nonce, data ) {
-  return {
-    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
-    method: 'PUT',
-    headers: {
-      'X-WP-Nonce': nonce
-    },
-    data: Object.assign(
-      {
-        id: attendeeId,
-      }, 
-      data
-    )
-  };
-}
-
 export {
-  getUpdateAttendeeRequestBody,
   getUpdateShopOrderRequestBody,
   getUpdateOrderRequestBody,
   getLineItemByProductId,

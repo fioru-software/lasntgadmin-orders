@@ -74,7 +74,7 @@ const TrueFalse = props => {
     type: "checkbox",
     id: props.id,
     name: props.name,
-    disabled: props?.disabled || props?.defaultValue !== '' && props?.readOnly,
+    disabled: props?.disabled || false,
     required: props?.required,
     onClick: handleClick,
     checked: checked,
@@ -126,7 +126,7 @@ const TextInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    disabled: props?.disabled || props?.defaultValue !== '' && props?.readOnly,
+    disabled: props?.disabled || false,
     onFocus: props?.handleFocus
   });
 };
@@ -143,7 +143,7 @@ const EmailInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "^[^@\s]+@[^@\s]+\.[^@\s]+$",
-    disabled: props?.disabled || props?.defaultValue !== '' && props?.readOnly,
+    disabled: props?.disabled || false,
     onFocus: props?.handleFocus
   });
 };
@@ -152,11 +152,11 @@ const TextArea = props => {
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("textarea", {
     id: props?.id,
     ref: textInput,
-    disabled: props?.disabled || props?.readOnly,
+    disabled: props?.disabled || false,
     name: props?.name,
     defaultValue: props?.defaultValue,
     required: props?.required,
-    handleFocus: props?.handleFocus
+    onFocus: props?.handleFocus
   }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: name,
@@ -185,7 +185,7 @@ const DateInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    disabled: props?.disabled || !(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.defaultValue) && props?.readOnly,
+    disabled: props?.disabled || false,
     onFocus: props?.handleFocus
   });
 };
@@ -208,7 +208,7 @@ const NumberInput = props => {
     max: props?.max,
     min: props?.min || 0,
     step: props?.step || 1,
-    disabled: props?.disabled || props?.defaultValue !== '' && props?.readOnly,
+    disabled: props?.disabled || false,
     onChange: props?.onChange,
     value: props?.value,
     onFocus: props?.handleFocus
@@ -227,7 +227,7 @@ const TelInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "[0-9+\s]+",
-    disabled: props?.disabled || props?.defaultValue !== '' && props?.readOnly,
+    disabled: props?.disabled || false,
     onFocus: props?.handleFocus
   });
 };
@@ -378,13 +378,15 @@ const AttendeeFormFieldsetFields = props => {
   const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__.AttendeeContext);
   const fields = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AcfFieldsContext);
   const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
-  const index = props.index;
-  const quantity = props.quantity;
+  const index = parseInt(props.index);
+  const quantity = parseInt(props.quantity);
+  const groupId = parseInt(props.groupId);
   function isFieldDisabled() {
     return (0,_product_utils__WEBPACK_IMPORTED_MODULE_8__.isCourseClosed)(product.status);
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_hidden_fields__WEBPACK_IMPORTED_MODULE_5__.HiddenFields, {
-    index: index
+    index: index,
+    groupId: groupId
   }), fields.map(field => {
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_predictive_search_fields__WEBPACK_IMPORTED_MODULE_6__.PredictiveSearchFields, {
       quantity: quantity,
@@ -475,8 +477,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const HiddenFields = props => {
-  const index = props.index;
+  const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(ProductContext);
+  const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(OrderContext);
   const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_1__.AttendeeContext);
+  const index = parseInt(props.index);
+  const groupId = parseInt(props.groupId);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (attendee?.ID || attendee?.id) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: `attendees[${index}]['id']`,
@@ -488,19 +493,19 @@ const HiddenFields = props => {
   }), attendee?.meta?.order_ids && attendee?.meta?.order_ids.map(orderId => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: `attendees[${index}]['meta']['order_ids']`,
-    value: parseInt(orderId)
+    value: order.id
   })), attendee?.meta?.product_ids && attendee?.meta?.product_ids.map(productId => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: `attendees[${index}]['meta']['product_ids']`,
-    value: parseInt(productId)
+    value: product.id
   })), attendee?.meta['groups-read'] && attendee?.meta['groups-read'].map(groupId => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: `attendees[${index}]['meta']['groups-read']`,
-    value: parseInt(groupId)
+    value: groupId
   })), attendee?.acf?.course_prerequisites_met && attendee?.acf?.course_prerequisites_met.map(productId => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: `attendees[${index}]['meta']['course_prerequisites_met']`,
-    value: parseInt(productId)
+    value: product.id
   })));
 };
 
@@ -631,12 +636,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const AttendeeFormFieldset = props => {
-  const index = props.index;
-  const quantity = props.quantity;
+  const index = parseInt(props.index);
+  const quantity = parseInt(props.quantity);
+  const groupId = parseInt(props.groupId);
   const [attendee, setAttendee] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(props.attendee);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AttendeeContext.Provider, {
     value: attendee
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "Attendee ", index + 1), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_fields__WEBPACK_IMPORTED_MODULE_1__.AttendeeFormFieldsetFields, {
+    groupId: groupId,
     quantity: quantity,
     index: index,
     setAttendee: setAttendee
@@ -658,8 +665,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   assembleAcfFieldsForRequestBody: () => (/* binding */ assembleAcfFieldsForRequestBody),
 /* harmony export */   countOccurrencesOfEmployeeNumber: () => (/* binding */ countOccurrencesOfEmployeeNumber),
-/* harmony export */   createAttendeesRequestBody: () => (/* binding */ createAttendeesRequestBody),
-/* harmony export */   createBatchRequestBody: () => (/* binding */ createBatchRequestBody),
+/* harmony export */   createAttendeeRequest: () => (/* binding */ createAttendeeRequest),
+/* harmony export */   createBatchRequest: () => (/* binding */ createBatchRequest),
 /* harmony export */   determineAcfValue: () => (/* binding */ determineAcfValue),
 /* harmony export */   extractAcfInputs: () => (/* binding */ extractAcfInputs),
 /* harmony export */   extractAttendeeByIndex: () => (/* binding */ extractAttendeeByIndex),
@@ -685,45 +692,76 @@ function extractAttendeeByIndex(index, formElement, formData) {
     const name = extractAcfInputs(input.getAttribute('name'));
     switch (name) {
       case 'course_prerequisites_met':
-        return [name, extractCoursePrerequisitesMetFieldValue(index, formElement, formData)];
+        return [name, extractCoursePrerequisitesMetFieldValue(index, formData)];
         break;
       default:
         return [name, determineAcfValue(input.value)];
     }
   });
 }
-function extractCoursePrerequisitesMetFieldValue(index, formElement, formData) {
+function extractCoursePrerequisitesMetFieldValue(index, formData) {
   const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
   const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
-  // set ensure array values are unique
+  // use set to ensure array values are unique
   const set = new Set([...existingCoursePrerequisitesMetProductIds, ...courePrerequisitesMetProductIds]);
   return [...set];
 }
 
 /**
- * @todo use orderUtils.getUpdateAttendeeRequestBody()
+ * @param { number } quantity Number of attendees
+ * @param { HTMLElement } form
+ * @param { number } groupId
+ * @param { number } orderId
+ * @return object
  */
-function createAttendeesRequestBody(index, formElement, groupId, orderId) {
-  const formData = new FormData(formElement);
-  const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
-  const body = {
-    path: attendeeId ? `/wp/v2/attendee/${attendeeId}?order_id=${orderId}` : `/wp/v2/attendee?order_id=${orderId}`,
+function createBatchRequest(nonce, formData, quantity, formElement, groupId, orderId) {
+  return (0,lodash__WEBPACK_IMPORTED_MODULE_0__.range)(quantity).map(index => {
+    return createAttendeesRequest(nonce, formData, index, formElement, groupId, orderId);
+  });
+}
+function getUpdateAttendeeBatchRequest(orderId, attendeeId, nonce, body) {
+  return {
+    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
+    method: 'PUT',
+    headers: {
+      'X-WP-Nonce': nonce
+    },
+    body: Object.assign({
+      id: attendeeId
+    }, body)
+  };
+}
+function getCreateAttendeeBatchRequest(orderId, nonce, body) {
+  return {
+    path: `/wp/v2/attendee?order_id=${orderId}`,
     method: 'POST',
     headers: {
-      "X-WP-Nonce": props.nonce
+      'X-WP-Nonce': nonce
     },
-    body: {
-      id: attendeeId,
-      status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
-      meta: {
-        'groups-read': [...new Set(formData.getAll(`attendees[${index}]['meta']['groups-read']`).map(Number).filter(Number).concat(parseInt(props.groupId)))],
-        order_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['order_ids']`).map(Number).filter(Number).concat(parseInt(props.order.id)))],
-        product_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat(parseInt(props.product.id)))]
-      },
-      acf: assembleAcfFieldsForRequestBody(index, formElement, formData)
-    }
+    body
+  };
+}
+function createAttendeeBatchRequestBody(index, formData, groupId, orderId, productId) {
+  const body = {
+    status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
+    meta: {
+      'groups-read': [...new Set(formData.getAll(`attendees[${index}]['meta']['groups-read']`).map(Number).filter(Number).concat(groupId))],
+      order_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['order_ids']`).map(Number).filter(Number).concat(orderId))],
+      product_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat(productId))]
+    },
+    acf: assembleAcfFieldsForRequestBody(index, formElement, formData)
   };
   return body;
+}
+function createAttendeeRequest(nonce, formData, index, formElement, groupId, orderId, productId) {
+  const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
+  if (formData.has(`attendees[${index}]['id']`)) {
+    const attendeeId = parseInt(formData.get(`attendees[${index}]['id']`));
+    const req = getUpdateAttendeeBatchRequest(orderId, attendeeId, nonce, data);
+  } else {
+    const req = getCreateAttendeeBatchRequest(orderId, nonce, body);
+  }
+  return req;
 }
 
 /**
@@ -739,19 +777,6 @@ function determineAcfValue(value) {
 function extractAcfInputs(name) {
   const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/);
   return match ? match[1] : null;
-}
-
-/**
- * @param { number } quantity Number of attendees
- * @param { HTMLElement } form
- * @param { number } groupId
- * @param { number } orderId
- * @return object
- */
-function createBatchRequestBody(quantity, formElement, groupId, orderId) {
-  return (0,lodash__WEBPACK_IMPORTED_MODULE_0__.range)(quantity).map(index => {
-    return createAttendeesRequestBody(index, formElement, groupId, orderId);
-  });
 }
 function extractAttendeeIdsFromResponse(attendeeResponses) {
   return attendeeResponses.map(res => Object.hasOwn(res.body, 'id') ? parseInt(res.body.id) : null).filter(Boolean);
@@ -848,6 +873,11 @@ __webpack_require__.r(__webpack_exports__);
  */
 const AttendeeForm = props => {
   const quantity = parseInt(props.quantity);
+  const nonce = props.nonce;
+  const order = props.order;
+  const groupId = parseInt(props.groupId);
+  const orderId = parseInt(props.order.id);
+  const productId = parseInt(props.product.id);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
 
@@ -889,10 +919,11 @@ const AttendeeForm = props => {
     if (quantity > 1) {
       checkForDuplicateEmployeeNumbers(quantity, formData);
     }
+    const batchReq = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__.createBatchRequest)(nonce, formData, quantity, e.target, groupId, orderId, productId);
+    console.log(batchReq);
 
     // @todo continue from here
     return;
-    const batchReq = createBatchRequestBody(quantity, e.target, parseInt(props.groupId), props.order.id);
     try {
       setNotice(null);
       setIsLoading(true);
@@ -901,7 +932,7 @@ const AttendeeForm = props => {
         status: 'info',
         message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Updating attendees.', 'lasntgadmin')
       });
-      apiFetch.use(apiFetch.createNonceMiddleware(props.nonce));
+      apiFetch.use(apiFetch.createNonceMiddleware(nonce));
       const attendeesRes = await apiFetch({
         path: `/batch/v1`,
         method: 'POST',
@@ -914,8 +945,8 @@ const AttendeeForm = props => {
         status: 'info',
         message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Adding attendees to order.', 'lasntgadmin')
       });
-      apiFetch.use(apiFetch.createNonceMiddleware(props.nonce));
-      const orderAttendeeIdsUpdateRes = await apiFetch(getUpdateShopOrderRequestBody(props.order.id, props.nonce, {
+      apiFetch.use(apiFetch.createNonceMiddleware(nonce));
+      const orderAttendeeIdsUpdateRes = await apiFetch(getUpdateShopOrderRequestBody(orderId, nonce, {
         meta: {
           attendee_ids: [...new Set(attendeeIds)]
         }
@@ -936,14 +967,14 @@ const AttendeeForm = props => {
         status: 'info',
         message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Updating order status.', 'lasntgadmin')
       });
-      const orderRes = await apiFetch(getUpdateShopOrderRequestBody(props.order.id, props.nonce, {
-        status: hasAttendees(props.order) || isWaitingOrder(props.order) ? `wc-${props.order.status}` : 'wc-pending'
+      const orderRes = await apiFetch(getUpdateShopOrderRequestBody(orderId, nonce, {
+        status: hasAttendees(order) || isWaitingOrder(order) ? `wc-${order.status}` : 'wc-pending'
       }));
       setNotice({
         status: 'success',
         message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Updated order. Redirecting...', 'lasntgadmin')
       });
-      document.location.assign(isWaitingOrder(props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${props.order.id}&action=edit&tab=payment`);
+      document.location.assign(isWaitingOrder(order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${orderId}&action=edit&tab=payment`);
     } catch (e) {
       console.error(e);
       setNotice({
@@ -973,11 +1004,12 @@ const AttendeeForm = props => {
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.ProductContext.Provider, {
     value: props.product
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.OrderContext.Provider, {
-    value: props.order
+    value: order
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.AcfFieldsContext.Provider, {
     value: props.fields
   }, quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_3__.range)(quantity).map(index => {
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__.AttendeeFormFieldset, {
+      groupId: groupId,
       quantity: quantity,
       index: index,
       attendee: props.attendees[index]
@@ -2076,7 +2108,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getDraftStatus: () => (/* binding */ getDraftStatus),
 /* harmony export */   getLineItemByProductId: () => (/* binding */ getLineItemByProductId),
 /* harmony export */   getPendingStatus: () => (/* binding */ getPendingStatus),
-/* harmony export */   getUpdateAttendeeRequestBody: () => (/* binding */ getUpdateAttendeeRequestBody),
 /* harmony export */   getUpdateOrderRequestBody: () => (/* binding */ getUpdateOrderRequestBody),
 /* harmony export */   getUpdateShopOrderRequestBody: () => (/* binding */ getUpdateShopOrderRequestBody),
 /* harmony export */   getWaitingStatus: () => (/* binding */ getWaitingStatus),
@@ -2175,18 +2206,6 @@ function getUpdateOrderRequestBody(orderId, nonce, data) {
       "X-WP-Nonce": nonce
     },
     data
-  };
-}
-function getUpdateAttendeeRequestBody(orderId, attendeeId, nonce, data) {
-  return {
-    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
-    method: 'PUT',
-    headers: {
-      'X-WP-Nonce': nonce
-    },
-    data: Object.assign({
-      id: attendeeId
-    }, data)
   };
 }
 

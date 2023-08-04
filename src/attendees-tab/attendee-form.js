@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useContext } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -12,7 +12,8 @@ import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-conte
 
 import { 
   extractIndexedEmployeeNumbersFromForm,
-  extractLastIndexOfDuplicateEmployeeNumberField
+  extractLastIndexOfDuplicateEmployeeNumberField,
+  createBatchRequest
 } from "./attendee-form-utils";
 
 /**
@@ -26,6 +27,11 @@ import {
 const AttendeeForm = props => {
 
   const quantity = parseInt( props.quantity );
+  const nonce = props.nonce;
+  const order = props.order;
+  const groupId = parseInt( props.groupId );
+  const orderId = parseInt( props.order.id );
+  const productId = parseInt( props.product.id );
 
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
@@ -72,10 +78,11 @@ const AttendeeForm = props => {
       checkForDuplicateEmployeeNumbers( quantity, formData );
     }
 
+    const batchReq = createBatchRequest( nonce, formData, quantity, e.target, groupId, orderId, productId );
+    console.log(batchReq);
+
     // @todo continue from here
     return;
-
-    const batchReq = createBatchRequestBody( quantity, e.target, parseInt(props.groupId), props.order.id );
 
     try {
 
@@ -88,7 +95,7 @@ const AttendeeForm = props => {
         message: __( 'Updating attendees.', 'lasntgadmin' )
       });
 
-      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+      apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 
       const attendeesRes = await apiFetch(
         {
@@ -107,10 +114,10 @@ const AttendeeForm = props => {
         message: __( 'Adding attendees to order.', 'lasntgadmin' )
       });
 
-      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+      apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 
       const orderAttendeeIdsUpdateRes = await apiFetch(
-        getUpdateShopOrderRequestBody( props.order.id, props.nonce, {
+        getUpdateShopOrderRequestBody( orderId, nonce, {
           meta: {
             attendee_ids: [ ... new Set(attendeeIds) ]
           }
@@ -136,10 +143,10 @@ const AttendeeForm = props => {
 
       const orderRes = await apiFetch(
         getUpdateShopOrderRequestBody(
-          props.order.id,
-          props.nonce,
+          orderId,
+          nonce,
           {
-            status: hasAttendees( props.order ) || isWaitingOrder( props.order ) ? `wc-${props.order.status}` : 'wc-pending'
+            status: hasAttendees( order ) || isWaitingOrder( order ) ? `wc-${order.status}` : 'wc-pending'
           }
         )
       );
@@ -149,7 +156,7 @@ const AttendeeForm = props => {
         message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
       });
 
-      document.location.assign( isWaitingOrder( props.order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment` );
+      document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
 
     } catch (e) {
       console.error(e);
@@ -180,12 +187,12 @@ const AttendeeForm = props => {
           <div id="order_data" class="panel woocommerce-order-data">
 
             <ProductContext.Provider value={ props.product }>
-              <OrderContext.Provider value={ props.order }>
+              <OrderContext.Provider value={ order }>
                 <AcfFieldsContext.Provider value={ props.fields }>
 
                 { quantity > 0 && range( quantity ).map( ( index ) => {
                   return (
-                    <AttendeeFormFieldset quantity={ quantity } index={ index } attendee={ props.attendees[index] } />
+                    <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } attendee={ props.attendees[index] } />
                   );
                 })}
 
