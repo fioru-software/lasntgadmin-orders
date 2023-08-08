@@ -2,56 +2,173 @@
 import { 
   extractIndexedEmployeeNumbersFromForm, 
   extractLastIndexOfDuplicateEmployeeNumberField,
-  extractCoursePrerequisitesMetFieldValue,
+  extractCoursePrerequisitesMetFieldValues,
   countOccurrencesOfEmployeeNumber,
-  createAttendeeRequestBody
+  createAttendeeBatchRequestBody,
+  createAttendeeRequestBody,
+  createAttendeeBatchRequest,
+  extractAcfFieldsByAttendeeIndex
 } from "./attendee-form-utils";
 
-import { generateAcfFormData, generateMetaFormData } from "./attendee-form-test-helper";
+import { generateFormDataForAttendeeWithIndex } from "./attendee-form-test-helper";
 
 import { faker } from "@faker-js/faker";
 
-describe("createBatchRequestBody()", () => {
 
-  it.todo("todo");
+describe("createAttendeeBatchRequest()", () => {
+  describe("Existing attendee", () => {
+    it("Creates a PUT request", () => {
 
-  describe("createAttendeeRequestBody()", () => {
-    it.todo("todo");
+      const nonce = faker.string.uuid();
+      const index = faker.number.int(10);
+      const formData = new FormData();
+
+      const body = {};
+      const orderId = faker.number.int();
+      const attendeeId = faker.number.int();
+
+      formData.append(`attendees[${index}]['id']`, attendeeId );
+
+      const req = createAttendeeBatchRequest( nonce, index, formData, body, orderId );
+      expect( req.path ).toEqual(`/wp/v2/attendee/${attendeeId}?order_id=${orderId}`);
+      expect( req.method ).toEqual('PUT');
+      expect( req.headers['X-WP-Nonce'] ).toEqual( nonce );
+      expect( req.body.id ).toEqual( attendeeId );
+    });
+
   });
+  describe("New attendee", () => {
+    it("Creates a POST request", () => {
 
-  describe("extractAttendeeByIndex()", () => {
-    it.todo("todo");
-  });
+      const nonce = faker.string.uuid();
+      const index = faker.number.int(10);
+      const formData = new FormData();
+      const body = {};
+      const orderId = faker.number.int();
 
-  describe("extractAcfInputs()", () => {
-    it.todo("todo");
-  });
-
-  describe("extractCoursePrerequisitesMetFieldValue()", () => {
-    it.only("wip", () => {
-
-      const meta = [
-        {
-          course_prerequisites_met: faker.number.int()
-        },
-        {
-          course_prerequisites_met: faker.number.int()
-        }
-      ];
-      const formData = generateMetaFormData( meta );
-      
-      // @todo continue from here
-      const values = extractCoursePrerequisitesMetFieldValue( 1, formData );
-      console.log(values);
-      //const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
-      //const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
-
+      const req = createAttendeeBatchRequest( nonce, index, formData, body, orderId );
+      expect( req.path ).toEqual(`/wp/v2/attendee?order_id=${orderId}`);
+      expect( req.method ).toEqual('POST');
+      expect( req.headers['X-WP-Nonce'] ).toEqual( nonce );
     });
   });
+});
 
-  describe("determineAcfValue()", () => {
-    it.todo("todo");
+describe("createAttendeeBatchRequestBody()", () => {
+  it("returns a request body object", () => {
+    const index = faker.number.int(10);
+    const groupId = faker.number.int();
+    const orderId = faker.number.int();
+    const productId = faker.number.int();
+    let formData = new FormData();
+
+    const attendeeMetaFields = [
+      {
+        course_prerequisites_met: faker.number.int()
+      },
+      {
+        course_prerequisites_met: faker.number.int()
+      }
+    ];
+    generateFormDataForAttendeeWithIndex( formData, index, 'meta', attendeeMetaFields );
+
+    const attendeeAcfFields = [
+      {
+        first_name: faker.person.firstName(),
+        course_prerequisites_met: faker.number.int()
+      }
+    ];
+    generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeAcfFields );
+
+    const body = createAttendeeBatchRequestBody( index, formData, groupId, orderId, productId );
+
+    expect( body.status).toEqual('publish');
+    expect( body.meta['groups-read']).toContain(groupId);
+    expect( body.meta.order_ids).toContain(orderId);
+    expect( body.meta.product_ids).toContain(productId);
+    expect( body.acf.first_name).toEqual( attendeeAcfFields[0].first_name );
+    expect( body.acf.course_prerequisites_met).toContain( attendeeAcfFields[0].course_prerequisites_met );
+    expect( body.acf.course_prerequisites_met).toContain( attendeeMetaFields[0].course_prerequisites_met );
+    expect( body.acf.course_prerequisites_met).toContain( attendeeMetaFields[1].course_prerequisites_met );
   });
+});
+
+describe("extractAcfFieldsByAttendeeIndex()", () => {
+  it("Returns an object keyed by acf field shortname", () => {
+
+    let formData = new FormData();
+
+    const attendees = [
+      [
+        {
+          first_name: faker.person.firstName(),
+          course_prerequisites_met: faker.number.int()
+        }
+      ],
+      [
+        {
+          first_name: faker.person.firstName(),
+          course_prerequisites_met: faker.number.int()
+        }
+      ]
+    ];
+
+    attendees.forEach( ( attendeeFields, index ) => {
+      generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeFields );
+    });
+
+    for( let index=0; index<attendees.length; index++) {
+      const acfFields = extractAcfFieldsByAttendeeIndex( index, formData );
+      expect( acfFields.first_name ).toEqual( attendees[index][0].first_name );
+      expect( typeof acfFields.first_name ).toEqual( 'string' );
+      expect( acfFields.course_prerequisites_met ).toBeInstanceOf( Array );
+      expect( acfFields.course_prerequisites_met ).toContain( attendees[index][0].course_prerequisites_met );
+    }
+
+  });
+});
+
+describe("extractCoursePrerequisitesMetFieldValues()", () => {
+
+  describe("Existing product ids in meta fields", () => {
+
+    describe("New product ids in acf field", () => {
+
+      it("Combine product ids from meta and acf fields", () => {
+
+        const index = faker.number.int(10);
+        let formData = new FormData();
+
+        const attendeeMetaFields = [
+          {
+            course_prerequisites_met: faker.number.int()
+          },
+          {
+            course_prerequisites_met: faker.number.int()
+          }
+        ];
+        generateFormDataForAttendeeWithIndex( formData, index, 'meta', attendeeMetaFields );
+
+        const attendeeAcfFields = [
+          {
+            course_prerequisites_met: faker.number.int()
+          }
+        ];
+        generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeAcfFields );
+
+        const values = extractCoursePrerequisitesMetFieldValues( index, formData );
+
+        expect( values.length ).toEqual(3);
+        expect( values ).toContain( attendeeMetaFields[0].course_prerequisites_met );
+        expect( values ).toContain( attendeeMetaFields[1].course_prerequisites_met );
+        expect( values ).toContain( attendeeAcfFields[0].course_prerequisites_met );
+
+      });
+
+    });
+
+  });
+
 });
 
 
@@ -60,21 +177,32 @@ describe("extractIndexedEmployeeNumbersFromForm()", () => {
   it("extracts employee numbers whilst retaining the original index", () => {
 
     const attendees = [
-      {
-        employee_number: faker.string.uuid()
-      },
-      {
-        employee_number: ''
-      },
-      {
-        employee_number: faker.string.uuid()
-      }
+      [
+        {
+          employee_number: faker.string.uuid()
+        }
+      ],
+      [
+        {
+          employee_number: ''
+        }
+      ],
+      [
+        {
+          employee_number: faker.string.uuid()
+        }
+      ]
     ];
-    const formData = generateAcfFormData( attendees );
+
+    const formData = new FormData();
+    attendees.forEach( ( attendeeFields, index ) => {
+      generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeFields );
+    });
+
     const employeeNumbers = extractIndexedEmployeeNumbersFromForm( attendees.length, formData );
     expect( Object.keys(employeeNumbers).length ).toEqual(2);
-    expect( employeeNumbers[0]).toEqual( attendees[0].employee_number);
-    expect( employeeNumbers[2]).toEqual( attendees[2].employee_number);
+    expect( employeeNumbers[0]).toEqual( attendees[0][0].employee_number);
+    expect( employeeNumbers[2]).toEqual( attendees[2][0].employee_number);
 
   });
 
@@ -100,20 +228,32 @@ describe("extractLastIndexOfDuplicateEmployeeNumberfield()", () => {
     it("returns index", () => {
       const duplicateEmployeeNumber = faker.string.uuid();
       const attendees = [
-        {
-          employee_number: faker.string.uuid()
-        },
-        {
-          employee_number: duplicateEmployeeNumber
-        },
-        {
-          employee_number: faker.string.uuid()
-        },
-        {
-          employee_number: duplicateEmployeeNumber
-        }
+        [
+          {
+            employee_number: faker.string.uuid()
+          }
+        ],
+        [
+          {
+            employee_number: duplicateEmployeeNumber
+          }
+        ],
+        [
+          {
+            employee_number: faker.string.uuid()
+          }
+        ],
+        [
+          {
+            employee_number: duplicateEmployeeNumber
+          }
+        ]
       ];
-      const formData = generateAcfFormData( attendees );
+
+      const formData = new FormData();
+      attendees.forEach( ( attendeeFields, index ) => {
+        generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeFields );
+      });
       const index = extractLastIndexOfDuplicateEmployeeNumberField(
         extractIndexedEmployeeNumbersFromForm( 4, formData )
       );
@@ -124,17 +264,26 @@ describe("extractLastIndexOfDuplicateEmployeeNumberfield()", () => {
   describe("without a duplicate", () => {
     it("returns false", () => {
       const attendees = [
-        {
-          employee_number: faker.string.uuid()
-        },
-        {
-          employee_number: faker.string.uuid()
-        },
-        {
-          employee_number: faker.string.uuid()
-        }
+        [
+          {
+            employee_number: faker.string.uuid()
+          }
+        ],
+        [
+          {
+            employee_number: faker.string.uuid()
+          }
+        ],
+        [
+          {
+            employee_number: faker.string.uuid()
+          }
+        ]
       ];
-      const formData = generateAcfFormData( attendees );
+      const formData = new FormData();
+      attendees.forEach( ( attendeeFields, index ) => {
+        generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeFields );
+      });
       const index = extractLastIndexOfDuplicateEmployeeNumberField(
         extractIndexedEmployeeNumbersFromForm( 3, formData )
       );

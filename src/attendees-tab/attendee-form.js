@@ -1,6 +1,7 @@
 
 import { useState, useContext } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
 import { range } from 'lodash';
@@ -11,9 +12,11 @@ import { isCourseClosed } from '../product-utils';
 import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-context';
 
 import { 
+  extractAttendeeIdsFromResponse,
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
-  createBatchRequest
+  createAttendeeBatchRequestBody,
+  createAttendeeBatchRequest
 } from "./attendee-form-utils";
 
 /**
@@ -78,17 +81,16 @@ const AttendeeForm = props => {
       checkForDuplicateEmployeeNumbers( quantity, formData );
     }
 
-    const batchReq = createBatchRequest( nonce, formData, quantity, e.target, groupId, orderId, productId );
-    console.log(batchReq);
-
-    // @todo continue from here
-    return;
+    const attendeeBatchReqs = range( quantity ).map( index => {
+      const attendeeReqBody = createAttendeeBatchRequestBody( index, formData, groupId, orderId, productId );
+      const attendeeBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeReqBody, orderId )
+      return attendeeBatchReq;
+    });
 
     try {
 
       setNotice(null);
       setIsLoading(true);
-      setSubmitButtonDisabled(true);
 
       setNotice({
         status: 'info',
@@ -97,17 +99,25 @@ const AttendeeForm = props => {
 
       apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 
-      const attendeesRes = await apiFetch(
+      const attendeeBatchRes = await apiFetch(
         {
           path: `/batch/v1`,
           method: 'POST',
           data: {
-            requests: batchReq
+            requests: attendeeBatchReqs
           }
         }
       );
 
-      const attendeeIds = extractAttendeeIdsFromResponse( attendeesRes.responses );
+      console.log('attendeeBatchRes');
+      console.log(attendeeBatchRes);
+
+      const attendeeIds = extractAttendeeIdsFromResponse( attendeeBatchRes.responses );
+
+      console.log('attendeeIds');
+      console.log(attendeeIds);
+      // @todo continue from here
+      return;
 
       setNotice({
         status: 'info',
@@ -166,16 +176,17 @@ const AttendeeForm = props => {
       });
       setIsLoading(false);
 
+      /*
       delay( () => {
         setIsLoading(true);
         document.location.reload();
       }, 3000 );
-      //setSubmitButtonDisabled(false);
+      */
     }
   }
 
   function isSubmitButtonDisabled() {
-    return isCourseClosed( props.product.status );
+    return isCourseClosed( props.product.status ) || isLoading;
   }
 
   return (

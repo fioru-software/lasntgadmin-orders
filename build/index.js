@@ -472,14 +472,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
+/* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
 
 
 
 const HiddenFields = props => {
-  const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(ProductContext);
-  const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(OrderContext);
-  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_1__.AttendeeContext);
+  const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_1__.ProductContext);
+  const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_1__.OrderContext);
+  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_1__.AttendeeContext);
   const index = parseInt(props.index);
   const groupId = parseInt(props.groupId);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (attendee?.ID || attendee?.id) && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
@@ -663,43 +663,63 @@ const AttendeeFormFieldset = props => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   assembleAcfFieldsForRequestBody: () => (/* binding */ assembleAcfFieldsForRequestBody),
 /* harmony export */   countOccurrencesOfEmployeeNumber: () => (/* binding */ countOccurrencesOfEmployeeNumber),
-/* harmony export */   createAttendeeRequest: () => (/* binding */ createAttendeeRequest),
+/* harmony export */   createAttendeeBatchRequest: () => (/* binding */ createAttendeeBatchRequest),
+/* harmony export */   createAttendeeBatchRequestBody: () => (/* binding */ createAttendeeBatchRequestBody),
 /* harmony export */   createBatchRequest: () => (/* binding */ createBatchRequest),
-/* harmony export */   determineAcfValue: () => (/* binding */ determineAcfValue),
-/* harmony export */   extractAcfInputs: () => (/* binding */ extractAcfInputs),
-/* harmony export */   extractAttendeeByIndex: () => (/* binding */ extractAttendeeByIndex),
+/* harmony export */   extractAcfFieldValue: () => (/* binding */ extractAcfFieldValue),
+/* harmony export */   extractAcfFieldsByAttendeeIndex: () => (/* binding */ extractAcfFieldsByAttendeeIndex),
+/* harmony export */   extractAcfInputName: () => (/* binding */ extractAcfInputName),
 /* harmony export */   extractAttendeeIdsFromResponse: () => (/* binding */ extractAttendeeIdsFromResponse),
-/* harmony export */   extractCoursePrerequisitesMetFieldValue: () => (/* binding */ extractCoursePrerequisitesMetFieldValue),
+/* harmony export */   extractCoursePrerequisitesMetFieldValues: () => (/* binding */ extractCoursePrerequisitesMetFieldValues),
 /* harmony export */   extractIndexedEmployeeNumbersFromForm: () => (/* binding */ extractIndexedEmployeeNumbersFromForm),
 /* harmony export */   extractLastIndexOfDuplicateEmployeeNumberField: () => (/* binding */ extractLastIndexOfDuplicateEmployeeNumberField)
 /* harmony export */ });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 
-function assembleAcfFieldsForRequestBody(index, formElement, formData) {
-  return Object.assign(Object.fromEntries(extractAttendeeByIndex(index, formElement, formData)));
+
+/**
+ * Example of longName is attendees[0]['acf']['first_name']
+ * Example of shortName is first_name
+ *
+ * @param { number } index Attendee index for HTML inputs
+ * @param { FormData } formData
+ * @return array
+ */
+function extractAcfFieldsByAttendeeIndex(index, formData) {
+  let fields = {};
+  for (const longName of formData.keys()) {
+    const shortName = extractAcfInputName(longName);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_0__.isNull)(shortName)) {
+      switch (shortName) {
+        case 'course_prerequisites_met':
+          fields[shortName] = extractCoursePrerequisitesMetFieldValues(index, formData);
+          break;
+        default:
+          fields[shortName] = extractAcfFieldValue(index, shortName, formData);
+      }
+    }
+  }
+  return fields;
 }
 
 /**
- * @param { number } index Attendee index for HTML inputs
- * @param { HTMLElement } form
- * @return array
+ * @param { string } name ACF input field's name attribute
  */
-function extractAttendeeByIndex(index, formElement, formData) {
-  return Array.from(formElement.querySelectorAll(`[name^="attendees[${index}]['acf']"]`)).filter(input => input.value !== "").map(input => {
-    const name = extractAcfInputs(input.getAttribute('name'));
-    switch (name) {
-      case 'course_prerequisites_met':
-        return [name, extractCoursePrerequisitesMetFieldValue(index, formData)];
-        break;
-      default:
-        return [name, determineAcfValue(input.value)];
-    }
-  });
+function extractAcfInputName(name) {
+  const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/);
+  return match ? match[1] : null;
 }
-function extractCoursePrerequisitesMetFieldValue(index, formData) {
+
+/**
+ * Checkboxes require boolean
+ */
+function extractAcfFieldValue(index, name, formData) {
+  const value = formData.get(`attendees[${index}]['acf']['${name}']`);
+  return value === "true" ? true : value === "false" ? false : value;
+}
+function extractCoursePrerequisitesMetFieldValues(index, formData) {
   const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
   const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
   // use set to ensure array values are unique
@@ -714,9 +734,9 @@ function extractCoursePrerequisitesMetFieldValue(index, formData) {
  * @param { number } orderId
  * @return object
  */
-function createBatchRequest(nonce, formData, quantity, formElement, groupId, orderId) {
+function createBatchRequest(nonce, formData, quantity, groupId, orderId) {
   return (0,lodash__WEBPACK_IMPORTED_MODULE_0__.range)(quantity).map(index => {
-    return createAttendeesRequest(nonce, formData, index, formElement, groupId, orderId);
+    return createAttendeesRequest(nonce, formData, index, groupId, orderId);
   });
 }
 function getUpdateAttendeeBatchRequest(orderId, attendeeId, nonce, body) {
@@ -749,34 +769,20 @@ function createAttendeeBatchRequestBody(index, formData, groupId, orderId, produ
       order_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['order_ids']`).map(Number).filter(Number).concat(orderId))],
       product_ids: [...new Set(formData.getAll(`attendees[${index}]['meta']['product_ids']`).map(Number).filter(Number).concat(productId))]
     },
-    acf: assembleAcfFieldsForRequestBody(index, formElement, formData)
+    acf: extractAcfFieldsByAttendeeIndex(index, formData)
   };
   return body;
 }
-function createAttendeeRequest(nonce, formData, index, formElement, groupId, orderId, productId) {
+function createAttendeeBatchRequest(nonce, index, formData, body, orderId) {
+  let req = {};
   const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
   if (formData.has(`attendees[${index}]['id']`)) {
     const attendeeId = parseInt(formData.get(`attendees[${index}]['id']`));
-    const req = getUpdateAttendeeBatchRequest(orderId, attendeeId, nonce, data);
+    req = getUpdateAttendeeBatchRequest(orderId, attendeeId, nonce, body);
   } else {
-    const req = getCreateAttendeeBatchRequest(orderId, nonce, body);
+    req = getCreateAttendeeBatchRequest(orderId, nonce, body);
   }
   return req;
-}
-
-/**
- * Checkboxes require boolean
- */
-function determineAcfValue(value) {
-  return value === "true" ? true : value === "false" ? false : value;
-}
-
-/**
- * @param { string } name ACF input field's name attribute
- */
-function extractAcfInputs(name) {
-  const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/);
-  return match ? match[1] : null;
 }
 function extractAttendeeIdsFromResponse(attendeeResponses) {
   return attendeeResponses.map(res => Object.hasOwn(res.body, 'id') ? parseInt(res.body.id) : null).filter(Boolean);
@@ -845,14 +851,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
-/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
-/* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
-/* harmony import */ var _attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./attendee-form-utils */ "./src/attendees-tab/attendee-form-utils.js");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./attendee-form-fieldset */ "./src/attendees-tab/attendee-form-fieldset.js");
+/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
+/* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
+/* harmony import */ var _attendee_form_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./attendee-form-utils */ "./src/attendees-tab/attendee-form-utils.js");
+
 
 
 
@@ -888,7 +897,7 @@ const AttendeeForm = props => {
   function showDuplicateEmployeeNumberValidationError(quantity, index) {
     if (index !== false) {
       const input = document.querySelector(`input[name="attendees[${index}]['acf']['employee_number']"]`);
-      const validationErrorMsg = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Employee number must be unique.', 'lasntgadmin');
+      const validationErrorMsg = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Employee number must be unique.', 'lasntgadmin');
       input.setCustomValidity(validationErrorMsg);
       input.reportValidity();
     }
@@ -903,8 +912,8 @@ const AttendeeForm = props => {
    * @see PredictiveSearchFields
    */
   function checkForDuplicateEmployeeNumbers(quantity, formData) {
-    const indexedEmployeeNumbers = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__.extractIndexedEmployeeNumbersFromForm)(quantity, formData);
-    const indexOfDuplicateEmployeeNumberField = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__.extractLastIndexOfDuplicateEmployeeNumberField)(indexedEmployeeNumbers);
+    const indexedEmployeeNumbers = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_8__.extractIndexedEmployeeNumbersFromForm)(quantity, formData);
+    const indexOfDuplicateEmployeeNumberField = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_8__.extractLastIndexOfDuplicateEmployeeNumberField)(indexedEmployeeNumbers);
     showDuplicateEmployeeNumberValidationError(quantity, indexOfDuplicateEmployeeNumberField);
   }
 
@@ -919,34 +928,39 @@ const AttendeeForm = props => {
     if (quantity > 1) {
       checkForDuplicateEmployeeNumbers(quantity, formData);
     }
-    const batchReq = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_7__.createBatchRequest)(nonce, formData, quantity, e.target, groupId, orderId, productId);
-    console.log(batchReq);
-
-    // @todo continue from here
-    return;
+    const attendeeBatchReqs = (0,lodash__WEBPACK_IMPORTED_MODULE_4__.range)(quantity).map(index => {
+      const attendeeReqBody = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_8__.createAttendeeBatchRequestBody)(index, formData, groupId, orderId, productId);
+      const attendeeBatchReq = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_8__.createAttendeeBatchRequest)(nonce, index, formData, attendeeReqBody, orderId);
+      return attendeeBatchReq;
+    });
     try {
       setNotice(null);
       setIsLoading(true);
-      setSubmitButtonDisabled(true);
       setNotice({
         status: 'info',
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Updating attendees.', 'lasntgadmin')
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Updating attendees.', 'lasntgadmin')
       });
-      apiFetch.use(apiFetch.createNonceMiddleware(nonce));
-      const attendeesRes = await apiFetch({
+      _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().createNonceMiddleware(nonce));
+      const attendeeBatchRes = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
         path: `/batch/v1`,
         method: 'POST',
         data: {
-          requests: batchReq
+          requests: attendeeBatchReqs
         }
       });
-      const attendeeIds = extractAttendeeIdsFromResponse(attendeesRes.responses);
+      console.log('attendeeBatchRes');
+      console.log(attendeeBatchRes);
+      const attendeeIds = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_8__.extractAttendeeIdsFromResponse)(attendeeBatchRes.responses);
+      console.log('attendeeIds');
+      console.log(attendeeIds);
+      // @todo continue from here
+      return;
       setNotice({
         status: 'info',
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Adding attendees to order.', 'lasntgadmin')
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Adding attendees to order.', 'lasntgadmin')
       });
-      apiFetch.use(apiFetch.createNonceMiddleware(nonce));
-      const orderAttendeeIdsUpdateRes = await apiFetch(getUpdateShopOrderRequestBody(orderId, nonce, {
+      _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default().createNonceMiddleware(nonce));
+      const orderAttendeeIdsUpdateRes = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()(getUpdateShopOrderRequestBody(orderId, nonce, {
         meta: {
           attendee_ids: [...new Set(attendeeIds)]
         }
@@ -965,14 +979,14 @@ const AttendeeForm = props => {
       }
       setNotice({
         status: 'info',
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Updating order status.', 'lasntgadmin')
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Updating order status.', 'lasntgadmin')
       });
-      const orderRes = await apiFetch(getUpdateShopOrderRequestBody(orderId, nonce, {
+      const orderRes = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()(getUpdateShopOrderRequestBody(orderId, nonce, {
         status: hasAttendees(order) || isWaitingOrder(order) ? `wc-${order.status}` : 'wc-pending'
       }));
       setNotice({
         status: 'success',
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Updated order. Redirecting...', 'lasntgadmin')
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Updated order. Redirecting...', 'lasntgadmin')
       });
       document.location.assign(isWaitingOrder(order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${orderId}&action=edit&tab=payment`);
     } catch (e) {
@@ -982,16 +996,18 @@ const AttendeeForm = props => {
         message: e.message
       });
       setIsLoading(false);
-      delay(() => {
+
+      /*
+      delay( () => {
         setIsLoading(true);
         document.location.reload();
-      }, 3000);
-      //setSubmitButtonDisabled(false);
+      }, 3000 );
+      */
     }
   }
 
   function isSubmitButtonDisabled() {
-    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_5__.isCourseClosed)(props.product.status);
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_6__.isCourseClosed)(props.product.status) || isLoading;
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-wrap"
@@ -1001,14 +1017,14 @@ const AttendeeForm = props => {
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     id: "order_data",
     class: "panel woocommerce-order-data"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.ProductContext.Provider, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_7__.ProductContext.Provider, {
     value: props.product
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.OrderContext.Provider, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_7__.OrderContext.Provider, {
     value: order
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_6__.AcfFieldsContext.Provider, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_7__.AcfFieldsContext.Provider, {
     value: props.fields
-  }, quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_3__.range)(quantity).map(index => {
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_4__.AttendeeFormFieldset, {
+  }, quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_4__.range)(quantity).map(index => {
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_5__.AttendeeFormFieldset, {
       groupId: groupId,
       quantity: quantity,
       index: index,
@@ -1026,7 +1042,7 @@ const AttendeeForm = props => {
     name: "save",
     value: "Create",
     disabled: isSubmitButtonDisabled()
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Save attendees', 'lasntgadmin')), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null))))));
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Save attendees', 'lasntgadmin')), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null))))));
 };
 
 

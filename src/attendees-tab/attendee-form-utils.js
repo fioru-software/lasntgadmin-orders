@@ -1,37 +1,51 @@
 
 import { range, isNull } from "lodash";
 
-function assembleAcfFieldsForRequestBody( index, formElement, formData ) {
-  return Object.assign(
-    Object.fromEntries(
-      extractAttendeeByIndex( index, formElement, formData )
-    )
-  );
+/**
+ * Example of longName is attendees[0]['acf']['first_name']
+ * Example of shortName is first_name
+ *
+ * @param { number } index Attendee index for HTML inputs
+ * @param { FormData } formData
+ * @return array
+ */
+function extractAcfFieldsByAttendeeIndex( index, formData ) {
+
+  let fields = {};
+  for (const longName of formData.keys()) {
+    const shortName = extractAcfInputName( longName );
+    if( ! isNull( shortName ) ) {
+      switch(shortName) {
+        case 'course_prerequisites_met':
+          fields[shortName] = extractCoursePrerequisitesMetFieldValues( index, formData );
+          break;
+        default:
+          fields[shortName] = extractAcfFieldValue( index, shortName, formData );
+      }
+    }
+  }
+  return fields;
+
 }
 
 /**
- * @param { number } index Attendee index for HTML inputs
- * @param { HTMLElement } form
- * @return array
+ * @param { string } name ACF input field's name attribute
  */
-function extractAttendeeByIndex( index, formElement, formData ) {
-  return Array.from(
-    formElement.querySelectorAll(`[name^="attendees[${index}]['acf']"]`))
-    .filter( input => input.value !== "" )
-    .map( input => {
-      const name = extractAcfInputs( input.getAttribute('name') );
-      switch(name) {
-        case 'course_prerequisites_met':
-          return [ name,  extractCoursePrerequisitesMetFieldValue( index, formData ) ];
-          break;
-        default:
-          return [ name, determineAcfValue( input.value) ]
-      }
-    }
-    );
+function extractAcfInputName( name ) {
+  const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/)
+  return match ? match[1] : null;
 }
 
-function extractCoursePrerequisitesMetFieldValue( index, formData ) {
+
+/**
+ * Checkboxes require boolean
+ */
+function extractAcfFieldValue( index, name, formData ) {
+  const value = formData.get(`attendees[${index}]['acf']['${name}']`);
+  return value === "true" ? true : value === "false" ? false : value
+}
+
+function extractCoursePrerequisitesMetFieldValues( index, formData ) {
   const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
   const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
   // use set to ensure array values are unique
@@ -51,9 +65,9 @@ function extractCoursePrerequisitesMetFieldValue( index, formData ) {
  * @param { number } orderId
  * @return object
  */
-function createBatchRequest( nonce, formData, quantity, formElement, groupId, orderId ) {
+function createBatchRequest( nonce, formData, quantity, groupId, orderId ) {
   return range(quantity).map( index => {
-    return createAttendeesRequest( nonce, formData, index, formElement, groupId, orderId );
+    return createAttendeesRequest( nonce, formData, index, groupId, orderId );
   });
 }
 
@@ -104,39 +118,24 @@ function createAttendeeBatchRequestBody( index, formData, groupId, orderId, prod
         )
       ]
     },
-    acf: assembleAcfFieldsForRequestBody( index, formElement, formData )
+    acf: extractAcfFieldsByAttendeeIndex( index, formData )
   };
   return body;
 }
 
-function createAttendeeRequest( nonce, formData, index, formElement, groupId, orderId, productId ) {
+function createAttendeeBatchRequest( nonce, index, formData, body, orderId ) {
 
-
+  let req = {};
   const attendeeId = formData.has(`attendees[${index}]['id']`) ? parseInt(formData.get(`attendees[${index}]['id']`)) : null;
 
   if( formData.has(`attendees[${index}]['id']`) ) {
     const attendeeId = parseInt( formData.get( `attendees[${index}]['id']` ) );
-    const req = getUpdateAttendeeBatchRequest( orderId, attendeeId, nonce, data );
+    req = getUpdateAttendeeBatchRequest( orderId, attendeeId, nonce, body );
   } else {
-    const req = getCreateAttendeeBatchRequest( orderId, nonce, body );
+    req = getCreateAttendeeBatchRequest( orderId, nonce, body );
   }
 
   return req;
-}
-
-/**
- * Checkboxes require boolean
- */
-function determineAcfValue( value ) {
-  return value === "true" ? true : value === "false" ? false : value
-}
-
-/**
- * @param { string } name ACF input field's name attribute
- */
-function extractAcfInputs( name ) {
-  const match = name.match(/attendees\[\d+\]\['acf'\]\['(.+)'\]/)
-  return match ? match[1] : null;
 }
 
 function extractAttendeeIdsFromResponse( attendeeResponses ) {
@@ -194,12 +193,12 @@ function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
 }
 
 export {
-  assembleAcfFieldsForRequestBody,
-  extractAttendeeByIndex,
-  extractCoursePrerequisitesMetFieldValue,
-  createAttendeeRequest,
-  determineAcfValue,
-  extractAcfInputs,
+  createAttendeeBatchRequestBody,
+  extractAcfFieldsByAttendeeIndex,
+  extractCoursePrerequisitesMetFieldValues,
+  createAttendeeBatchRequest,
+  extractAcfFieldValue,
+  extractAcfInputName,
   createBatchRequest,
   extractAttendeeIdsFromResponse,
   extractIndexedEmployeeNumbersFromForm,

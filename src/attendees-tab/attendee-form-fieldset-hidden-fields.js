@@ -1,6 +1,6 @@
 
 import { useContext } from '@wordpress/element';
-import { AttendeeContext } from './attendee-form-fieldset';
+import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
 
 const HiddenFields = props => {
 
