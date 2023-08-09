@@ -6,6 +6,7 @@ use Lasntg\Admin\Orders\{ PluginUtils, OrderData };
 use Lasntg\Admin\Group\GroupApi;
 use Lasntg\Admin\Products\{ ProductApi, ProductUtils };
 use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
+use Lasntg\Admin\Attendees\Error\{ DuplicateEmployeeNumberError, AlreadyEnrolledError };
 
 use Groups_Access_Meta_Boxes;
 
@@ -39,7 +40,8 @@ class PageUtils {
 		add_action( 'add_meta_boxes', [ self::class, 'add_metaboxes' ], 50, 2 );
 		add_action( 'admin_init', [ self::class, 'remove_title' ] );
 
-		add_action( 'admin_notices', [ self::class, 'show_notices' ] );
+		add_action( 'admin_notices', [ self::class, 'show_wc_notices' ] );
+		add_action( 'admin_notices', [ self::class, 'show_admin_notices' ] );
 
 		/**
 		 * Enqueue admin order component
@@ -82,7 +84,7 @@ class PageUtils {
 	 *
 	 * @see self::after_pay()
 	 */
-	public static function show_notices() {
+	public static function show_wc_notices() {
 		$notices = PaymentUtils::get_notices();
 		if ( isset( $notices['error'] ) ) {
 			PaymentUtils::delete_notices();
@@ -94,6 +96,15 @@ class PageUtils {
 			echo '</div>';
 		}
 	}
+
+    public static function show_admin_notices() {
+        if( $transient = get_transient( AlreadyEnrolledError::getCode() ) ) {
+            echo "<div class='notice notice-error is-dismissible'>";
+            echo wp_kses( "<p>" . AlreadyEnrolledError::getMessage() . "</p>", 'post' );
+            echo '</div>';
+            delete_transient( AlreadyEnrolledError::getCode() );
+        }
+    }
 
 	public static function is_order_editable( bool $is_editable, WC_Order $order ) {
 		return in_array( $order->get_status(), array( 'pending', 'on-hold', 'auto-draft', 'attendees', 'waiting-list' ), true );

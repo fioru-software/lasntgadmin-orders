@@ -29,53 +29,6 @@ const SelectInput = props => {
 
 }
 
-const TrueFalse = props => {
-
-  const [ checked, setChecked ] = useState(false);
-  const [ value, setValue ] = useState("");
-
-  useEffect( () => {
-    setChecked(props.defaultValue);
-    setValue( props.defaultValue ? "On" : "Off" );
-  }, [ props.defaultValue]);
-
-  function handleClick(e) {
-    setChecked(e.target.checked);
-    setValue( e.target.checked ? "On" : "Off" );
-  }
-
-  return (
-    <input type="checkbox" id={ props.id } name={ props.name} disabled={ props?.disabled || false } required={ props?.required } onClick={ handleClick } checked={ checked } value={ checked } onFocus={ props?.handleFocus }/>
-  );
-};
-
-const CoursePrerequisitesMetCheckBox = props => {
-
-  const [ checked, setChecked ] = useState(false);
-  const [ disabled, setDisabled ] = useState(false);
-
-  /**
-   * Only disable input when course prerequisites have already been accepted for this course
-   */
-  useEffect( () => {
-    if( ! isNil( props?.productIds ) && Array.isArray( props?.productIds) ) {
-      const productIds = props.productIds.map( Number );
-      if( productIds.includes( parseInt(props.defaultValue) ) ) {
-        setChecked(true);
-        setDisabled( props?.disabled );
-      }
-    }
-  }, [ props?.disabled ]);
-
-  function handleClick(e) {
-    setChecked(e.target.checked);
-  }
-
-  return (
-    <input type="checkbox" id={ props.id } name={ props.name} disabled={ disabled } required={ props?.required } onClick={ handleClick } checked={ checked } defaultValue={ props.defaultValue } onFocus={ props?.handleFocus }/>
-  );
-};
-
 const TextInput = props => {
 
   const textInput = useRef(null);
@@ -165,7 +118,5 @@ export {
   EmailInput,
   DateInput,
   NumberInput,
-  TelInput,
-  CoursePrerequisitesMetCheckBox,
-  TrueFalse
+  TelInput
 };

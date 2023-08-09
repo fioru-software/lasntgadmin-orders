@@ -56,11 +56,11 @@ const AttendeeFormFieldsetFields = props => {
               }
 
               { field.type === 'true_false' && 
-                <TrueFalse id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } required={ !!field.required } defaultValue={  attendee?.acf[field.name] || field.default_value } disabled={ isFieldDisabled() } /> 
+                <input type="checkbox" id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={  attendee?.acf[field.name] || field.default_value } />
               }
 
               { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && 
-                <CoursePrerequisitesMetCheckBox id={ field.key } productIds={ attendee?.acf?.course_prerequisites_met } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } required={ !!field.required } defaultValue={ product.id } disabled={ isFieldDisabled() } /> 
+                <input type="checkbox" id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={ attendee?.acf?.course_prerequisites_met.map(Number).includes( product.id ) } />
               }
 
               { field.type === 'number' && 

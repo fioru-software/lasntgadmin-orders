@@ -1,17 +1,20 @@
 
-import { useState, useContext } from '@wordpress/element';
+import { useEffect, useState, useContext } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-import { range } from 'lodash';
+import { isNil, delay, range } from 'lodash';
 
 import { AttendeeFormFieldset } from './attendee-form-fieldset';
 import { isCourseClosed } from '../product-utils';
+import { isWaitingOrder, hasAttendees, getUpdateShopOrderRequestBody } from '../order-utils';
 
 import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-context';
 
 import { 
+  extractValidAttendeesFromResponse,
+  extractInvalidAttendeesFromResponse,
   extractAttendeeIdsFromResponse,
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
@@ -36,8 +39,24 @@ const AttendeeForm = props => {
   const orderId = parseInt( props.order.id );
   const productId = parseInt( props.product.id );
 
+  const [ attendees, setAttendees ] = useState([]);
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
+
+  useEffect( () => {
+    if( ! isNil( props.attendees ) ) {
+      console.log('attendees from props');
+      console.log(props.attendees);
+      setAttendees( props.attendees );
+    }
+  }, [ props.attendees ]);
+
+  useEffect( () => {
+    if( ! isNil(attendees ) ) {
+      console.log('attendees from state');
+      console.log(attendees);
+    }
+  }, [ attendees ]);
 
   /**
    * @param {Number} quantity Order quantity
@@ -86,6 +105,8 @@ const AttendeeForm = props => {
       const attendeeBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeReqBody, orderId )
       return attendeeBatchReq;
     });
+    console.log('attendees from form');
+    console.log(attendeeBatchReqs.map( req => req.body ));
 
     try {
 
@@ -109,15 +130,37 @@ const AttendeeForm = props => {
         }
       );
 
-      console.log('attendeeBatchRes');
-      console.log(attendeeBatchRes);
+      console.log('response from attendees update');
+      console.log(attendeeBatchRes.responses);
 
       const attendeeIds = extractAttendeeIdsFromResponse( attendeeBatchRes.responses );
+      const validAttendees = extractValidAttendeesFromResponse( attendeeBatchRes.responses );
+      const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeBatchRes.responses );
 
-      console.log('attendeeIds');
-      console.log(attendeeIds);
-      // @todo continue from here
+      if( validAttendees.length ) {
+        setAttendees( validAttendees.concat( invalidAttendees.map( invalidAttendee => {} ) ) );
+      }
+      // report which attendee was removed
+      // @todo reformat valid attendee body
+      console.log('valid attendee bodies');
+      console.log(validAttendees);
+      console.log('invalid attendee data');
+      console.log(invalidAttendees);
+
+      /**
+       * if there is an error
+       * then change the non-error attendee to predictive searched attendees
+       */
       return;
+
+      // Employee number is not unique 
+      // or
+      // Attendee is already enrolled in this course
+      attendeeBatchRes.responses.forEach( res => {
+        if( res.status >= 500 && res.status <= 599 ) {
+          throw new Error( res.body.message );
+        }
+      });
 
       setNotice({
         status: 'info',
@@ -133,13 +176,6 @@ const AttendeeForm = props => {
           }
         })
       );
-
-      // Employee number is not unique
-      attendeesRes.responses.forEach( res => {
-        if( res.status >= 500 && res.status <= 599 ) {
-          throw new Error( res.body.message );
-        }
-      });
 
       // Valid attendees are less than order order quantity
       if( parseInt( quantity ) !== attendeeIds.length ) {
@@ -166,7 +202,7 @@ const AttendeeForm = props => {
         message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
       });
 
-      document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
+      //document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
 
     } catch (e) {
       console.error(e);
@@ -174,14 +210,9 @@ const AttendeeForm = props => {
         status: 'error',
         message: e.message
       });
-      setIsLoading(false);
 
-      /*
-      delay( () => {
-        setIsLoading(true);
-        document.location.reload();
-      }, 3000 );
-      */
+      //window.scrollTo(0,0);
+      //document.location.reload();
     }
   }
 
@@ -201,11 +232,8 @@ const AttendeeForm = props => {
               <OrderContext.Provider value={ order }>
                 <AcfFieldsContext.Provider value={ props.fields }>
 
-                { quantity > 0 && range( quantity ).map( ( index ) => {
-                  return (
-                    <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } attendee={ props.attendees[index] } />
-                  );
-                })}
+                  { attendees.length > 0 && attendees.map( ( attendee, index ) => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } attendee={ attendees[index] } /> ) }
+                  { attendees.length == 0 && quantity > 0 && range( quantity ).map( index => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } />) }
 
                 </AcfFieldsContext.Provider>
               </OrderContext.Provider>

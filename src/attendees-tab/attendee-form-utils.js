@@ -138,6 +138,24 @@ function createAttendeeBatchRequest( nonce, index, formData, body, orderId ) {
   return req;
 }
 
+function extractValidAttendeesFromResponse( attendeeResponses ) {
+  const validResponses = attendeeResponses.map( res => { 
+    if( ('body' in res) && !('data' in res.body) ) {
+      return res.body;
+    }
+  }).filter(Boolean);
+  return validResponses;
+}
+
+function extractInvalidAttendeesFromResponse( attendeeResponses ) {
+  const invalidResponses = attendeeResponses.map( res => { 
+    if( ('body' in res) && ('data' in res.body) ) {
+      return res.body.data;
+    }
+  }).filter(Boolean);
+  return invalidResponses;
+}
+
 function extractAttendeeIdsFromResponse( attendeeResponses ) {
   return attendeeResponses.map( res => Object.hasOwn(res.body, 'id' ) ? parseInt( res.body.id ) : null ).filter(Boolean);
 }
@@ -201,6 +219,8 @@ export {
   extractAcfInputName,
   createBatchRequest,
   extractAttendeeIdsFromResponse,
+  extractValidAttendeesFromResponse,
+  extractInvalidAttendeesFromResponse,
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
   countOccurrencesOfEmployeeNumber

@@ -7,12 +7,42 @@ import {
   createAttendeeBatchRequestBody,
   createAttendeeRequestBody,
   createAttendeeBatchRequest,
-  extractAcfFieldsByAttendeeIndex
+  extractAcfFieldsByAttendeeIndex,
+  extractValidAttendeesFromResponse,
+  extractInvalidAttendeesFromResponse
 } from "./attendee-form-utils";
 
-import { generateFormDataForAttendeeWithIndex } from "./attendee-form-test-helper";
+import { 
+    generateFormDataForAttendeeWithIndex,
+    generateAttendeeUpdateRequestErrorResponse,
+    generateAttendeeUpdateRequestSuccessResponse
+} from "./attendee-form-test-helper";
 
 import { faker } from "@faker-js/faker";
+
+describe("extractValidAttendeesFromResponse()", ()  => {
+    it("returns body", () => {
+        const errorRes = generateAttendeeUpdateRequestErrorResponse();
+        const successRes = generateAttendeeUpdateRequestSuccessResponse();
+        const res = [ errorRes, successRes ];
+        const validAttendees = extractValidAttendeesFromResponse( res );
+        validAttendees.forEach( validAttendee => {
+            expect( validAttendee ).toEqual( successRes.body );
+        });
+    });
+});
+
+describe("extractInvalidAttendeesFromResponse()", () => {
+    it("returns body.data", () => {
+        const errorRes = generateAttendeeUpdateRequestErrorResponse();
+        const successRes = generateAttendeeUpdateRequestSuccessResponse();
+        const res = [ errorRes, successRes ];
+        const invalidAttendees = extractInvalidAttendeesFromResponse( res );
+        invalidAttendees.forEach( invalidAttendee => {
+            expect( invalidAttendee ).toEqual( errorRes.body.data );
+        });
+    });
+});
 
 
 describe("createAttendeeBatchRequest()", () => {
