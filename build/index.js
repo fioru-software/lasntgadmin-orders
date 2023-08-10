@@ -10,6 +10,7 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Checkbox: () => (/* binding */ Checkbox),
 /* harmony export */   DateInput: () => (/* binding */ DateInput),
 /* harmony export */   EmailInput: () => (/* binding */ EmailInput),
 /* harmony export */   NumberInput: () => (/* binding */ NumberInput),
@@ -46,8 +47,7 @@ const SelectInput = props => {
     disabled: props?.disabled || false,
     required: props?.required || false,
     value: value,
-    onChange: handleChange,
-    onFocus: props?.handleFocus
+    onChange: handleChange
   }, !props.value && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("option", {
     disabled: true,
     value: ""
@@ -57,21 +57,40 @@ const SelectInput = props => {
     value: value
   }));
 };
+const Checkbox = props => {
+  const checkboxInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "checkbox",
+    id: props.id,
+    ref: checkboxInput,
+    name: props.name,
+    disabled: props?.disabled || false,
+    required: props?.required || false,
+    defaultChecked: props.defaultChecked || false
+  });
+};
 const TextInput = props => {
-  const textInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.defaultValue)) {
+      setValue(props.defaultValue);
+    }
+  }, [props.defaultValue]);
+  function handleChange(e) {
+    setInputText(e.target.value);
+  }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     name: props.name,
     id: props.id,
     type: "text",
-    ref: textInput,
     maxlength: props?.maxlength || 32,
     minlength: props?.minlength || 1,
-    defaultValue: props?.defaultValue,
+    value: value,
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
     disabled: props?.disabled || false,
-    onFocus: props?.handleFocus
+    onChange: handleChange
   });
 };
 const EmailInput = props => {
@@ -87,8 +106,7 @@ const EmailInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "^[^@\s]+@[^@\s]+\.[^@\s]+$",
-    disabled: props?.disabled || false,
-    onFocus: props?.handleFocus
+    disabled: props?.disabled || false
   });
 };
 const TextArea = props => {
@@ -99,8 +117,7 @@ const TextArea = props => {
     disabled: props?.disabled || false,
     name: props?.name,
     defaultValue: props?.defaultValue,
-    required: props?.required,
-    onFocus: props?.handleFocus
+    required: props?.required
   }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: name,
@@ -129,8 +146,7 @@ const DateInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    disabled: props?.disabled || false,
-    onFocus: props?.handleFocus
+    disabled: props?.disabled || false
   });
 };
 const NumberInput = props => {
@@ -154,8 +170,7 @@ const NumberInput = props => {
     step: props?.step || 1,
     disabled: props?.disabled || false,
     onChange: props?.onChange,
-    value: props?.value,
-    onFocus: props?.handleFocus
+    value: props?.value
   });
 };
 const TelInput = props => {
@@ -171,8 +186,7 @@ const TelInput = props => {
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "[0-9+\s]+",
-    disabled: props?.disabled || false,
-    onFocus: props?.handleFocus
+    disabled: props?.disabled || false
   });
 };
 
@@ -367,15 +381,13 @@ const AttendeeFormFieldsetFields = props => {
       defaultValue: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       disabled: isFieldDisabled()
-    }), field.type === 'true_false' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
-      type: "checkbox",
+    }), field.type === 'true_false' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.Checkbox, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
       disabled: isFieldDisabled(),
       required: !!field.required,
       defaultChecked: attendee?.acf[field.name] || field.default_value
-    }), field.type === 'checkbox' && field.name === 'course_prerequisites_met' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
-      type: "checkbox",
+    }), field.type === 'checkbox' && field.name === 'course_prerequisites_met' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.Checkbox, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
       disabled: isFieldDisabled(),
@@ -608,6 +620,7 @@ const AttendeeFormFieldset = props => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addIdToValidAttendees: () => (/* binding */ addIdToValidAttendees),
 /* harmony export */   countOccurrencesOfEmployeeNumber: () => (/* binding */ countOccurrencesOfEmployeeNumber),
 /* harmony export */   createAttendeeBatchRequest: () => (/* binding */ createAttendeeBatchRequest),
 /* harmony export */   createAttendeeBatchRequestBody: () => (/* binding */ createAttendeeBatchRequestBody),
@@ -625,6 +638,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 
+function addIdToValidAttendees(attendeeReqBodies, validAttendees) {
+  return attendeeReqBodies.map(body => {
+    // if valid attendee (means attendee was created) then add id, so we can rerender attendees
+    const attendee = validAttendees.find((validAttendee, index) => validAttendee.acf.employee_number === body.acf.employee_number);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_0__.isUndefined)(attendee)) {
+      body = Object.assign({}, attendee, body);
+    }
+    return body;
+  });
+}
 
 /**
  * Example of longName is attendees[0]['acf']['first_name']
@@ -854,7 +877,7 @@ const AttendeeForm = props => {
   const productId = parseInt(props.product.id);
   const [attendees, setAttendees] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isLoading, setLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_4__.isNil)(props.attendees)) {
       console.log('attendees from props');
@@ -912,11 +935,9 @@ const AttendeeForm = props => {
       const attendeeBatchReq = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.createAttendeeBatchRequest)(nonce, index, formData, attendeeReqBody, orderId);
       return attendeeBatchReq;
     });
-    console.log('attendees from form');
-    console.log(attendeeBatchReqs.map(req => req.body));
     try {
       setNotice(null);
-      setIsLoading(true);
+      setLoading(true);
       setNotice({
         status: 'info',
         message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Updating attendees.', 'lasntgadmin')
@@ -929,30 +950,21 @@ const AttendeeForm = props => {
           requests: attendeeBatchReqs
         }
       });
-      console.log('response from attendees update');
-      console.log(attendeeBatchRes.responses);
-      const attendeeIds = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.extractAttendeeIdsFromResponse)(attendeeBatchRes.responses);
+
+      // Valid attendees are missing additional acf fields.
       const validAttendees = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.extractValidAttendeesFromResponse)(attendeeBatchRes.responses);
+      // Invalid attendees contain additional acf fields.
       const invalidAttendees = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.extractInvalidAttendeesFromResponse)(attendeeBatchRes.responses);
-      if (validAttendees.length) {
-        setAttendees(validAttendees.concat(invalidAttendees.map(invalidAttendee => {})));
+      if (invalidAttendees.length) {
+        const attendeeReqBodies = attendeeBatchReqs.map(req => req.body);
+        const updatedAttendeeReqBodies = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.addIdToValidAttendees)(attendeeReqBodies, validAttendees);
+        setAttendees(updatedAttendeeReqBodies);
       }
-      // report which attendee was removed
-      // @todo reformat valid attendee body
-      console.log('valid attendee bodies');
-      console.log(validAttendees);
-      console.log('invalid attendee data');
-      console.log(invalidAttendees);
 
       /**
-       * if there is an error
-       * then change the non-error attendee to predictive searched attendees
+       * Employee number is not unique 
+       * Attendee is already enrolled in this course
        */
-      return;
-
-      // Employee number is not unique 
-      // or
-      // Attendee is already enrolled in this course
       attendeeBatchRes.responses.forEach(res => {
         if (res.status >= 500 && res.status <= 599) {
           throw new Error(res.body.message);
@@ -969,9 +981,12 @@ const AttendeeForm = props => {
         }
       }));
 
-      // Valid attendees are less than order order quantity
-      if (parseInt(quantity) !== attendeeIds.length) {
-        throw new Error(`Missing attendee ${attendeeIds.length}/${quantity}`);
+      /**
+       * Valid attendees are less than order order quantity
+       * @deprecated
+       */
+      if (parseInt(quantity) !== validAttendees.length) {
+        throw new Error(`Missing attendee ${validAttendees.length}/${quantity}`);
       }
       setNotice({
         status: 'info',
@@ -992,12 +1007,9 @@ const AttendeeForm = props => {
         status: 'error',
         message: e.message
       });
-
-      //window.scrollTo(0,0);
-      //document.location.reload();
+      setLoading(false);
     }
   }
-
   function isSubmitButtonDisabled() {
     return (0,_product_utils__WEBPACK_IMPORTED_MODULE_6__.isCourseClosed)(props.product.status) || isLoading;
   }

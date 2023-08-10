@@ -1,9 +1,21 @@
 
 import { 
   generateFormDataForAttendeeWithIndex,
+  generateAttendeePostData,
+  generateAttendeeBody
 } from "./attendee-form-test-helper";
 
 import { faker } from "@faker-js/faker";
+
+
+describe("generateAttendeeBody", () => {
+  it.skip("returns a random attendee object", () => {
+    const body  = generateAttendeeBody();
+    console.log(body);
+    const data = generateAttendeePostData( faker.number.int(100), body );
+    console.log(data);
+  });
+});
 
 describe("generateFormDataForAttendeeWithIndex()", () => {
 

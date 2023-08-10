@@ -9,38 +9,130 @@ import {
   createAttendeeBatchRequest,
   extractAcfFieldsByAttendeeIndex,
   extractValidAttendeesFromResponse,
-  extractInvalidAttendeesFromResponse
+  extractInvalidAttendeesFromResponse,
+  addIdToValidAttendees
 } from "./attendee-form-utils";
 
 import { 
-    generateFormDataForAttendeeWithIndex,
-    generateAttendeeUpdateRequestErrorResponse,
-    generateAttendeeUpdateRequestSuccessResponse
+  generateFormDataForAttendeeWithIndex,
+  generateAttendeeUpdateRequestErrorResponse,
+  generateAttendeeUpdateRequestSuccessResponse,
+  generateAttendeeBody,
+  generateAttendeePostData
 } from "./attendee-form-test-helper";
 
 import { faker } from "@faker-js/faker";
 
+// - search form data request bodies for attendee with employee number
+describe("addIdToValidAttendees()", () => {
+
+  describe("valid new attendee and invalid existing attendee is already enrolled", () => {
+    /**
+     * New attendee form fieldset is converted to an existing attendee form fieldset
+     * Existing attendee form fieldset remains the same
+     * User needs to manually remove the existing attendee from the form using the reset or remove buttons
+     */
+    it("id and additional fields added to new attendee", () => {
+      const newAttendee = generateAttendeeBody(); // no id in request
+      const existingAttendee = generateAttendeeBody( { id: faker.number.int() } ); // id in request 
+      const attendeeReqBodies = [ newAttendee, existingAttendee ];
+
+      const successRes = generateAttendeeUpdateRequestSuccessResponse( Object.assign( { id: faker.number.int() }, newAttendee ) ); // only response contains id
+
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( existingAttendee ) ); // request and response contains id
+      const attendeeBatchRes = [ errorRes, successRes ];
+
+      // new attendee has been created, so we need to convert the attendee to an existing attendee in the form
+      const validAttendees = extractValidAttendeesFromResponse( attendeeBatchRes ); 
+      const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
+
+      expect( attendeeReqBodies[0].acf.employee_number).toEqual( updatedAttendeeReqBodies[0].acf.employee_number ); // attendee index remains same in request and response
+      expect( attendeeReqBodies[1].acf.employee_number).toEqual( updatedAttendeeReqBodies[1].acf.employee_number ); // attendee index remains same in request and response
+
+      expect( attendeeReqBodies[0].id ).toBeUndefined(); // new attendee req does not contain an id
+      expect( attendeeReqBodies[0].acf.dob ).toBeDefined(); // new attendee req contains dob
+      expect( attendeeReqBodies[1].id ).toBeDefined(); // existing attendee req contains an id
+      expect( attendeeReqBodies[1].acf.dob ).toBeDefined(); // existing attendee req contains dob
+
+      expect( updatedAttendeeReqBodies[0].id ).toBeDefined(); // id added
+      expect( updatedAttendeeReqBodies[0].acf.dob).toBeDefined(); // dob added
+      expect( updatedAttendeeReqBodies[0].id ).toBeDefined(); // existing id
+      expect( updatedAttendeeReqBodies[0].acf.dob).toBeDefined(); // existing dob
+
+    });
+  });
+  describe("valid existing attendee and invalid new attendee with duplicate employee number", () => {
+    /**
+     * Existing attendee form fieldset remains unchanged
+     * New attendee form fieldset remains unchanged
+     * User needs to update the employee number manually.
+     */
+    it("all attendee fields remain the same", () => {
+
+      const existingAttendee = generateAttendeeBody( { id: faker.number.int() } ); // id in request 
+      const newAttendee = generateAttendeeBody(); // no id in request
+      const attendeeReqBodies = [ existingAttendee, newAttendee ];
+
+      const successRes = generateAttendeeUpdateRequestSuccessResponse( existingAttendee ); // request and response contains id
+
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( newAttendee ) ); // neither request nor response contains id
+      const attendeeBatchRes = [ successRes, errorRes ];
+
+      const validAttendees = extractValidAttendeesFromResponse( attendeeBatchRes ); 
+      const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
+
+      expect( attendeeReqBodies[0].acf.employee_number).toEqual( updatedAttendeeReqBodies[0].acf.employee_number ); // attendee index remains same in request and response
+      expect( attendeeReqBodies[1].acf.employee_number).toEqual( updatedAttendeeReqBodies[1].acf.employee_number ); // attendee index remains same in request and response
+
+      expect( attendeeReqBodies[0].id).toBeDefined(); // existing attendee req contains id
+      expect( attendeeReqBodies[0].acf.dob).toBeDefined(); // existing attendee req contains dob
+      expect( attendeeReqBodies[1].id).toBeUndefined(); // new attendee req does not contain id
+      expect( attendeeReqBodies[1].acf.dob).toBeDefined(); // new attendee req contains dob
+
+      expect( updatedAttendeeReqBodies[0].id ).toBeDefined();
+      expect( updatedAttendeeReqBodies[0].acf.dob ).toBeDefined();
+      expect( updatedAttendeeReqBodies[1].id ).toBeUndefined();
+      expect( updatedAttendeeReqBodies[1].acf.dob ).toBeDefined();
+
+    });
+  });
+
+});
+
 describe("extractValidAttendeesFromResponse()", ()  => {
     it("returns body", () => {
-        const errorRes = generateAttendeeUpdateRequestErrorResponse();
-        const successRes = generateAttendeeUpdateRequestSuccessResponse();
-        const res = [ errorRes, successRes ];
-        const validAttendees = extractValidAttendeesFromResponse( res );
-        validAttendees.forEach( validAttendee => {
-            expect( validAttendee ).toEqual( successRes.body );
-        });
+
+      const existingAttendee = generateAttendeeBody( { id: faker.number.int() } ); // id in request 
+      const newAttendee = generateAttendeeBody(); // no id in request
+      const attendeeReqBodies = [ existingAttendee, newAttendee ];
+
+      const successRes = generateAttendeeUpdateRequestSuccessResponse( existingAttendee ); // request and response contains id
+
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( newAttendee ) ); // neither request nor response contains id
+
+      const res = [ errorRes, successRes ];
+      const validAttendees = extractValidAttendeesFromResponse( res );
+      validAttendees.forEach( validAttendee => {
+        expect( validAttendee ).toEqual( successRes.body );
+      });
     });
 });
 
 describe("extractInvalidAttendeesFromResponse()", () => {
     it("returns body.data", () => {
-        const errorRes = generateAttendeeUpdateRequestErrorResponse();
-        const successRes = generateAttendeeUpdateRequestSuccessResponse();
-        const res = [ errorRes, successRes ];
-        const invalidAttendees = extractInvalidAttendeesFromResponse( res );
-        invalidAttendees.forEach( invalidAttendee => {
-            expect( invalidAttendee ).toEqual( errorRes.body.data );
-        });
+
+      const existingAttendee = generateAttendeeBody( { id: faker.number.int() } ); // id in request 
+      const newAttendee = generateAttendeeBody(); // no id in request
+      const attendeeReqBodies = [ existingAttendee, newAttendee ];
+
+      const successRes = generateAttendeeUpdateRequestSuccessResponse( existingAttendee ); // request and response contains id
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( newAttendee ) );
+
+      const res = [ errorRes, successRes ];
+      const invalidAttendees = extractInvalidAttendeesFromResponse( res );
+      invalidAttendees.forEach( invalidAttendee => {
+        expect( invalidAttendee ).toEqual( errorRes.body.data );
+      });
     });
 });
 

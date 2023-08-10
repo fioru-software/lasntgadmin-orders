@@ -1,7 +1,7 @@
 
 import { useContext, useState, useEffect } from '@wordpress/element';
 
-import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CoursePrerequisitesMetCheckBox, TrueFalse } from './acf-inputs';
+import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, CoursePrerequisitesMetCheckBox, TrueFalse, Checkbox } from './acf-inputs';
 
 import { __ } from '@wordpress/i18n';
 
@@ -56,11 +56,11 @@ const AttendeeFormFieldsetFields = props => {
               }
 
               { field.type === 'true_false' && 
-                <input type="checkbox" id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={  attendee?.acf[field.name] || field.default_value } />
+                <Checkbox id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={  attendee?.acf[field.name] || field.default_value } />
               }
 
               { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && 
-                <input type="checkbox" id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={ attendee?.acf?.course_prerequisites_met.map(Number).includes( product.id ) } />
+                <Checkbox id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={ attendee?.acf?.course_prerequisites_met.map(Number).includes( product.id ) } />
               }
 
               { field.type === 'number' && 

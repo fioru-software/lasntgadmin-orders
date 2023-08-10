@@ -1,5 +1,16 @@
 
-import { range, isNull } from "lodash";
+import { isUndefined, range, isNull } from "lodash";
+
+function addIdToValidAttendees( attendeeReqBodies, validAttendees ) {
+  return attendeeReqBodies.map( body => { 
+    // if valid attendee (means attendee was created) then add id, so we can rerender attendees
+    const attendee = validAttendees.find( ( validAttendee, index ) => validAttendee.acf.employee_number === body.acf.employee_number );
+    if( !isUndefined( attendee ) ) {
+      body = Object.assign( {}, attendee, body );
+    }
+    return body;
+  });
+}
 
 /**
  * Example of longName is attendees[0]['acf']['first_name']
@@ -223,5 +234,6 @@ export {
   extractInvalidAttendeesFromResponse,
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
-  countOccurrencesOfEmployeeNumber
+  countOccurrencesOfEmployeeNumber,
+  addIdToValidAttendees
 }

@@ -19,7 +19,8 @@ import {
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
   createAttendeeBatchRequestBody,
-  createAttendeeBatchRequest
+  createAttendeeBatchRequest,
+  addIdToValidAttendees
 } from "./attendee-form-utils";
 
 /**
@@ -41,7 +42,7 @@ const AttendeeForm = props => {
 
   const [ attendees, setAttendees ] = useState([]);
   const [ notice, setNotice ] = useState(null);
-  const [ isLoading, setIsLoading ] = useState(false);
+  const [ isLoading, setLoading ] = useState(false);
 
   useEffect( () => {
     if( ! isNil( props.attendees ) ) {
@@ -105,13 +106,11 @@ const AttendeeForm = props => {
       const attendeeBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeReqBody, orderId )
       return attendeeBatchReq;
     });
-    console.log('attendees from form');
-    console.log(attendeeBatchReqs.map( req => req.body ));
 
     try {
 
       setNotice(null);
-      setIsLoading(true);
+      setLoading(true);
 
       setNotice({
         status: 'info',
@@ -130,32 +129,21 @@ const AttendeeForm = props => {
         }
       );
 
-      console.log('response from attendees update');
-      console.log(attendeeBatchRes.responses);
-
-      const attendeeIds = extractAttendeeIdsFromResponse( attendeeBatchRes.responses );
+      // Valid attendees are missing additional acf fields.
       const validAttendees = extractValidAttendeesFromResponse( attendeeBatchRes.responses );
+      // Invalid attendees contain additional acf fields.
       const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeBatchRes.responses );
-
-      if( validAttendees.length ) {
-        setAttendees( validAttendees.concat( invalidAttendees.map( invalidAttendee => {} ) ) );
+      
+      if( invalidAttendees.length ) {
+        const attendeeReqBodies = attendeeBatchReqs.map( req => req.body );
+        const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
+        setAttendees( updatedAttendeeReqBodies );
       }
-      // report which attendee was removed
-      // @todo reformat valid attendee body
-      console.log('valid attendee bodies');
-      console.log(validAttendees);
-      console.log('invalid attendee data');
-      console.log(invalidAttendees);
 
       /**
-       * if there is an error
-       * then change the non-error attendee to predictive searched attendees
+       * Employee number is not unique 
+       * Attendee is already enrolled in this course
        */
-      return;
-
-      // Employee number is not unique 
-      // or
-      // Attendee is already enrolled in this course
       attendeeBatchRes.responses.forEach( res => {
         if( res.status >= 500 && res.status <= 599 ) {
           throw new Error( res.body.message );
@@ -177,9 +165,12 @@ const AttendeeForm = props => {
         })
       );
 
-      // Valid attendees are less than order order quantity
-      if( parseInt( quantity ) !== attendeeIds.length ) {
-        throw new Error( `Missing attendee ${ attendeeIds.length }/${ quantity }` );
+       /**
+        * Valid attendees are less than order order quantity
+        * @deprecated
+        */
+      if( parseInt( quantity ) !== validAttendees.length ) {
+        throw new Error( `Missing attendee ${ validAttendees.length }/${ quantity }` );
       }
 
       setNotice({
@@ -210,9 +201,7 @@ const AttendeeForm = props => {
         status: 'error',
         message: e.message
       });
-
-      //window.scrollTo(0,0);
-      //document.location.reload();
+      setLoading(false);
     }
   }
 
