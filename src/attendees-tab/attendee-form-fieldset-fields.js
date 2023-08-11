@@ -5,13 +5,12 @@ import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, C
 
 import { __ } from '@wordpress/i18n';
 
-import { AcfFieldsContext, ProductContext } from './attendee-context';
-import { AttendeeContext } from './attendee-form-fieldset';
+import { AcfFieldsContext, ProductContext, AttendeeContext } from './attendee-context';
 
 import { HiddenFields } from './attendee-form-fieldset-hidden-fields';
 import { PredictiveSearchFields } from './attendee-form-fieldset-predictive-search-fields';
 
-import { isNil } from 'lodash';
+import { isNil, isArray } from 'lodash';
 
 import { isCourseClosed } from '../product-utils';
 
@@ -33,7 +32,7 @@ const AttendeeFormFieldsetFields = props => {
     <>
       <HiddenFields index={ index } groupId={ groupId }/>
 
-      { fields.map( field => {
+      { isArray( fields ) && fields.map( field => {
         return (
           <>
 
@@ -56,11 +55,11 @@ const AttendeeFormFieldsetFields = props => {
               }
 
               { field.type === 'true_false' && 
-                <Checkbox id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={  attendee?.acf[field.name] || field.default_value } />
+                <TrueFalse id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={  attendee?.acf[field.name] || field.default_value } />
               }
 
-              { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && 
-                <Checkbox id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={ attendee?.acf?.course_prerequisites_met.map(Number).includes( product.id ) } />
+              { field.type === 'checkbox' && field.name === 'course_prerequisites_met' &&
+                <Checkbox id={ field.key } productId={ product.id } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } defaultChecked={ attendee?.acf?.course_prerequisites_met } />
               }
 
               { field.type === 'number' && 

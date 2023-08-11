@@ -19,6 +19,8 @@ import {
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
   createAttendeeBatchRequestBody,
+  createAttendeeAcfFieldsBatchRequestBody,
+  createAttendeeMetaFieldsBatchRequestBody,
   createAttendeeBatchRequest,
   addIdToValidAttendees
 } from "./attendee-form-utils";
@@ -46,8 +48,6 @@ const AttendeeForm = props => {
 
   useEffect( () => {
     if( ! isNil( props.attendees ) ) {
-      console.log('attendees from props');
-      console.log(props.attendees);
       setAttendees( props.attendees );
     }
   }, [ props.attendees ]);
@@ -87,13 +87,19 @@ const AttendeeForm = props => {
   }
 
   /**
+   * Sends multiple REST requests.
+   * - create/update attendee acf fields
+   * - update order meta with attendee_id
+   * - update attendee meta with product_ids, order_ids and groups-read
+   * - update order status
+   *
    * @requires ACF Field group settings for additional groups: when post_type = 'post' and rest_api = true;
    * @see https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
    */
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
+    let formData = new FormData(e.target);
 
     setNotice(null);
 
@@ -101,11 +107,28 @@ const AttendeeForm = props => {
       checkForDuplicateEmployeeNumbers( quantity, formData );
     }
 
-    const attendeeBatchReqs = range( quantity ).map( index => {
-      const attendeeReqBody = createAttendeeBatchRequestBody( index, formData, groupId, orderId, productId );
-      const attendeeBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeReqBody, orderId )
-      return attendeeBatchReq;
-    });
+    let attendeeAcfFieldsBatchReqs = [];
+    let attendeeMetaFieldsBatchReqs = [];
+    let attendeeBatchReqs = [];
+
+    for( let index=0; index<quantity; index++ ) {
+
+      // acf fields only
+      const attendeeAcfFieldsReqBody = createAttendeeAcfFieldsBatchRequestBody( index, formData );
+      const attendeeAcfFieldsBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeAcfFieldsReqBody, orderId )
+      attendeeAcfFieldsBatchReqs.push( attendeeAcfFieldsBatchReq );
+
+      // meta fields only
+      const attendeeMetaFieldsReqBody = createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId );
+      const attendeeMetaFieldsBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeMetaFieldsReqBody, orderId )
+      attendeeMetaFieldsBatchReqs.push(  attendeeMetaFieldsBatchReq );
+
+      // acf + meta fields
+      const attendeeBatchReqBody = createAttendeeBatchRequestBody( attendeeAcfFieldsReqBody, attendeeMetaFieldsReqBody);
+      const attendeeBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeBatchReqBody, orderId )
+      attendeeBatchReqs.push(  attendeeBatchReq );
+
+    }
 
     try {
 
@@ -114,38 +137,44 @@ const AttendeeForm = props => {
 
       setNotice({
         status: 'info',
-        message: __( 'Updating attendees.', 'lasntgadmin' )
+        message: __( 'Updating attendee details.', 'lasntgadmin' )
       });
 
       apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 
-      const attendeeBatchRes = await apiFetch(
+      /**
+       * Updating attendee details
+       */
+      const attendeeAcfFieldsBatchRes = await apiFetch(
         {
           path: `/batch/v1`,
           method: 'POST',
           data: {
-            requests: attendeeBatchReqs
+            requests: attendeeAcfFieldsBatchReqs
           }
         }
       );
 
+      const validAttendeeIds = extractAttendeeIdsFromResponse( attendeeAcfFieldsBatchRes.responses );
       // Valid attendees are missing additional acf fields.
-      const validAttendees = extractValidAttendeesFromResponse( attendeeBatchRes.responses );
+      const validAttendees = extractValidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
       // Invalid attendees contain additional acf fields.
-      const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeBatchRes.responses );
+      const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
       
-      if( invalidAttendees.length ) {
+      if( validAttendees.length ) {
+        console.log('valid attendees', validAttendees);
         const attendeeReqBodies = attendeeBatchReqs.map( req => req.body );
+        console.log('attendee req bodies', attendeeReqBodies);
         const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
+        console.log('updated attendee req bodies', updatedAttendeeReqBodies);
         setAttendees( updatedAttendeeReqBodies );
       }
 
       /**
        * Employee number is not unique 
-       * Attendee is already enrolled in this course
        */
-      attendeeBatchRes.responses.forEach( res => {
-        if( res.status >= 500 && res.status <= 599 ) {
+      attendeeAcfFieldsBatchRes.responses.forEach( res => {
+        if( Object.hasOwn( res, 'body') && Object.hasOwn( res.body, 'message') ) {
           throw new Error( res.body.message );
         }
       });
@@ -155,23 +184,58 @@ const AttendeeForm = props => {
         message: __( 'Adding attendees to order.', 'lasntgadmin' )
       });
 
-      apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
-
+      /**
+       * Attendee is already enrolled in this course
+       */
       const orderAttendeeIdsUpdateRes = await apiFetch(
         getUpdateShopOrderRequestBody( orderId, nonce, {
           meta: {
-            attendee_ids: [ ... new Set(attendeeIds) ]
+            attendee_ids: [ ... new Set(validAttendeeIds) ]
           }
         })
       );
 
-       /**
-        * Valid attendees are less than order order quantity
-        * @deprecated
-        */
+      /**
+       * Valid attendees are less than order order quantity
+       */
       if( parseInt( quantity ) !== validAttendees.length ) {
         throw new Error( `Missing attendee ${ validAttendees.length }/${ quantity }` );
       }
+
+      /**
+       * Attendees have been added to the order
+       * To update the meta we need to reprocess the form as the form should now contains attendee ids
+       */
+      setNotice({
+        status: 'info',
+        message: __( 'Updating attendee meta.', 'lasntgadmin' )
+      });
+
+      formData = new FormData(e.target);
+      attendeeMetaFieldsBatchReqs = [];
+
+      for( let index=0; index<quantity; index++ ) {
+        // meta fields only
+        const attendeeMetaFieldsReqBody = createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId );
+        const attendeeMetaFieldsBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeMetaFieldsReqBody, orderId )
+        attendeeMetaFieldsBatchReqs.push(  attendeeMetaFieldsBatchReq );
+      }
+
+      /**
+       * Updating attendee meta 
+       *  - order_ids
+       *  - product_ids
+       *  - groups-read 
+       */
+      const attendeeMetaFieldsBatchRes = await apiFetch(
+        {
+          path: `/batch/v1`,
+          method: 'POST',
+          data: {
+            requests: attendeeMetaFieldsBatchReqs
+          }
+        }
+      );
 
       setNotice({
         status: 'info',

@@ -13,7 +13,13 @@ const AttendeeFormFieldset = props => {
   const quantity = parseInt( props.quantity );
   const groupId = parseInt( props.groupId );
 
-  const [ attendee, setAttendee ] = useState( props.attendee );
+  const [ attendee, setAttendee ] = useState(null);
+
+  useEffect( () => {
+    if( ! isNil(props.attendee) ) {
+      setAttendee( props.attendee );
+    }
+  }, [ props.attendee]);
 
   return (
 
@@ -32,6 +38,5 @@ const AttendeeFormFieldset = props => {
 };
 
 export {
-  AttendeeFormFieldset,
-  AttendeeContext
+  AttendeeFormFieldset
 };

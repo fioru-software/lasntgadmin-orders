@@ -5,8 +5,11 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { RadioControl } from '@wordpress/components';
 import { isNil } from "lodash";
+import { AttendeeContext } from './attendee-context';
 
 const PredictiveSearchInput = props => {
+
+  const attendee = useContext( AttendeeContext );
 
   const quantity = props.quantity;
 
@@ -28,7 +31,12 @@ const PredictiveSearchInput = props => {
 	useEffect( () => {
 		if( ! isNil( props?.defaultValue ) ) {
 			textInput.current.value = props.defaultValue;
-      props.defaultValue === "" ? setDisabled(false) : setDisabled(true);
+			if( props.defaultValue === "" ) {
+				setDisabled(false);
+			} else if( Object.hasOwn( attendee, 'id' ) || Object.hasOwn( attendee, 'ID' )) {
+				setDisabled(true);
+			}
+
 		}
 	}, [ props.defaultValue ]);
 
@@ -49,6 +57,7 @@ const PredictiveSearchInput = props => {
         async function runFetch() {
           setIsLoading(true);
           const res = await fetchAttendees( searchText );
+          console.log(res);
           setIsLoading(false);
 					setAttendees( res );
         }
@@ -96,6 +105,15 @@ const PredictiveSearchInput = props => {
     setDisabled(true);
 	}
 
+	function handleInput( e ) {
+		if( Object.hasOwn( props, 'onInput' ) ) {
+			props.onInput(e);
+		}
+		if( props?.capitalise ) {
+			textInput.current.value = e.target.value.toUpperCase();
+		}
+	}
+
   function handleCancel() {
     setOptions([]);
   }
@@ -123,7 +141,7 @@ const PredictiveSearchInput = props => {
   return (
 		<>
 			<p class="description">{ props.helpText }</p>
-			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ props?.onInput } />
+			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ handleInput } />
       { disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
 
 			{ showSearchResult() && <RadioControl options={ options } onChange={ handleSelect } />}

@@ -12,7 +12,7 @@ use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
-use WC_Abstract_Order;
+use WC_Abstract_Order, WP_Error;
 
 /**
  * Order Utility Class
@@ -40,7 +40,37 @@ class OrderUtils {
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
+        add_filter( 'rest_pre_insert_shop_order', [ self::class, 'ensure_unique_enrolment' ], 10, 2 );
 	}
+
+    /**
+     * Prevents an attendee from enrolling into the same course more than once.
+     *
+     * @return stdClass|WP_Error Post object or WP_Error.
+     */
+    public static function ensure_unique_enrolment( $post, WP_REST_Request $req ) {
+        if ( ! is_wp_error( $post ) ) {
+            $params      = $req->get_params();
+            if ( isset( $params['id'] ) && isset( $params['meta']['attendee_ids'] ) ) {
+                $attendee_ids = $params['meta']['attendee_ids'];
+                $order_id = intval( $params['id'] );
+                $order       = wc_get_order( $order_id );
+                $product_id  = OrderUtils::get_product_id( $order );
+
+                foreach( $attendee_ids as $attendee_id ) {
+                    if ( ! AttendeeUtils::is_unique_product_id( $product_id, intval( $attendee_id ) ) ) {
+                        $attendee = AttendeeUtils::get_attendee_with_profile( get_post( intval( $attendee_id ) ) );
+                        return new WP_Error(
+                            'attendee_already_enrolled',
+                            sprintf( __( 'Attendee with employee number %s is already enrolled in this course.', 'lasntadmin' ), $attendee->acf['employee_number'] ),
+                            $attendee
+                        );
+                    }
+                }
+            }
+        }
+        return $post;
+    }
 
 	public static function remove_product_ids_from_attendees_meta( int $order_id, WC_Order $order ): void {
 		$order_attendee_ids = array_values(

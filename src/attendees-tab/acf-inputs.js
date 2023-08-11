@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { DateTime } from "luxon";
-import { isNil } from 'lodash';
+import { isArray, isNil } from 'lodash';
 import { __ } from '@wordpress/i18n';
 
 const SelectInput = props => {
@@ -29,12 +29,31 @@ const SelectInput = props => {
 
 }
 
-const Checkbox = props => {
+const TrueFalse = props => {
 
   const checkboxInput = useRef(null);
 
   return (
-    <input type="checkbox" id={ props.id } ref={ checkboxInput } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } defaultChecked={ props.defaultChecked || false } />
+    <input type="checkbox" ref={ checkboxInput } id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } defaultChecked={ props.defaultChecked } />
+  );
+};
+
+const Checkbox = props => {
+
+  const [ checked, setChecked ] = useState(false);
+
+  useEffect( () => {
+    if( isArray( props.defaultChecked ) ) {
+      setChecked( props.defaultChecked.map(Number).includes( props.productId ) );
+    }
+  }, [ props?.defaultChecked ]);
+
+  function handleChange( e ) {
+    setChecked( e.target.checked );
+  }
+
+  return (
+    <input type="checkbox" id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } checked={ checked } onChange={ handleChange }  />
   );
 }
 
@@ -49,7 +68,7 @@ const TextInput = props => {
   }, [ props.defaultValue]);
 
   function handleChange(e) {
-    setInputText(e.target.value);
+    setValue(e.target.value);
   }
 
   return (
@@ -138,5 +157,6 @@ export {
   DateInput,
   NumberInput,
   TelInput,
-  Checkbox
+  Checkbox,
+  TrueFalse
 };

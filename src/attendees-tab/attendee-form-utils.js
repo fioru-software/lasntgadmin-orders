@@ -109,9 +109,16 @@ function getCreateAttendeeBatchRequest( orderId, nonce, body ) {
   };
 }
 
-function createAttendeeBatchRequestBody( index, formData, groupId, orderId, productId ) {
+function createAttendeeAcfFieldsBatchRequestBody( index, formData ) {
   const body = {
     status: formData.has(`attendees[${index}]['status']`) ? formData.get(`attendees[${index}]['status']`) : 'publish',
+    acf: extractAcfFieldsByAttendeeIndex( index, formData )
+  };
+  return body;
+}
+
+function createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId ) {
+  const body = {
     meta: {
       'groups-read': [
         ... new Set(
@@ -129,9 +136,12 @@ function createAttendeeBatchRequestBody( index, formData, groupId, orderId, prod
         )
       ]
     },
-    acf: extractAcfFieldsByAttendeeIndex( index, formData )
   };
   return body;
+}
+
+function createAttendeeBatchRequestBody( acfFields, metaFields ) {
+  return Object.assign({}, acfFields, metaFields );
 }
 
 function createAttendeeBatchRequest( nonce, index, formData, body, orderId ) {
@@ -223,6 +233,8 @@ function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
 
 export {
   createAttendeeBatchRequestBody,
+  createAttendeeAcfFieldsBatchRequestBody,
+  createAttendeeMetaFieldsBatchRequestBody,
   extractAcfFieldsByAttendeeIndex,
   extractCoursePrerequisitesMetFieldValues,
   createAttendeeBatchRequest,

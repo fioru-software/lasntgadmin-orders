@@ -312,8 +312,8 @@ class PageUtils {
 		$awarding_body_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
 		$water_grant_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'funding_sources', $product->get_id() );
 		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
-		$awarding_body_fields    = acf_get_fields( $awarding_body_acf_field_group_id );
-        $water_grant_fields = acf_get_fields( $water_grant_acf_field_group_id );
+		$awarding_body_fields    = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
+        $water_grant_fields = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
 
 		echo sprintf(
 			'<div
