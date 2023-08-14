@@ -40,6 +40,7 @@ const SelectInput = props => {
     }
   }, [props.value]);
   function handleChange(e) {
+    props.value = e.target.value;
     setValue(e.target.value);
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
@@ -59,48 +60,68 @@ const SelectInput = props => {
   }));
 };
 const TrueFalse = props => {
-  const checkboxInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  const [checked, setChecked] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isBoolean)(props.checked)) {
+      setChecked(props.checked);
+    }
+  }, [props?.checked]);
+  function handleChange(e) {
+    props.checked = e.target.checked;
+    setChecked(e.target.checked);
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "checkbox",
-    ref: checkboxInput,
     id: props.id,
     name: props.name,
     disabled: props?.disabled || false,
     required: props?.required || false,
-    defaultChecked: props.defaultChecked
-  });
+    checked: props.checked,
+    onChange: handleChange
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: checked
+  }));
 };
 const Checkbox = props => {
   const [checked, setChecked] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if ((0,lodash__WEBPACK_IMPORTED_MODULE_2__.isArray)(props.defaultChecked)) {
-      setChecked(props.defaultChecked.map(Number).includes(props.productId));
+    if ((0,lodash__WEBPACK_IMPORTED_MODULE_2__.isArray)(props.checked)) {
+      setChecked(props.checked.map(Number).includes(props.value));
     }
-  }, [props?.defaultChecked]);
+  }, [props?.checked]);
   function handleChange(e) {
+    props.checked = e.target.checked;
     setChecked(e.target.checked);
   }
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "checkbox",
     id: props.id,
     name: props.name,
     disabled: props?.disabled || false,
     required: props?.required || false,
     checked: checked,
-    onChange: handleChange
-  });
+    onChange: handleChange,
+    value: props.value
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: checked
+  }));
 };
 const TextInput = props => {
   const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.defaultValue)) {
-      setValue(props.defaultValue);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.value)) {
+      setValue(props.value);
     }
-  }, [props.defaultValue]);
+  }, [props.value]);
   function handleChange(e) {
+    props.value = e.target.value;
     setValue(e.target.value);
   }
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     name: props.name,
     id: props.id,
     type: "text",
@@ -112,77 +133,112 @@ const TextInput = props => {
     pattern: props?.pattern,
     disabled: props?.disabled || false,
     onChange: handleChange
-  });
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: value
+  }));
 };
 const EmailInput = props => {
-  const emailInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.value)) {
+      setValue(props.value);
+    }
+  }, [props.value]);
+  function handleChange(e) {
+    props.value = e.target.value;
+    setValue(e.target.value);
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     name: props.name,
     id: props.id,
     type: "email",
-    ref: emailInput,
     maxlength: props?.maxlength || 32,
     minlength: props?.minlength || 1,
-    defaultValue: props?.defaultValue,
+    value: value,
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "^[^@\s]+@[^@\s]+\.[^@\s]+$",
-    disabled: props?.disabled || false
-  });
-};
-const TextArea = props => {
-  const textInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("textarea", {
-    id: props?.id,
-    ref: textInput,
     disabled: props?.disabled || false,
-    name: props?.name,
-    defaultValue: props?.defaultValue,
-    required: props?.required
+    onChange: handleChange
   }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
-    name: name,
-    defaultValue: props?.defaultValue
+    name: props.name,
+    value: value
+  }));
+};
+const TextArea = props => {
+  const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.value)) {
+      setValue(props.value);
+    }
+  }, [props.value]);
+  function handleChange(e) {
+    props.value = e.target.value;
+    setValue(e.target.value);
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("textarea", {
+    id: props?.id,
+    disabled: props?.disabled || false,
+    name: props?.name,
+    value: value,
+    required: props?.required,
+    onChange: handleChange
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: value
   }));
 };
 const DateInput = props => {
-  const dateInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.defaultValue)) {
-      let dt = luxon__WEBPACK_IMPORTED_MODULE_1__.DateTime.fromISO(props.defaultValue);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.value)) {
+      let dt = luxon__WEBPACK_IMPORTED_MODULE_1__.DateTime.fromISO(props.value);
       if (dt.invalid) {
-        dt = luxon__WEBPACK_IMPORTED_MODULE_1__.DateTime.fromFormat(props.defaultValue, 'dd/MM/yyyy');
+        dt = luxon__WEBPACK_IMPORTED_MODULE_1__.DateTime.fromFormat(props.value, 'dd/MM/yyyy');
       }
-      dateInput.current.value = dt.toISODate();
-    } else {
-      dateInput.current.value = null;
+      setValue(dt.toISODate());
     }
-  }, [props?.defaultValue]);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  }, [props.value]);
+  function handleChange(e) {
+    props.value = e.target.value;
+    setValue(e.target.value);
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     name: props.name,
     id: props.id,
     type: "date",
-    ref: dateInput,
-    defaultValue: props?.defaultValue,
+    value: value,
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern,
-    disabled: props?.disabled || false
-  });
+    disabled: props?.disabled || false,
+    onChange: handleChange
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: value
+  }));
 };
 const NumberInput = props => {
-  const numberInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.defaultValue)) {
-      numberInput.current.value = parseInt(props.defaultValue);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.value)) {
+      setValue(parseInt(props.value));
     }
-  }, [props?.defaultValue]);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  }, [props?.value]);
+  function handleChange(e) {
+    props.value = e.target.value;
+    setValue(e.target.value);
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     name: props.name,
     id: props.id,
     type: "number",
-    ref: numberInput,
-    defaultValue: props?.defaultValue,
+    value: value,
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "^\d+",
@@ -190,25 +246,41 @@ const NumberInput = props => {
     min: props?.min || 0,
     step: props?.step || 1,
     disabled: props?.disabled || false,
-    onChange: props?.onChange,
-    value: props?.value
-  });
+    onChange: handleChange
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: value
+  }));
 };
 const TelInput = props => {
-  const telInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+  const [value, setValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.value)) {
+      setValue(props.value);
+    }
+  }, [props?.value]);
+  function handleChange(e) {
+    props.value = e.target.value;
+    setValue(e.target.value);
+  }
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     name: props.name,
     id: props.id,
     type: "tel",
-    ref: telInput,
     maxlength: props?.maxlength || 32,
     minlength: props?.minlength || 1,
-    defaultValue: props?.defaultValue,
+    value: value,
     placeholder: props?.placeholder,
     required: props?.required || false,
     pattern: props?.pattern || "[0-9+\s]+",
-    disabled: props?.disabled || false
-  });
+    disabled: props?.disabled || false,
+    onChange: handleChange
+  }), props?.disabled && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    name: props.name,
+    value: value
+  }));
 };
 
 
@@ -274,6 +346,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const AttendeeFormFieldsetButtons = props => {
   const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
+  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AttendeeContext);
   const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.OrderContext);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
@@ -282,7 +355,7 @@ const AttendeeFormFieldsetButtons = props => {
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status);
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || (0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(attendee);
   }
 
   /**
@@ -376,7 +449,7 @@ const AttendeeFormFieldsetFields = props => {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
       placeholder: field.placeholder,
-      defaultValue: attendee?.acf[field.name] || field.default_value,
+      value: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
       required: !!field.required,
       disabled: isFieldDisabled()
@@ -384,20 +457,20 @@ const AttendeeFormFieldsetFields = props => {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
       placeholder: field.placeholder,
-      defaultValue: attendee?.acf[field.name] || field.default_value,
+      value: attendee?.acf[field.name] || field.default_value,
       maxlength: field.maxlength,
       required: !!field.required,
       disabled: isFieldDisabled()
     }), field.type === 'textarea' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.TextArea, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
-      defaultValue: attendee?.acf[field.name] || field.default_value,
+      value: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       disabled: isFieldDisabled()
     }), field.type === 'date_picker' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.DateInput, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
-      defaultValue: attendee?.acf[field.name] || field.default_value,
+      value: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       disabled: isFieldDisabled()
     }), field.type === 'true_false' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.TrueFalse, {
@@ -405,18 +478,18 @@ const AttendeeFormFieldsetFields = props => {
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
       disabled: isFieldDisabled(),
       required: !!field.required,
-      defaultChecked: attendee?.acf[field.name] || field.default_value
+      checked: attendee?.acf[field.name] || field.default_value
     }), field.type === 'checkbox' && field.name === 'course_prerequisites_met' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.Checkbox, {
       id: field.key,
-      productId: product.id,
+      value: product.id,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
       disabled: isFieldDisabled(),
       required: !!field.required,
-      defaultChecked: attendee?.acf?.course_prerequisites_met
+      checked: attendee?.acf?.course_prerequisites_met
     }), field.type === 'number' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.NumberInput, {
       id: field.key,
       name: `attendees[${index}]['${field.prefix}']['${field.name}']`,
-      defaultValue: attendee?.acf[field.name] || field.default_value,
+      value: attendee?.acf[field.name] || field.default_value,
       required: !!field.required,
       disabled: isFieldDisabled()
     }), field.type === 'select' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_acf_inputs__WEBPACK_IMPORTED_MODULE_1__.SelectInput, {
@@ -482,7 +555,7 @@ const HiddenFields = props => {
   })), attendee?.acf?.course_prerequisites_met && attendee?.acf?.course_prerequisites_met.map(productId => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     name: `attendees[${index}]['meta']['course_prerequisites_met']`,
-    value: product.id
+    value: productId
   })));
 };
 
@@ -514,7 +587,6 @@ const PredictiveSearchFields = props => {
   const quantity = props.quantity;
   const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_2__.AttendeeContext);
   function handleSelect(value) {
-    console.log(value);
     props.onChange(value);
   }
 
@@ -921,12 +993,6 @@ const AttendeeForm = props => {
       setAttendees(props.attendees);
     }
   }, [props.attendees]);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_4__.isNil)(attendees)) {
-      console.log('attendees from state');
-      console.log(attendees);
-    }
-  }, [attendees]);
 
   /**
    * @param {Number} quantity Order quantity
@@ -953,6 +1019,7 @@ const AttendeeForm = props => {
     const indexedEmployeeNumbers = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.extractIndexedEmployeeNumbersFromForm)(quantity, formData);
     const indexOfDuplicateEmployeeNumberField = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.extractLastIndexOfDuplicateEmployeeNumberField)(indexedEmployeeNumbers);
     showDuplicateEmployeeNumberValidationError(quantity, indexOfDuplicateEmployeeNumberField);
+    return indexOfDuplicateEmployeeNumberField !== false;
   }
 
   /**
@@ -970,7 +1037,9 @@ const AttendeeForm = props => {
     let formData = new FormData(e.target);
     setNotice(null);
     if (quantity > 1) {
-      checkForDuplicateEmployeeNumbers(quantity, formData);
+      if (checkForDuplicateEmployeeNumbers(quantity, formData)) {
+        return;
+      }
     }
     let attendeeAcfFieldsBatchReqs = [];
     let attendeeMetaFieldsBatchReqs = [];
@@ -1016,11 +1085,8 @@ const AttendeeForm = props => {
       // Invalid attendees contain additional acf fields.
       const invalidAttendees = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.extractInvalidAttendeesFromResponse)(attendeeAcfFieldsBatchRes.responses);
       if (validAttendees.length) {
-        console.log('valid attendees', validAttendees);
         const attendeeReqBodies = attendeeBatchReqs.map(req => req.body);
-        console.log('attendee req bodies', attendeeReqBodies);
         const updatedAttendeeReqBodies = (0,_attendee_form_utils__WEBPACK_IMPORTED_MODULE_9__.addIdToValidAttendees)(attendeeReqBodies, validAttendees);
-        console.log('updated attendee req bodies', updatedAttendeeReqBodies);
         setAttendees(updatedAttendeeReqBodies);
       }
 

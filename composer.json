@@ -63,13 +63,13 @@
     ],
     "require": {
         "composer/installers": "~2.0",
-        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.7",
-        "fioru/lasntgadmin-attendees": "^3.1.0",
-        "fioru/lasntgadmin-products": "^5.4.2",
-        "fioru/lasntgadmin-groups": "^1.1",
-        "fioru/lasntgadmin-subscriptions": "^2.1.2",
-        "fioru/lasntgadmin-users": "^3.2.0",
-        "fioru/lasntgadmin-translate": "^1.2.3",
+        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.4.3",
+        "fioru/lasntgadmin-attendees": "^3.7.8",
+        "fioru/lasntgadmin-products": "^5.9.24",
+        "fioru/lasntgadmin-groups": "^1.5.5",
+        "fioru/lasntgadmin-subscriptions": "^2.1.11",
+        "fioru/lasntgadmin-users": "^3.3.7",
+        "fioru/lasntgadmin-translate": "^1.2.6",
         "fioru/lasntgadmin-theme": "^1.0.0"
     },
     "require-dev": {

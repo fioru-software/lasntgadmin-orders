@@ -2,7 +2,7 @@
 import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ProductContext, OrderContext } from './attendee-context';
+import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import { isPaidStatus, isGrantPaid, isPurchaseOrderPaid } from '../order-utils';
 import { isNil } from 'lodash';
@@ -14,6 +14,7 @@ import { isNil } from 'lodash';
 const AttendeeFormFieldsetButtons = props => {
 
   const product = useContext( ProductContext );
+  const attendee = useContext( AttendeeContext );
   const order = useContext( OrderContext );
 
   const [ isLoading, setIsLoading ] = useState(false);
@@ -23,7 +24,7 @@ const AttendeeFormFieldsetButtons = props => {
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return isCourseClosed( product.status )
+    return isCourseClosed( product.status ) || isNil( attendee );
   }
 
   /**

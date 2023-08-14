@@ -52,13 +52,6 @@ const AttendeeForm = props => {
     }
   }, [ props.attendees ]);
 
-  useEffect( () => {
-    if( ! isNil(attendees ) ) {
-      console.log('attendees from state');
-      console.log(attendees);
-    }
-  }, [ attendees ]);
-
   /**
    * @param {Number} quantity Order quantity
    * @param {Number} index Attendee index
@@ -84,6 +77,7 @@ const AttendeeForm = props => {
     const indexedEmployeeNumbers = extractIndexedEmployeeNumbersFromForm( quantity, formData );
     const indexOfDuplicateEmployeeNumberField = extractLastIndexOfDuplicateEmployeeNumberField( indexedEmployeeNumbers );
     showDuplicateEmployeeNumberValidationError( quantity, indexOfDuplicateEmployeeNumberField );
+    return indexOfDuplicateEmployeeNumberField !== false;
   }
 
   /**
@@ -104,7 +98,9 @@ const AttendeeForm = props => {
     setNotice(null);
 
     if( quantity > 1 ) {
-      checkForDuplicateEmployeeNumbers( quantity, formData );
+      if(checkForDuplicateEmployeeNumbers( quantity, formData )) {
+        return;
+      }
     }
 
     let attendeeAcfFieldsBatchReqs = [];
@@ -162,11 +158,8 @@ const AttendeeForm = props => {
       const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
       
       if( validAttendees.length ) {
-        console.log('valid attendees', validAttendees);
         const attendeeReqBodies = attendeeBatchReqs.map( req => req.body );
-        console.log('attendee req bodies', attendeeReqBodies);
         const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
-        console.log('updated attendee req bodies', updatedAttendeeReqBodies);
         setAttendees( updatedAttendeeReqBodies );
       }
 

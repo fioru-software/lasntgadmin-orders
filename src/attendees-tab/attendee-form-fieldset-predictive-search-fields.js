@@ -15,7 +15,6 @@ const PredictiveSearchFields = props => {
   const attendee = useContext( AttendeeContext );
 
   function handleSelect( value ) {
-    console.log(value);
     props.onChange( value );
   }
 

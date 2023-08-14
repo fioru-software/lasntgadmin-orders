@@ -54,7 +54,7 @@ function extractAcfInputName( name ) {
 function extractAcfFieldValue( index, name, formData ) {
   const value = formData.get(`attendees[${index}]['acf']['${name}']`);
   return value === "true" ? true : value === "false" ? false : value
-}
+} 
 
 function extractCoursePrerequisitesMetFieldValues( index, formData ) {
   const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
