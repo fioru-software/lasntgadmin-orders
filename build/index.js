@@ -1,5 +1,4 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/attendees-tab/acf-inputs.js":
@@ -8,6 +7,7 @@
   \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Checkbox: () => (/* binding */ Checkbox),
@@ -292,6 +292,7 @@ const TelInput = props => {
   \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AcfFieldsContext: () => (/* binding */ AcfFieldsContext),
@@ -314,83 +315,9 @@ const AttendeeContext = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.creat
 /*!*************************************************************!*\
   !*** ./src/attendees-tab/attendee-form-fieldset-buttons.js ***!
   \*************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (() => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   AttendeeFormFieldsetButtons: () => (/* binding */ AttendeeFormFieldsetButtons)
-/* harmony export */ });
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
-/* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
-/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../order-utils */ "./src/order-utils.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
-
-
-
-
-
-
-
-
-
-/**
- * Decides which actions are available per attendee.
- * Product statuses open_for_enrollment
- */
-const AttendeeFormFieldsetButtons = props => {
-  const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
-  const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AttendeeContext);
-  const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.OrderContext);
-  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-
-  /**
-   * Reset button is disabled when the course has a status considered to be closed
-   */
-  function isResetButtonDisabled() {
-    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || (0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(attendee);
-  }
-
-  /**
-   * Remove button is disabled 
-   * when the course has a status considered to be closed 
-   * or payment method is not grant and purchase order
-   */
-  function isRemoveButtonDisabled() {
-    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || order.payment_method !== "" && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_5__.isGrantPaid)(order.payment_method) && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_5__.isPurchaseOrderPaid)(order.payment_method);
-  }
-  function handleResetAttendee(e) {
-    e.preventDefault();
-    props.setAttendee(null);
-  }
-  function handleRemoveAttendee(e) {
-    e.preventDefault();
-    console.log('TODO: remove attendee');
-  }
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    class: "form-field"
-  }, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
-    status: notice.status,
-    isDismissable: true,
-    onDismiss: () => setNotice(null)
-  }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
-    class: "button alt save_order wp-element-button",
-    onClick: handleResetAttendee,
-    disabled: isResetButtonDisabled()
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Reset Attendee', 'lasntgadmin')), "\xA0", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
-    class: "button alt save_order wp-element-button",
-    onClick: handleRemoveAttendee,
-    disabled: isRemoveButtonDisabled()
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Remove Attendee', 'lasntgadmin')), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)));
-};
-
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /usr/local/src/src/attendees-tab/attendee-form-fieldset-buttons.js: Unexpected reserved word 'await'. (85:34)\n\n\u001b[0m \u001b[90m 83 |\u001b[39m           }\u001b[0m\n\u001b[0m \u001b[90m 84 |\u001b[39m         )\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 85 |\u001b[39m         \u001b[36mconst\u001b[39m updateAttendeeRes \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m apiFetch(\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 86 |\u001b[39m           updateAttendeeRequest\u001b[0m\n\u001b[0m \u001b[90m 87 |\u001b[39m         )\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 88 |\u001b[39m\u001b[0m\n    at instantiate (/usr/local/src/node_modules/@babel/parser/lib/index.js:63:32)\n    at constructor (/usr/local/src/node_modules/@babel/parser/lib/index.js:358:12)\n    at JSXParserMixin.raise (/usr/local/src/node_modules/@babel/parser/lib/index.js:3255:19)\n    at JSXParserMixin.checkReservedWord (/usr/local/src/node_modules/@babel/parser/lib/index.js:12084:12)\n    at JSXParserMixin.parseIdentifierName (/usr/local/src/node_modules/@babel/parser/lib/index.js:12063:12)\n    at JSXParserMixin.parseIdentifier (/usr/local/src/node_modules/@babel/parser/lib/index.js:12038:23)\n    at JSXParserMixin.parseExprAtom (/usr/local/src/node_modules/@babel/parser/lib/index.js:11258:27)\n    at JSXParserMixin.parseExprAtom (/usr/local/src/node_modules/@babel/parser/lib/index.js:6974:20)\n    at JSXParserMixin.parseExprSubscripts (/usr/local/src/node_modules/@babel/parser/lib/index.js:10890:23)\n    at JSXParserMixin.parseUpdate (/usr/local/src/node_modules/@babel/parser/lib/index.js:10873:21)\n    at JSXParserMixin.parseMaybeUnary (/usr/local/src/node_modules/@babel/parser/lib/index.js:10849:23)\n    at JSXParserMixin.parseMaybeUnaryOrPrivate (/usr/local/src/node_modules/@babel/parser/lib/index.js:10687:61)\n    at JSXParserMixin.parseExprOps (/usr/local/src/node_modules/@babel/parser/lib/index.js:10692:23)\n    at JSXParserMixin.parseMaybeConditional (/usr/local/src/node_modules/@babel/parser/lib/index.js:10669:23)\n    at JSXParserMixin.parseMaybeAssign (/usr/local/src/node_modules/@babel/parser/lib/index.js:10630:21)\n    at /usr/local/src/node_modules/@babel/parser/lib/index.js:10600:39\n    at JSXParserMixin.allowInAnd (/usr/local/src/node_modules/@babel/parser/lib/index.js:12275:16)\n    at JSXParserMixin.parseMaybeAssignAllowIn (/usr/local/src/node_modules/@babel/parser/lib/index.js:10600:17)\n    at JSXParserMixin.parseVar (/usr/local/src/node_modules/@babel/parser/lib/index.js:13255:91)\n    at JSXParserMixin.parseVarStatement (/usr/local/src/node_modules/@babel/parser/lib/index.js:13096:10)\n    at JSXParserMixin.parseStatementContent (/usr/local/src/node_modules/@babel/parser/lib/index.js:12679:23)\n    at JSXParserMixin.parseStatementLike (/usr/local/src/node_modules/@babel/parser/lib/index.js:12584:17)\n    at JSXParserMixin.parseStatementListItem (/usr/local/src/node_modules/@babel/parser/lib/index.js:12564:17)\n    at JSXParserMixin.parseBlockOrModuleBlockBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:13185:61)\n    at JSXParserMixin.parseBlockBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:13178:10)\n    at JSXParserMixin.parseBlock (/usr/local/src/node_modules/@babel/parser/lib/index.js:13166:10)\n    at JSXParserMixin.parseStatementContent (/usr/local/src/node_modules/@babel/parser/lib/index.js:12686:21)\n    at JSXParserMixin.parseStatementLike (/usr/local/src/node_modules/@babel/parser/lib/index.js:12584:17)\n    at JSXParserMixin.parseStatementOrSloppyAnnexBFunctionDeclaration (/usr/local/src/node_modules/@babel/parser/lib/index.js:12574:17)\n    at JSXParserMixin.parseIfStatement (/usr/local/src/node_modules/@babel/parser/lib/index.js:12985:28)\n    at JSXParserMixin.parseStatementContent (/usr/local/src/node_modules/@babel/parser/lib/index.js:12615:21)\n    at JSXParserMixin.parseStatementLike (/usr/local/src/node_modules/@babel/parser/lib/index.js:12584:17)\n    at JSXParserMixin.parseStatementListItem (/usr/local/src/node_modules/@babel/parser/lib/index.js:12564:17)\n    at JSXParserMixin.parseBlockOrModuleBlockBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:13185:61)\n    at JSXParserMixin.parseBlockBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:13178:10)\n    at JSXParserMixin.parseBlock (/usr/local/src/node_modules/@babel/parser/lib/index.js:13166:10)\n    at JSXParserMixin.parseTryStatement (/usr/local/src/node_modules/@babel/parser/lib/index.js:13069:23)\n    at JSXParserMixin.parseStatementContent (/usr/local/src/node_modules/@babel/parser/lib/index.js:12623:21)\n    at JSXParserMixin.parseStatementLike (/usr/local/src/node_modules/@babel/parser/lib/index.js:12584:17)\n    at JSXParserMixin.parseStatementListItem (/usr/local/src/node_modules/@babel/parser/lib/index.js:12564:17)\n    at JSXParserMixin.parseBlockOrModuleBlockBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:13185:61)\n    at JSXParserMixin.parseBlockBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:13178:10)\n    at JSXParserMixin.parseBlock (/usr/local/src/node_modules/@babel/parser/lib/index.js:13166:10)\n    at JSXParserMixin.parseFunctionBody (/usr/local/src/node_modules/@babel/parser/lib/index.js:11947:24)\n    at JSXParserMixin.parseFunctionBodyAndFinish (/usr/local/src/node_modules/@babel/parser/lib/index.js:11933:10)\n    at /usr/local/src/node_modules/@babel/parser/lib/index.js:13314:12\n    at JSXParserMixin.withSmartMixTopicForbiddingContext (/usr/local/src/node_modules/@babel/parser/lib/index.js:12257:14)\n    at JSXParserMixin.parseFunction (/usr/local/src/node_modules/@babel/parser/lib/index.js:13313:10)\n    at JSXParserMixin.parseFunctionStatement (/usr/local/src/node_modules/@babel/parser/lib/index.js:12980:17)\n    at JSXParserMixin.parseStatementContent (/usr/local/src/node_modules/@babel/parser/lib/index.js:12610:21)");
 
 /***/ }),
 
@@ -400,6 +327,7 @@ const AttendeeFormFieldsetButtons = props => {
   \************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AttendeeFormFieldsetFields: () => (/* binding */ AttendeeFormFieldsetFields)
@@ -516,6 +444,7 @@ const AttendeeFormFieldsetFields = props => {
   \*******************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   HiddenFields: () => (/* binding */ HiddenFields)
@@ -568,6 +497,7 @@ const HiddenFields = props => {
   \******************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   PredictiveSearchFields: () => (/* binding */ PredictiveSearchFields)
@@ -670,6 +600,7 @@ const PredictiveSearchFields = props => {
   \*****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AttendeeFormFieldset: () => (/* binding */ AttendeeFormFieldset)
@@ -678,6 +609,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _attendee_form_fieldset_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./attendee-form-fieldset-fields */ "./src/attendees-tab/attendee-form-fieldset-fields.js");
 /* harmony import */ var _attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attendee-form-fieldset-buttons */ "./src/attendees-tab/attendee-form-fieldset-buttons.js");
+/* harmony import */ var _attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _attendee_context__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./attendee-context */ "./src/attendees-tab/attendee-context.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
@@ -705,7 +637,8 @@ const AttendeeFormFieldset = props => {
     index: index,
     setAttendee: setAttendee
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset_buttons__WEBPACK_IMPORTED_MODULE_2__.AttendeeFormFieldsetButtons, {
-    setAttendee: setAttendee
+    setAttendee: setAttendee,
+    nonce: nonce
   })));
 };
 
@@ -718,6 +651,7 @@ const AttendeeFormFieldset = props => {
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   addIdToValidAttendees: () => (/* binding */ addIdToValidAttendees),
@@ -740,6 +674,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 
+function isOrderIdInAttendeeMeta() {}
+function isProductIdInAttendeeMeta() {}
 function addIdToValidAttendees(attendeeReqBodies, validAttendees) {
   return attendeeReqBodies.map(body => {
     // if valid attendee (means attendee was created) then add id, so we can rerender attendees
@@ -939,6 +875,7 @@ function countOccurrencesOfEmployeeNumber(employeeNumber, employeeNumbers) {
   \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AttendeeForm: () => (/* binding */ AttendeeForm)
@@ -1192,11 +1129,13 @@ const AttendeeForm = props => {
     groupId: groupId,
     quantity: quantity,
     index: index,
-    attendee: attendees[index]
+    attendee: attendees[index],
+    nonce: nonce
   })), attendees.length == 0 && quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_4__.range)(quantity).map(index => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_5__.AttendeeFormFieldset, {
     groupId: groupId,
     quantity: quantity,
-    index: index
+    index: index,
+    nonce: nonce
   }))))), quantity > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
   }, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
@@ -1221,6 +1160,7 @@ const AttendeeForm = props => {
   \******************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   PredictiveSearchInput: () => (/* binding */ PredictiveSearchInput)
@@ -1390,6 +1330,7 @@ const PredictiveSearchInput = props => {
   \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   GroupSelector: () => (/* binding */ GroupSelector)
@@ -1501,6 +1442,7 @@ const GroupSelector = props => {
   \*************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Option: () => (/* binding */ Option)
@@ -1532,6 +1474,7 @@ const Option = props => {
   \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   OrderForm: () => (/* binding */ OrderForm)
@@ -1786,6 +1729,7 @@ const OrderForm = props => {
   \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ProductPanel: () => (/* binding */ ProductPanel)
@@ -2083,6 +2027,7 @@ const ProductPanel = props => {
   \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ProductSelector: () => (/* binding */ ProductSelector)
@@ -2190,6 +2135,7 @@ const ProductSelector = props => {
   \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   StatusSelector: () => (/* binding */ StatusSelector)
@@ -2300,22 +2246,24 @@ const StatusSelector = props => {
   \****************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   filterOrderMetaByKey: () => (/* binding */ filterOrderMetaByKey),
 /* harmony export */   findOrderMetaByKey: () => (/* binding */ findOrderMetaByKey),
 /* harmony export */   getAttendeesStatus: () => (/* binding */ getAttendeesStatus),
 /* harmony export */   getDraftStatus: () => (/* binding */ getDraftStatus),
 /* harmony export */   getLineItemByProductId: () => (/* binding */ getLineItemByProductId),
 /* harmony export */   getPendingStatus: () => (/* binding */ getPendingStatus),
-/* harmony export */   getUpdateOrderRequestBody: () => (/* binding */ getUpdateOrderRequestBody),
-/* harmony export */   getUpdateShopOrderRequestBody: () => (/* binding */ getUpdateShopOrderRequestBody),
+/* harmony export */   getUpdateOrderRequest: () => (/* binding */ getUpdateOrderRequest),
+/* harmony export */   getUpdateShopOrderRequest: () => (/* binding */ getUpdateShopOrderRequest),
 /* harmony export */   getWaitingStatus: () => (/* binding */ getWaitingStatus),
 /* harmony export */   hasAttendees: () => (/* binding */ hasAttendees),
+/* harmony export */   isAttendeeIdInOrderMeta: () => (/* binding */ isAttendeeIdInOrderMeta),
 /* harmony export */   isDraftOrder: () => (/* binding */ isDraftOrder),
 /* harmony export */   isDraftStatus: () => (/* binding */ isDraftStatus),
 /* harmony export */   isExistingOrder: () => (/* binding */ isExistingOrder),
 /* harmony export */   isGrantPaid: () => (/* binding */ isGrantPaid),
-/* harmony export */   isOrderAttendee: () => (/* binding */ isOrderAttendee),
 /* harmony export */   isPaidOrder: () => (/* binding */ isPaidOrder),
 /* harmony export */   isPaidStatus: () => (/* binding */ isPaidStatus),
 /* harmony export */   isPendingStatus: () => (/* binding */ isPendingStatus),
@@ -2326,6 +2274,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 
+function isAttendeeIdInOrderMeta(attendeeId, orderMeta) {
+  const attendeeIds = findOrderMetaByKey('attendee_ids', orderMeta);
+  if (attendeeIds !== undefined) {
+    return attendeeIds.map(meta => meta.value).map(Number).includes(parseInt(attendeeId));
+  }
+  return false;
+}
 function isPurchaseOrderPaid(paymentMethod) {
   return paymentMethod === 'woocommerce_gateway_purchase_order';
 }
@@ -2335,22 +2290,25 @@ function isGrantPaid(paymentMethod) {
 function isPaidStatus(status) {
   return ['on-hold', 'completed'].includes(status);
 }
+
+/**
+ * @return {Object|Undefined}
+ */
 function findOrderMetaByKey(key, orderMeta) {
   return orderMeta.find(item => item.key === key);
+}
+
+/**
+ * @return {Array}
+ */
+function filterOrderMetaByKey(key, orderMeta) {
+  return orderMeta.filter(meta => meta.key === key);
 }
 function getLineItemByProductId(productId, order) {
   return order.line_items.find(item => item.product_id === productId);
 }
 function isExistingOrder(order) {
   return order.line_items.find(item => (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isNumber)(item?.product_id));
-}
-
-/**
- * @todo clarify
- */
-function isOrderAttendee(order, attendee) {
-  //{ ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
-  return order.meta_data.filter(meta => meta.key === 'attendee_ids').map(meta => meta.value).map(Number).includes(attendee.ID);
 }
 function isPaidOrder(order) {
   return isPaidStatus(order.status);
@@ -2385,7 +2343,7 @@ function hasAttendees(order) {
 function getAttendeesStatus() {
   return 'attendees';
 }
-function getUpdateShopOrderRequestBody(orderId, nonce, data) {
+function getUpdateShopOrderRequest(orderId, nonce, data) {
   return {
     path: `/wp/v2/shop_order/${orderId}`,
     method: 'PUT',
@@ -2397,7 +2355,7 @@ function getUpdateShopOrderRequestBody(orderId, nonce, data) {
     }, data)
   };
 }
-function getUpdateOrderRequestBody(orderId, nonce, data) {
+function getUpdateOrderRequest(orderId, nonce, data) {
   return {
     path: `/wc/v3/orders/${orderId}`,
     method: 'PUT',
@@ -2417,14 +2375,41 @@ function getUpdateOrderRequestBody(orderId, nonce, data) {
   \******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   calculateAvailableSpaces: () => (/* binding */ calculateAvailableSpaces),
+/* harmony export */   findFirstProductMetaByKey: () => (/* binding */ findFirstProductMetaByKey),
 /* harmony export */   findGroupQuota: () => (/* binding */ findGroupQuota),
 /* harmony export */   findGroupQuotas: () => (/* binding */ findGroupQuotas),
 /* harmony export */   findProductById: () => (/* binding */ findProductById),
-/* harmony export */   isCourseClosed: () => (/* binding */ isCourseClosed)
+/* harmony export */   isCourseClosed: () => (/* binding */ isCourseClosed),
+/* harmony export */   isGrantFunded: () => (/* binding */ isGrantFunded),
+/* harmony export */   isWaterGrantFunded: () => (/* binding */ isWaterGrantFunded)
 /* harmony export */ });
+function isGrantFunded(product) {
+  if ('meta_data' in product) {
+    const grantYear = findFirstProductMetaByKey('grant_year', product.meta_data);
+    if (undefined !== grantYear) {
+      return true;
+    }
+  }
+  return false;
+}
+function isWaterGrantFunded(product) {
+  if ('meta_data' in product) {
+    if (isGrantFunded(product)) {
+      const fundingSources = findFirstProductMetaByKey('funding_sources', product.meta_data);
+      if (undefined !== fundingSources && fundingSources.value.includes('water-grant')) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+function findFirstProductMetaByKey(key, productMeta) {
+  return productMeta.find(item => item.key === key);
+}
 function isCourseClosed(status) {
   return isClosedStatus(status) || isCancelledStatus(status) || isArchivedStatus(status);
 }
@@ -2496,6 +2481,7 @@ function calculateAvailableSpaces(stockQuantity, groupQuota) {
   \*************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = window["lodash"];
 
 /***/ }),
@@ -2506,6 +2492,7 @@ module.exports = window["lodash"];
   \**********************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = window["wp"]["apiFetch"];
 
 /***/ }),
@@ -2516,6 +2503,7 @@ module.exports = window["wp"]["apiFetch"];
   \************************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = window["wp"]["components"];
 
 /***/ }),
@@ -2526,6 +2514,7 @@ module.exports = window["wp"]["components"];
   \*********************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = window["wp"]["element"];
 
 /***/ }),
@@ -2536,6 +2525,7 @@ module.exports = window["wp"]["element"];
   \******************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = window["wp"]["i18n"];
 
 /***/ }),
@@ -2546,6 +2536,7 @@ module.exports = window["wp"]["i18n"];
   \*****************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = window["wp"]["url"];
 
 /***/ }),
@@ -2556,6 +2547,7 @@ module.exports = window["wp"]["url"];
   \********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ DateTime),
@@ -4802,6 +4794,7 @@ function friendlyDateTime(dateTimeish) {
   \********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   accurateMatrix: () => (/* binding */ accurateMatrix),
@@ -5769,6 +5762,7 @@ class Duration {
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ConflictingSpecificationError: () => (/* binding */ ConflictingSpecificationError),
@@ -5850,6 +5844,7 @@ class ZoneIsAbstractError extends LuxonError {
   \****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   gregorianToOrdinal: () => (/* binding */ gregorianToOrdinal),
@@ -6026,6 +6021,7 @@ function hasInvalidTimeData(obj) {
   \*********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
@@ -6116,6 +6112,7 @@ function highOrderDiffs(cursor, later, units) {
   \***********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   digitRegex: () => (/* binding */ digitRegex),
@@ -6206,6 +6203,7 @@ function digitRegex({ numberingSystem }, append = "") {
   \************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   eraForDateTime: () => (/* binding */ eraForDateTime),
@@ -6473,6 +6471,7 @@ function formatString(knownFormat) {
   \************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   DATETIME_FULL: () => (/* binding */ DATETIME_FULL),
@@ -6684,6 +6683,7 @@ const DATETIME_HUGE_WITH_SECONDS = {
   \**************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Formatter)
@@ -7101,6 +7101,7 @@ class Formatter {
   \************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Invalid)
@@ -7129,6 +7130,7 @@ class Invalid {
   \***********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Locale)
@@ -7642,6 +7644,7 @@ class Locale {
   \****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   parseHTTPDate: () => (/* binding */ parseHTTPDate),
@@ -7993,6 +7996,7 @@ function parseSQL(s) {
   \****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   expandMacroTokens: () => (/* binding */ expandMacroTokens),
@@ -8461,6 +8465,7 @@ function formatOptsToTokens(formatOpts, locale) {
   \*********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   asNumber: () => (/* binding */ asNumber),
@@ -8779,6 +8784,7 @@ function timeObject(obj) {
   \*************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   normalizeZone: () => (/* binding */ normalizeZone)
@@ -8833,6 +8839,7 @@ function normalizeZone(input, defaultZone) {
   \****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Info)
@@ -9022,6 +9029,7 @@ class Info {
   \********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Interval)
@@ -9680,6 +9688,7 @@ class Interval {
   \*****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   DateTime: () => (/* reexport safe */ _datetime_js__WEBPACK_IMPORTED_MODULE_0__["default"]),
@@ -9728,6 +9737,7 @@ const VERSION = "3.3.0";
   \********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Settings)
@@ -9894,6 +9904,7 @@ class Settings {
   \****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Zone)
@@ -10000,6 +10011,7 @@ class Zone {
   \**************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ IANAZone)
@@ -10205,6 +10217,7 @@ class IANAZone extends _zone_js__WEBPACK_IMPORTED_MODULE_1__["default"] {
   \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ FixedOffsetZone)
@@ -10323,6 +10336,7 @@ class FixedOffsetZone extends _zone_js__WEBPACK_IMPORTED_MODULE_1__["default"] {
   \*****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ InvalidZone)
@@ -10391,6 +10405,7 @@ class InvalidZone extends _zone_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
   \****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ SystemZone)
@@ -10531,8 +10546,9 @@ class SystemZone extends _zone_js__WEBPACK_IMPORTED_MODULE_1__["default"] {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/

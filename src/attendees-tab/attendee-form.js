@@ -278,8 +278,8 @@ const AttendeeForm = props => {
               <OrderContext.Provider value={ order }>
                 <AcfFieldsContext.Provider value={ props.fields }>
 
-                  { attendees.length > 0 && attendees.map( ( attendee, index ) => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } attendee={ attendees[index] } /> ) }
-                  { attendees.length == 0 && quantity > 0 && range( quantity ).map( index => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } />) }
+                  { attendees.length > 0 && attendees.map( ( attendee, index ) => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } attendee={ attendees[index] } nonce={ nonce } /> ) }
+                  { attendees.length == 0 && quantity > 0 && range( quantity ).map( index => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } nonce={ nonce } />) }
 
                 </AcfFieldsContext.Provider>
               </OrderContext.Provider>

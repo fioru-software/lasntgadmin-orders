@@ -1,4 +1,30 @@
 
+function isGrantFunded( product ) {
+  if( 'meta_data' in product ) {
+    const grantYear = findFirstProductMetaByKey( 'grant_year', product.meta_data );
+    if( undefined !== grantYear ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isWaterGrantFunded( product ) {
+  if( 'meta_data' in product ) {
+    if( isGrantFunded( product ) ) {
+      const fundingSources = findFirstProductMetaByKey( 'funding_sources', product.meta_data );
+      if( undefined !== fundingSources && fundingSources.value.includes('water-grant')) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function findFirstProductMetaByKey( key, productMeta ) {
+  return productMeta.find( item => item.key === key );
+}
+
 function isCourseClosed( status ) {
   return isClosedStatus(status) || isCancelledStatus( status ) || isArchivedStatus(status);
 }
@@ -78,5 +104,8 @@ export {
   findGroupQuotas,
   findGroupQuota,
   calculateAvailableSpaces,
-  isCourseClosed
+  isCourseClosed,
+  isGrantFunded,
+  isWaterGrantFunded,
+  findFirstProductMetaByKey
 };

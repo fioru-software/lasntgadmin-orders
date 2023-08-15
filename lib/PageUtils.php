@@ -314,6 +314,11 @@ class PageUtils {
 		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$awarding_body_fields    = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
         $water_grant_fields = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
+        $attendee_additional_fields = array_merge(
+            $attendee_profile_fields,
+            $awarding_body_fields,
+            $water_grant_fields
+        );
 
 		echo sprintf(
 			'<div
@@ -330,15 +335,7 @@ class PageUtils {
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( self::get_order_quantity( $order ) ),
-			esc_attr(
-				json_encode(
-					array_merge(
-						$attendee_profile_fields,
-                        $awarding_body_fields,
-                        $water_grant_fields
-					)
-				)
-			),
+			esc_attr( json_encode( $attendee_additional_fields ) ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),

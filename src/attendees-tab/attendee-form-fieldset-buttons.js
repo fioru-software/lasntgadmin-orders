@@ -4,14 +4,22 @@ import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
-import { isPaidStatus, isGrantPaid, isPurchaseOrderPaid } from '../order-utils';
+
+import { 
+  getUpdateShopOrderRequest, getUpdateOrderRequest, filterOrderMetaByKey, 
+  isPaidStatus, isGrantPaid, isPurchaseOrderPaid, isAttendeeIdInOrderMeta
+} from '../order-utils';
+
 import { isNil } from 'lodash';
+import { getUpdateAttendeeBatchRequest } from './attendee-form-utils';
 
 /**
  * Decides which actions are available per attendee.
  * Product statuses open_for_enrollment
  */
 const AttendeeFormFieldsetButtons = props => {
+
+  const nonce = props.nonce;
 
   const product = useContext( ProductContext );
   const attendee = useContext( AttendeeContext );
@@ -24,7 +32,7 @@ const AttendeeFormFieldsetButtons = props => {
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return isCourseClosed( product.status ) || isNil( attendee );
+    return isCourseClosed( product.status ) || isNil( attendee ) || isLoading ;
   }
 
   /**
@@ -33,7 +41,7 @@ const AttendeeFormFieldsetButtons = props => {
    * or payment method is not grant and purchase order
    */
   function isRemoveButtonDisabled() {
-    return isCourseClosed( product.status ) || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
+    return isCourseClosed( product.status ) || isLoading || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
   }
 
   function handleResetAttendee( e ) {
@@ -42,8 +50,148 @@ const AttendeeFormFieldsetButtons = props => {
   }
 
   function handleRemoveAttendee( e ) {
+
     e.preventDefault();
-    console.log('TODO: remove attendee');
+
+    try {
+
+      setIsLoading(true);
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+
+      /**
+       * When existing attendee
+       */
+      if( 'ID' in attendee ) {
+
+        /**
+         * When order in attendee meta
+         * then remove order from attendee's meta.
+         */
+        if( isOrderIdInAttendeeMeta( order.id, attendee.meta ) ) {
+
+          setNotice({
+            status: 'info',
+            message: 'Removing order from attendee meta...'
+          });
+
+          const updateAttendeeRequest = getUpdateAttendeeBatchRequest(
+            order.id,
+            attendee.ID,
+            nonce,
+            {
+              meta: {
+                product_ids: Array.isArray( attendee?.meta?.product_ids ) ? [ ... new Set(
+                  attendee?.meta?.product_ids.map(Number).filter(Number).filter( productId => productId !== parseInt( product.id ) )
+                )] : [],
+                order_ids: Array.isArray( attendee?.meta?.order_ids) ? [ ... new Set(
+                  attendee?.meta?.order_ids.map(Number).filter(Number).filter( orderId => orderId !== parseInt( order.id ) )
+                )] : []
+              }
+            }
+          );
+          const updateAttendeeRes = await apiFetch(
+            updateAttendeeRequest
+          );
+
+          setNotice({
+            status: 'success',
+            message: 'Removed order form attendee meta.'
+          });
+        }
+
+        /**
+         * When product in attendee meta
+         * then remove product from attendee's meta.
+         */
+        if( isProductIdInAttendeeMeta( order.id, attendee.meta ) ) {
+        }
+
+
+        /**
+         * When attendee in order order
+         * then remove attendee from order's meta.
+         */
+        if( isAttendeeIdInOrderMeta( attendee.ID, order.meta_data ) ) {
+
+          setNotice({
+            status: 'info',
+            message: 'Removing attendee from order meta...'
+          });
+
+          const updateShopOrderRequest = getUpdateShopOrderRequest(
+            order.id,
+            nonce,
+            {
+              meta: {
+                attendee_ids: Array.isArray( order.meta_data ) ? [ 
+                  ... new Set(
+                    findOrderMetaByKey('attendee_ids', order.meta_data ).filter( attendeeId => attendeeId !== parseInt( attendee.ID ) )
+                  )
+                ] : []
+              }
+            }
+          );
+
+          const shopOrderRes = await apiFetch(
+            updateShopOrderRequest
+          );
+
+          setNotice({
+            status: 'success',
+            message: 'Removed attendee from order meta.'
+          });
+
+        }
+
+      }
+
+      /**
+       * Decrementing order quantity.
+       */
+      setNotice({
+        status: 'info',
+        message: 'Decrementing order quantity...'
+      });
+
+      const updateOrderRequest = getUpdateOrderRequest(
+        order.id,
+        nonce,
+        {
+          total: order.total - product.price,
+          line_items: Array.isArray( order?.line_items ) ? order?.line_items.map( item => {
+            return {
+              id: item.id,
+              quantity: item.quantity - 1,
+              total: `${item.total - product.price}`,
+              subtotal: `${item.subtotal - product.price}`
+            };
+          }) : [],
+        }
+      );
+      const orderRes = await apiFetch(
+        updateOrderRequest
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Decremented order quantity.'
+      });
+
+      setNotice({
+        status: 'info',
+        message: 'Reloading page...'
+      });
+
+      document.location.reload();
+
+    } catch (e) {
+      console.error(e);
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      setIsLoading(false);
+    }
   }
 
   return (

@@ -1,6 +1,14 @@
 
 import { isNumber } from "lodash";
 
+function isAttendeeIdInOrderMeta( attendeeId, orderMeta ) {
+  const attendeeIds = findOrderMetaByKey( 'attendee_ids', orderMeta);
+  if( attendeeIds !== undefined ) {
+    return attendeeIds.map( meta => meta.value ).map(Number).includes( parseInt(attendeeId) );
+  }
+  return false;
+}
+
 function isPurchaseOrderPaid( paymentMethod ) {
   return paymentMethod === 'woocommerce_gateway_purchase_order';
 }
@@ -13,8 +21,18 @@ function isPaidStatus( status ) {
   return ['on-hold', 'completed'].includes( status );
 }
 
+/**
+ * @return {Object|Undefined}
+ */
 function findOrderMetaByKey( key, orderMeta ) {
   return orderMeta.find( item => item.key === key );
+}
+
+/**
+ * @return {Array}
+ */
+function filterOrderMetaByKey( key, orderMeta ) {
+  return orderMeta.filter( meta => meta.key === key );
 }
 
 function getLineItemByProductId( productId, order ) {
@@ -23,14 +41,6 @@ function getLineItemByProductId( productId, order ) {
 
 function isExistingOrder( order ) {
   return order.line_items.find( item => isNumber(item?.product_id) );
-}
-
-/**
- * @todo clarify
- */
-function isOrderAttendee( order, attendee ) {
-  //{ ! props.order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee?.ID ) && 
-  return order.meta_data.filter( meta => meta.key === 'attendee_ids' ).map( meta => meta.value).map(Number).includes( attendee.ID );
 }
 
 function isPaidOrder( order ) {
@@ -77,7 +87,7 @@ function getAttendeesStatus() {
   return 'attendees';
 }
 
-function getUpdateShopOrderRequestBody( orderId, nonce, data ) {
+function getUpdateShopOrderRequest( orderId, nonce, data ) {
   return  {
     path: `/wp/v2/shop_order/${orderId}`,
     method: 'PUT',
@@ -93,7 +103,7 @@ function getUpdateShopOrderRequestBody( orderId, nonce, data ) {
   };
 }
 
-function getUpdateOrderRequestBody( orderId, nonce, data) {
+function getUpdateOrderRequest( orderId, nonce, data) {
   return  {
     path: `/wc/v3/orders/${ orderId }`,
     method: 'PUT',
@@ -105,14 +115,15 @@ function getUpdateOrderRequestBody( orderId, nonce, data) {
 }
 
 export {
-  getUpdateShopOrderRequestBody,
-  getUpdateOrderRequestBody,
+  getUpdateShopOrderRequest,
+  getUpdateOrderRequest,
   getLineItemByProductId,
   getPendingStatus,
   getWaitingStatus,
   getDraftStatus,
   getAttendeesStatus,
   findOrderMetaByKey,
+  filterOrderMetaByKey,
   isExistingOrder,
   isWaitingOrder,
   isWaitingStatus, 
@@ -121,7 +132,7 @@ export {
   isPaidStatus,
   isGrantPaid,
   isPurchaseOrderPaid,
-  isOrderAttendee,
+  isAttendeeIdInOrderMeta,
   isPaidOrder,
   isDraftStatus,
   hasAttendees

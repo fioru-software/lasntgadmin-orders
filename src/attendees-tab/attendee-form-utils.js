@@ -1,6 +1,12 @@
 
 import { isUndefined, range, isNull } from "lodash";
 
+function isOrderIdInAttendeeMeta() {
+}
+
+function isProductIdInAttendeeMeta() {
+}
+
 function addIdToValidAttendees( attendeeReqBodies, validAttendees ) {
   return attendeeReqBodies.map( body => { 
     // if valid attendee (means attendee was created) then add id, so we can rerender attendees
