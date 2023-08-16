@@ -1,10 +1,54 @@
 
 import { isUndefined, range, isNull } from "lodash";
 
-function isOrderIdInAttendeeMeta() {
+/**
+ * @return {Boolean}
+ */
+function isOrderIdInAttendeeMeta( orderId, attendeeMeta ) {
+  if( 'order_ids' in attendeeMeta && Array.isArray( attendeeMeta.order_ids ) ) {
+    const orderIds = attendeeMeta.order_ids.map(Number);
+    return orderIds.includes( parseInt( orderId ) );
+  }
+  return false;
 }
 
-function isProductIdInAttendeeMeta() {
+/**
+ * @return {Array}
+ */
+function filterOrderIdFromAttendeeMeta( orderId, attendeeMeta) {
+  if( 'order_ids' in attendeeMeta && Array.isArray( attendeeMeta.order_ids ) ) {
+    return [ 
+      ... new Set(
+        attendeeMeta.order_ids.map(Number).filter( id => id !== parseInt( orderId ) )
+      ) 
+    ];
+  }
+  return [];
+}
+
+/**
+ * @return {Boolean}
+ */
+function isProductIdInAttendeeMeta( productId, attendeeMeta ) {
+  if( 'product_ids' in attendeeMeta && Array.isArray( attendeeMeta.product_ids ) ) {
+    const productIds = attendeeMeta.product_ids.map(Number);
+    return productIds.includes( parseInt( productId ) );
+  }
+  return false;
+}
+
+/**
+ * @return {Array}
+ */
+function filterProductIdFromAttendeeMeta( productId, attendeeMeta) {
+  if( 'product_ids' in attendeeMeta && Array.isArray( attendeeMeta.product_ids ) ) {
+    return [ 
+      ... new Set(
+        attendeeMeta.product_ids.map(Number).filter( id => id !== parseInt( productId ) )
+      ) 
+    ];
+  }
+  return [];
 }
 
 function addIdToValidAttendees( attendeeReqBodies, validAttendees ) {
@@ -146,6 +190,9 @@ function createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, ord
   return body;
 }
 
+/**
+ * Combination of acf and meta fields
+ */
 function createAttendeeBatchRequestBody( acfFields, metaFields ) {
   return Object.assign({}, acfFields, metaFields );
 }
@@ -238,6 +285,11 @@ function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
 }
 
 export {
+  filterOrderIdFromAttendeeMeta,
+  isProductIdInAttendeeMeta,
+  filterProductIdFromAttendeeMeta,
+  isOrderIdInAttendeeMeta,
+  getUpdateAttendeeBatchRequest,
   createAttendeeBatchRequestBody,
   createAttendeeAcfFieldsBatchRequestBody,
   createAttendeeMetaFieldsBatchRequestBody,

@@ -1,10 +1,30 @@
 
 import { isNumber } from "lodash";
 
+/**
+ * @return { Array }
+ */
+function filterAttendeeIdFromOrderMeta( attendeeId, orderMeta ) {
+  const attendeeIds = findOrderMetaByKey( 'attendee_ids', orderMeta);
+  if( attendeeIds !== undefined ) {
+    const attendeeIdsOrderMeta = filterOrderMetaByKey( 'attendee_ids', orderMeta );
+    return [
+      ... new Set(
+        attendeeIdsOrderMeta.map( meta => meta.value ).map(Number).filter( id => parseInt(id) !== parseInt( attendeeId ) )
+      )
+    ];
+  }
+  return [];
+}
+
+/**
+ * @return { Boolean }
+ */
 function isAttendeeIdInOrderMeta( attendeeId, orderMeta ) {
   const attendeeIds = findOrderMetaByKey( 'attendee_ids', orderMeta);
   if( attendeeIds !== undefined ) {
-    return attendeeIds.map( meta => meta.value ).map(Number).includes( parseInt(attendeeId) );
+    const attendeeIdsOrderMeta = filterOrderMetaByKey( 'attendee_ids', orderMeta );
+    return attendeeIdsOrderMeta.map( meta => meta.value ).map(Number).includes( parseInt(attendeeId) );
   }
   return false;
 }
@@ -32,7 +52,10 @@ function findOrderMetaByKey( key, orderMeta ) {
  * @return {Array}
  */
 function filterOrderMetaByKey( key, orderMeta ) {
-  return orderMeta.filter( meta => meta.key === key );
+  if( findOrderMetaByKey( key, orderMeta ) !== undefined ) {
+    return orderMeta.filter( meta => meta.key === key );
+  }
+  return [];
 }
 
 function getLineItemByProductId( productId, order ) {
@@ -115,6 +138,7 @@ function getUpdateOrderRequest( orderId, nonce, data) {
 }
 
 export {
+  filterAttendeeIdFromOrderMeta,
   getUpdateShopOrderRequest,
   getUpdateOrderRequest,
   getLineItemByProductId,

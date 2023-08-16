@@ -12,6 +12,7 @@ const AttendeeFormFieldset = props => {
   const index = parseInt( props.index );
   const quantity = parseInt( props.quantity );
   const groupId = parseInt( props.groupId );
+  const nonce = props.nonce;
 
   const [ attendee, setAttendee ] = useState(null);
 
@@ -30,7 +31,7 @@ const AttendeeFormFieldset = props => {
 
         <AttendeeFormFieldsetFields groupId={ groupId } quantity={ quantity } index={ index } setAttendee={ setAttendee }/>
 
-        <AttendeeFormFieldsetButtons setAttendee={ setAttendee } nonce={ nonce } />
+        <AttendeeFormFieldsetButtons setAttendee={ setAttendee } nonce={ nonce } quantity={ quantity } />
 
       </fieldset>
     </AttendeeContext.Provider>

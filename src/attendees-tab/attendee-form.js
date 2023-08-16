@@ -8,7 +8,7 @@ import { isNil, delay, range } from 'lodash';
 
 import { AttendeeFormFieldset } from './attendee-form-fieldset';
 import { isCourseClosed } from '../product-utils';
-import { isWaitingOrder, hasAttendees, getUpdateShopOrderRequestBody } from '../order-utils';
+import { isWaitingOrder, hasAttendees, getUpdateShopOrderRequest } from '../order-utils';
 
 import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-context';
 
@@ -23,7 +23,7 @@ import {
   createAttendeeMetaFieldsBatchRequestBody,
   createAttendeeBatchRequest,
   addIdToValidAttendees
-} from "./attendee-form-utils";
+} from "./attendee-utils";
 
 /**
  * @param { number } quantity
@@ -181,7 +181,7 @@ const AttendeeForm = props => {
        * Attendee is already enrolled in this course
        */
       const orderAttendeeIdsUpdateRes = await apiFetch(
-        getUpdateShopOrderRequestBody( orderId, nonce, {
+        getUpdateShopOrderRequest( orderId, nonce, {
           meta: {
             attendee_ids: [ ... new Set(validAttendeeIds) ]
           }
@@ -236,7 +236,7 @@ const AttendeeForm = props => {
       });
 
       const orderRes = await apiFetch(
-        getUpdateShopOrderRequestBody(
+        getUpdateShopOrderRequest(
           orderId,
           nonce,
           {
@@ -250,6 +250,9 @@ const AttendeeForm = props => {
         message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
       });
 
+      /**
+       * @todo remove this line
+       */
       //document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
 
     } catch (e) {

@@ -1,17 +1,23 @@
 
 import { 
+  filterOrderIdFromAttendeeMeta,
+  filterProductIdFromAttendeeMeta,
+  isProductIdInAttendeeMeta,
+  isOrderIdInAttendeeMeta,
   extractIndexedEmployeeNumbersFromForm, 
   extractLastIndexOfDuplicateEmployeeNumberField,
   extractCoursePrerequisitesMetFieldValues,
   countOccurrencesOfEmployeeNumber,
   createAttendeeBatchRequestBody,
+  createAttendeeMetaFieldsBatchRequestBody,
+  createAttendeeAcfFieldsBatchRequestBody,
   createAttendeeRequestBody,
   createAttendeeBatchRequest,
   extractAcfFieldsByAttendeeIndex,
   extractValidAttendeesFromResponse,
   extractInvalidAttendeesFromResponse,
   addIdToValidAttendees
-} from "./attendee-form-utils";
+} from "./attendee-utils";
 
 import { 
   generateFormDataForAttendeeWithIndex,
@@ -23,7 +29,89 @@ import {
 
 import { faker } from "@faker-js/faker";
 
-// - search form data request bodies for attendee with employee number
+describe("filterProductIdFromAttendeeMeta()", () => {
+  describe("product id is present", () => {
+    it("removes the product id", () => {
+      const productId = faker.number.int();
+      const attendeeMeta = {
+        product_ids: [ productId, faker.number.int() ]
+      }
+      expect( attendeeMeta.product_ids).toContain( productId );
+      expect( filterProductIdFromAttendeeMeta( productId, attendeeMeta)).not.toContain( productId ) ;
+    });
+  });
+});
+
+
+describe("filterOrderIdFromAttendeeMeta()", () => {
+  describe("order id is present", () => {
+    it("removes the order id", () => {
+      const orderId = faker.number.int();
+      const attendeeMeta = {
+        order_ids: [ orderId, faker.number.int() ]
+      }
+      expect( attendeeMeta.order_ids).toContain( orderId );
+      expect( filterOrderIdFromAttendeeMeta( orderId, attendeeMeta)).not.toContain( orderId ) ;
+    });
+  });
+});
+
+describe("isOrderIdInAttendeeMeta()", () => {
+
+  describe("order id in attendee meta", () => {
+    it("returns true", () => {
+      const orderId = faker.number.int();
+      const attendee = {
+        meta: {
+          order_ids: [ faker.number.int(), orderId, faker.number.int() ]
+        }
+      };
+      expect( isOrderIdInAttendeeMeta( orderId, attendee.meta ) ).toEqual(true);
+    });
+  });
+
+  describe("order id not in attendee meta", () => {
+    it("returns true", () => {
+      const orderId = faker.number.int();
+      const attendee = {
+        meta: {
+          order_ids: [ faker.number.int(), faker.number.int() ]
+        }
+      };
+      expect( isOrderIdInAttendeeMeta( orderId, attendee.meta ) ).toEqual(false);
+    });
+  });
+
+});
+
+describe("isProductIdInAttendeeMeta()", () => {
+
+  describe("product id in attendee meta", () => {
+    it("returns true", () => {
+      const productId = faker.number.int();
+      const attendee = {
+        meta: {
+          product_ids: [ faker.number.int(), productId, faker.number.int() ]
+        }
+      };
+      expect( isProductIdInAttendeeMeta( productId, attendee.meta ) ).toEqual(true);
+    });
+  });
+
+  describe("product id not in attendee meta", () => {
+    it("returns true", () => {
+      const productId = faker.number.int();
+      const attendee = {
+        meta: {
+          product_ids: [ faker.number.int(), faker.number.int() ]
+        }
+      };
+      expect( isProductIdInAttendeeMeta( productId, attendee.meta ) ).toEqual(false);
+    });
+  });
+
+});
+
 describe("addIdToValidAttendees()", () => {
 
   describe("valid new attendee and invalid existing attendee is already enrolled", () => {
@@ -176,13 +264,81 @@ describe("createAttendeeBatchRequest()", () => {
   });
 });
 
-describe("createAttendeeBatchRequestBody()", () => {
-  it("returns a request body object", () => {
+describe("createAttendeeMetaFieldsBatchRequestBody()", () => {
+  it("returns body with meta fields", () => {
+
     const index = faker.number.int(10);
     const groupId = faker.number.int();
     const orderId = faker.number.int();
     const productId = faker.number.int();
     let formData = new FormData();
+
+    const attendeeMetaFields = [
+      {
+        course_prerequisites_met: faker.number.int()
+      },
+      {
+        course_prerequisites_met: faker.number.int()
+      },
+      {
+        'groups-read': faker.number.int()
+      },
+      {
+        'groups-read': groupId
+      },
+      {
+        order_ids: faker.number.int()
+      },
+      {
+        order_ids: orderId
+      },
+      {
+        product_ids: productId
+      },
+      {
+        product_ids: faker.number.int()
+      }
+    ];
+    generateFormDataForAttendeeWithIndex( formData, index, 'meta', attendeeMetaFields );
+
+    const body = createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId );
+
+    expect( body.meta['groups-read']).toContain(groupId);
+    expect( body.meta.order_ids).toContain(orderId);
+    expect( body.meta.product_ids).toContain(productId);
+  });
+});
+
+describe("createAttendeeAcfFieldsBatchRequestBody()", () => {
+  it("returns body with acf fields", () => {
+
+    const index = faker.number.int(10);
+    let formData = new FormData();
+
+    const attendeeAcfFields = [
+      {
+        first_name: faker.person.firstName(),
+        course_prerequisites_met: faker.number.int()
+      }
+    ];
+    generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeAcfFields );
+
+    const body = createAttendeeAcfFieldsBatchRequestBody( index, formData );
+
+    expect( body.status ).toEqual('publish');
+    expect( body.acf.first_name).toEqual( attendeeAcfFields[0].first_name );
+    expect( body.acf.course_prerequisites_met).toContain( attendeeAcfFields[0].course_prerequisites_met );
+  });
+});
+
+describe("createAttendeeBatchRequestBody()", () => {
+  it("returns a request body object", () => {
+
+    const index = faker.number.int(10);
+    let formData = new FormData();
+    const groupId = faker.number.int();
+    const orderId = faker.number.int();
+    const productId = faker.number.int();
 
     const attendeeMetaFields = [
       {
@@ -196,19 +352,16 @@ describe("createAttendeeBatchRequestBody()", () => {
 
     const attendeeAcfFields = [
       {
-        first_name: faker.person.firstName(),
         course_prerequisites_met: faker.number.int()
       }
     ];
     generateFormDataForAttendeeWithIndex( formData, index, 'acf', attendeeAcfFields );
 
-    const body = createAttendeeBatchRequestBody( index, formData, groupId, orderId, productId );
+    const acfFieldsBatchRequestBody = createAttendeeAcfFieldsBatchRequestBody( index, formData );
+    const metaFieldsBatchRequestBody = createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId );
 
-    expect( body.status).toEqual('publish');
-    expect( body.meta['groups-read']).toContain(groupId);
-    expect( body.meta.order_ids).toContain(orderId);
-    expect( body.meta.product_ids).toContain(productId);
-    expect( body.acf.first_name).toEqual( attendeeAcfFields[0].first_name );
+    const body = createAttendeeBatchRequestBody( acfFieldsBatchRequestBody, metaFieldsBatchRequestBody );
+
     expect( body.acf.course_prerequisites_met).toContain( attendeeAcfFields[0].course_prerequisites_met );
     expect( body.acf.course_prerequisites_met).toContain( attendeeMetaFields[0].course_prerequisites_met );
     expect( body.acf.course_prerequisites_met).toContain( attendeeMetaFields[1].course_prerequisites_met );

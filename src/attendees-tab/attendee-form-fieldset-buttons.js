@@ -4,14 +4,28 @@ import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
+import apiFetch from '@wordpress/api-fetch';
 
 import { 
-  getUpdateShopOrderRequest, getUpdateOrderRequest, filterOrderMetaByKey, 
-  isPaidStatus, isGrantPaid, isPurchaseOrderPaid, isAttendeeIdInOrderMeta
+  getUpdateShopOrderRequest, 
+  getUpdateOrderRequest, 
+  filterOrderMetaByKey, 
+  filterAttendeeIdFromOrderMeta,
+  isPaidStatus, 
+  isGrantPaid, 
+  isPurchaseOrderPaid, 
+  isAttendeeIdInOrderMeta
 } from '../order-utils';
 
 import { isNil } from 'lodash';
-import { getUpdateAttendeeBatchRequest } from './attendee-form-utils';
+import { 
+  filterOrderIdFromAttendeeMeta,
+  filterProductIdFromAttendeeMeta,
+  isProductIdInAttendeeMeta,
+  isOrderIdInAttendeeMeta, 
+  getUpdateAttendeeBatchRequest 
+} from './attendee-utils';
+
 
 /**
  * Decides which actions are available per attendee.
@@ -20,6 +34,7 @@ import { getUpdateAttendeeBatchRequest } from './attendee-form-utils';
 const AttendeeFormFieldsetButtons = props => {
 
   const nonce = props.nonce;
+  const quantity = props.quantity;
 
   const product = useContext( ProductContext );
   const attendee = useContext( AttendeeContext );
@@ -27,6 +42,15 @@ const AttendeeFormFieldsetButtons = props => {
 
   const [ isLoading, setIsLoading ] = useState(false);
   const [ notice, setNotice ] = useState(null);
+
+  /**
+   * @todo remove this function
+   */
+  useEffect( () => {
+    if( !isNil( attendee ) ) {
+      console.log('attendee', attendee);
+    }
+  }, [ attendee ]);
 
   /**
    * Reset button is disabled when the course has a status considered to be closed
@@ -41,7 +65,7 @@ const AttendeeFormFieldsetButtons = props => {
    * or payment method is not grant and purchase order
    */
   function isRemoveButtonDisabled() {
-    return isCourseClosed( product.status ) || isLoading || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
+    return isCourseClosed( product.status ) || isLoading || quantity < 2 || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
   }
 
   function handleResetAttendee( e ) {
@@ -49,7 +73,7 @@ const AttendeeFormFieldsetButtons = props => {
     props.setAttendee(null);
   }
 
-  function handleRemoveAttendee( e ) {
+  async function handleRemoveAttendee( e ) {
 
     e.preventDefault();
 
@@ -74,23 +98,19 @@ const AttendeeFormFieldsetButtons = props => {
             message: 'Removing order from attendee meta...'
           });
 
-          const updateAttendeeRequest = getUpdateAttendeeBatchRequest(
+          const removeOrderFromAttendeeRequest = getUpdateAttendeeBatchRequest(
             order.id,
             attendee.ID,
             nonce,
             {
               meta: {
-                product_ids: Array.isArray( attendee?.meta?.product_ids ) ? [ ... new Set(
-                  attendee?.meta?.product_ids.map(Number).filter(Number).filter( productId => productId !== parseInt( product.id ) )
-                )] : [],
-                order_ids: Array.isArray( attendee?.meta?.order_ids) ? [ ... new Set(
-                  attendee?.meta?.order_ids.map(Number).filter(Number).filter( orderId => orderId !== parseInt( order.id ) )
-                )] : []
+                order_ids: filterOrderIdFromAttendeeMeta( order.id, attendee.meta )
               }
             }
           );
-          const updateAttendeeRes = await apiFetch(
-            updateAttendeeRequest
+
+          const removeOrderFromAttendeeResponse = await apiFetch(
+            removeOrderFromAttendeeRequest
           );
 
           setNotice({
@@ -104,6 +124,31 @@ const AttendeeFormFieldsetButtons = props => {
          * then remove product from attendee's meta.
          */
         if( isProductIdInAttendeeMeta( order.id, attendee.meta ) ) {
+
+          setNotice({
+            status: 'info',
+            message: 'Removing product from attendee meta...'
+          });
+
+          const removeProductFromAttendeeRequest = getUpdateAttendeeBatchRequest(
+            order.id,
+            attendee.ID,
+            nonce,
+            {
+              meta: {
+                product_ids: filterProductIdFromAttendeeMeta( product.id, attendee.meta )
+              }
+            }
+          );
+
+          const removeProductFromAttendeeResponse = await apiFetch(
+            removeProductFromAttendeeRequest
+          );
+
+          setNotice({
+            status: 'success',
+            message: 'Removed product form attendee meta.'
+          });
         }
 
 
@@ -118,22 +163,18 @@ const AttendeeFormFieldsetButtons = props => {
             message: 'Removing attendee from order meta...'
           });
 
-          const updateShopOrderRequest = getUpdateShopOrderRequest(
+          const removeAttendeeFromOrderRequest = getUpdateShopOrderRequest(
             order.id,
             nonce,
             {
               meta: {
-                attendee_ids: Array.isArray( order.meta_data ) ? [ 
-                  ... new Set(
-                    findOrderMetaByKey('attendee_ids', order.meta_data ).filter( attendeeId => attendeeId !== parseInt( attendee.ID ) )
-                  )
-                ] : []
+                attendee_ids: filterAttendeeIdFromOrderMeta( attendee.ID, order.meta_data )
               }
             }
           );
 
-          const shopOrderRes = await apiFetch(
-            updateShopOrderRequest
+          const removeAttendeeFromOrderResponse = await apiFetch(
+            removeAttendeeFromOrderRequest
           );
 
           setNotice({
@@ -153,7 +194,7 @@ const AttendeeFormFieldsetButtons = props => {
         message: 'Decrementing order quantity...'
       });
 
-      const updateOrderRequest = getUpdateOrderRequest(
+      const decrementOrderQuantityRequest = getUpdateOrderRequest(
         order.id,
         nonce,
         {
@@ -168,18 +209,14 @@ const AttendeeFormFieldsetButtons = props => {
           }) : [],
         }
       );
+
       const orderRes = await apiFetch(
-        updateOrderRequest
+        decrementOrderQuantityRequest
       );
 
       setNotice({
         status: 'success',
-        message: 'Decremented order quantity.'
-      });
-
-      setNotice({
-        status: 'info',
-        message: 'Reloading page...'
+        message: 'Decremented order quantity. Reloading page...'
       });
 
       document.location.reload();
