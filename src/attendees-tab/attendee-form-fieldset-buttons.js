@@ -23,7 +23,7 @@ import {
   filterProductIdFromAttendeeMeta,
   isProductIdInAttendeeMeta,
   isOrderIdInAttendeeMeta, 
-  getUpdateAttendeeBatchRequest 
+  getUpdateAttendeeRequest  
 } from './attendee-utils';
 
 
@@ -98,7 +98,7 @@ const AttendeeFormFieldsetButtons = props => {
             message: 'Removing order from attendee meta...'
           });
 
-          const removeOrderFromAttendeeRequest = getUpdateAttendeeBatchRequest(
+          const removeOrderFromAttendeeRequest = getUpdateAttendeeRequest(
             order.id,
             attendee.ID,
             nonce,
@@ -119,18 +119,21 @@ const AttendeeFormFieldsetButtons = props => {
           });
         }
 
+        console.log('product id', product.id);
+        console.log('attendee meta', attendee.meta);
+
         /**
          * When product in attendee meta
          * then remove product from attendee's meta.
          */
-        if( isProductIdInAttendeeMeta( order.id, attendee.meta ) ) {
+        if( isProductIdInAttendeeMeta( product.id, attendee.meta ) ) {
 
           setNotice({
             status: 'info',
             message: 'Removing product from attendee meta...'
           });
 
-          const removeProductFromAttendeeRequest = getUpdateAttendeeBatchRequest(
+          const removeProductFromAttendeeRequest = getUpdateAttendeeRequest(
             order.id,
             attendee.ID,
             nonce,
@@ -140,6 +143,9 @@ const AttendeeFormFieldsetButtons = props => {
               }
             }
           );
+
+          console.log('removeProductFromAttendeeRequest');
+          console.log(removeProductFromAttendeeRequest);
 
           const removeProductFromAttendeeResponse = await apiFetch(
             removeProductFromAttendeeRequest

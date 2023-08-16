@@ -132,6 +132,32 @@ function createBatchRequest( nonce, formData, quantity, groupId, orderId ) {
   });
 }
 
+/**
+ * apiFetch HTTP requests have a data property
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
+ */
+function getUpdateAttendeeRequest( orderId, attendeeId, nonce, body ) {
+  return {
+    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
+    method: 'PUT',
+    headers: {
+      'X-WP-Nonce': nonce
+    },
+    data: Object.assign(
+      {
+        id: attendeeId,
+      }, 
+      body
+    )
+  };
+}
+
+/**
+ * Batch HTTP requests have a body property
+ *
+ * @see https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
+ */
 function getUpdateAttendeeBatchRequest( orderId, attendeeId, nonce, body ) {
   return {
     path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
@@ -290,6 +316,7 @@ export {
   filterProductIdFromAttendeeMeta,
   isOrderIdInAttendeeMeta,
   getUpdateAttendeeBatchRequest,
+  getUpdateAttendeeRequest,
   createAttendeeBatchRequestBody,
   createAttendeeAcfFieldsBatchRequestBody,
   createAttendeeMetaFieldsBatchRequestBody,

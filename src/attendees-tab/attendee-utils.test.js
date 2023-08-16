@@ -91,7 +91,7 @@ describe("isProductIdInAttendeeMeta()", () => {
       const productId = faker.number.int();
       const attendee = {
         meta: {
-          product_ids: [ faker.number.int(), productId, faker.number.int() ]
+          product_ids: [ `${faker.number.int()}`, `${productId}`, `${faker.number.int()}` ]
         }
       };
       expect( isProductIdInAttendeeMeta( productId, attendee.meta ) ).toEqual(true);
@@ -103,7 +103,7 @@ describe("isProductIdInAttendeeMeta()", () => {
       const productId = faker.number.int();
       const attendee = {
         meta: {
-          product_ids: [ faker.number.int(), faker.number.int() ]
+          product_ids: [ `${faker.number.int()}`, `${faker.number.int()}` ]
         }
       };
       expect( isProductIdInAttendeeMeta( productId, attendee.meta ) ).toEqual(false);

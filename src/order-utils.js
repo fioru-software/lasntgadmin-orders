@@ -110,6 +110,11 @@ function getAttendeesStatus() {
   return 'attendees';
 }
 
+/**
+ * apiFetch HTTP requests have a data property
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
+ */
 function getUpdateShopOrderRequest( orderId, nonce, data ) {
   return  {
     path: `/wp/v2/shop_order/${orderId}`,
@@ -126,6 +131,11 @@ function getUpdateShopOrderRequest( orderId, nonce, data ) {
   };
 }
 
+/**
+ * apiFetch HTTP requests have a data property
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
+ */
 function getUpdateOrderRequest( orderId, nonce, data) {
   return  {
     path: `/wc/v3/orders/${ orderId }`,

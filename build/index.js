@@ -405,7 +405,7 @@ const AttendeeFormFieldsetButtons = props => {
             status: 'info',
             message: 'Removing order from attendee meta...'
           });
-          const removeOrderFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeBatchRequest)(order.id, attendee.ID, nonce, {
+          const removeOrderFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeRequest)(order.id, attendee.ID, nonce, {
             meta: {
               order_ids: (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.filterOrderIdFromAttendeeMeta)(order.id, attendee.meta)
             }
@@ -416,21 +416,25 @@ const AttendeeFormFieldsetButtons = props => {
             message: 'Removed order form attendee meta.'
           });
         }
+        console.log('product id', product.id);
+        console.log('attendee meta', attendee.meta);
 
         /**
          * When product in attendee meta
          * then remove product from attendee's meta.
          */
-        if ((0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.isProductIdInAttendeeMeta)(order.id, attendee.meta)) {
+        if ((0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.isProductIdInAttendeeMeta)(product.id, attendee.meta)) {
           setNotice({
             status: 'info',
             message: 'Removing product from attendee meta...'
           });
-          const removeProductFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeBatchRequest)(order.id, attendee.ID, nonce, {
+          const removeProductFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeRequest)(order.id, attendee.ID, nonce, {
             meta: {
               product_ids: (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.filterProductIdFromAttendeeMeta)(product.id, attendee.meta)
             }
           });
+          console.log('removeProductFromAttendeeRequest');
+          console.log(removeProductFromAttendeeRequest);
           const removeProductFromAttendeeResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeProductFromAttendeeRequest);
           setNotice({
             status: 'success',
@@ -1148,6 +1152,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   filterOrderIdFromAttendeeMeta: () => (/* binding */ filterOrderIdFromAttendeeMeta),
 /* harmony export */   filterProductIdFromAttendeeMeta: () => (/* binding */ filterProductIdFromAttendeeMeta),
 /* harmony export */   getUpdateAttendeeBatchRequest: () => (/* binding */ getUpdateAttendeeBatchRequest),
+/* harmony export */   getUpdateAttendeeRequest: () => (/* binding */ getUpdateAttendeeRequest),
 /* harmony export */   isOrderIdInAttendeeMeta: () => (/* binding */ isOrderIdInAttendeeMeta),
 /* harmony export */   isProductIdInAttendeeMeta: () => (/* binding */ isProductIdInAttendeeMeta)
 /* harmony export */ });
@@ -1267,6 +1272,30 @@ function createBatchRequest(nonce, formData, quantity, groupId, orderId) {
     return createAttendeesRequest(nonce, formData, index, groupId, orderId);
   });
 }
+
+/**
+ * apiFetch HTTP requests have a data property
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
+ */
+function getUpdateAttendeeRequest(orderId, attendeeId, nonce, body) {
+  return {
+    path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
+    method: 'PUT',
+    headers: {
+      'X-WP-Nonce': nonce
+    },
+    data: Object.assign({
+      id: attendeeId
+    }, body)
+  };
+}
+
+/**
+ * Batch HTTP requests have a body property
+ *
+ * @see https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
+ */
 function getUpdateAttendeeBatchRequest(orderId, attendeeId, nonce, body) {
   return {
     path: `/wp/v2/attendee/${attendeeId}?order_id=${orderId}`,
@@ -2595,6 +2624,12 @@ function hasAttendees(order) {
 function getAttendeesStatus() {
   return 'attendees';
 }
+
+/**
+ * apiFetch HTTP requests have a data property
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
+ */
 function getUpdateShopOrderRequest(orderId, nonce, data) {
   return {
     path: `/wp/v2/shop_order/${orderId}`,
@@ -2607,6 +2642,12 @@ function getUpdateShopOrderRequest(orderId, nonce, data) {
     }, data)
   };
 }
+
+/**
+ * apiFetch HTTP requests have a data property
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
+ */
 function getUpdateOrderRequest(orderId, nonce, data) {
   return {
     path: `/wc/v3/orders/${orderId}`,
