@@ -51,7 +51,7 @@ const AttendeeFormFieldsetFields = props => {
               }
 
               { field.type === 'date_picker' && 
-                <DateInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={  attendee?.acf[field.name] || field.default_value } required={ !!field.required } disabled={ isFieldDisabled() } /> 
+                <DateInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={ attendee?.acf[field.name] || field.default_value } required={ !!field.required } disabled={ isFieldDisabled() } /> 
               }
 
               { field.type === 'true_false' && 

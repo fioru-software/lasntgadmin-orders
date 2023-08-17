@@ -87,8 +87,12 @@ const TrueFalse = props => {
 const Checkbox = props => {
   const [checked, setChecked] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if ((0,lodash__WEBPACK_IMPORTED_MODULE_2__.isArray)(props.checked)) {
-      setChecked(props.checked.map(Number).includes(props.value));
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.checked)) {
+      if ((0,lodash__WEBPACK_IMPORTED_MODULE_2__.isArray)(props.checked)) {
+        setChecked(props.checked.map(Number).includes(props.value));
+      }
+    } else {
+      setChecked(false);
     }
   }, [props?.checked]);
   function handleChange(e) {
@@ -115,6 +119,8 @@ const TextInput = props => {
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.value)) {
       setValue(props.value);
+    } else {
+      setValue("");
     }
   }, [props.value]);
   function handleChange(e) {
@@ -144,6 +150,8 @@ const EmailInput = props => {
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.value)) {
       setValue(props.value);
+    } else {
+      setValue("");
     }
   }, [props.value]);
   function handleChange(e) {
@@ -173,6 +181,8 @@ const TextArea = props => {
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props.value)) {
       setValue(props.value);
+    } else {
+      setValue("");
     }
   }, [props.value]);
   function handleChange(e) {
@@ -201,6 +211,8 @@ const DateInput = props => {
         dt = luxon__WEBPACK_IMPORTED_MODULE_1__.DateTime.fromFormat(props.value, 'dd/MM/yyyy');
       }
       setValue(dt.toISODate());
+    } else {
+      setValue("");
     }
   }, [props.value]);
   function handleChange(e) {
@@ -258,6 +270,8 @@ const TelInput = props => {
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!(0,lodash__WEBPACK_IMPORTED_MODULE_2__.isNil)(props?.value)) {
       setValue(props.value);
+    } else {
+      setValue("");
     }
   }, [props?.value]);
   function handleChange(e) {
@@ -330,9 +344,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _product_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../product-utils */ "./src/product-utils.js");
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../order-utils */ "./src/order-utils.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash */ "lodash");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _order_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../order-utils */ "./src/order-utils.js");
 /* harmony import */ var _attendee_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./attendee-utils */ "./src/attendees-tab/attendee-utils.js");
 
 
@@ -355,23 +369,34 @@ const AttendeeFormFieldsetButtons = props => {
   const product = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.ProductContext);
   const attendee = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.AttendeeContext);
   const order = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useContext)(_attendee_context__WEBPACK_IMPORTED_MODULE_3__.OrderContext);
-  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isLoading, setLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [notice, setNotice] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [isRemovable, setRemovable] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)();
+  const [isResetable, setResetable] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)();
+  const [attendeeId, setAttendeeId] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(); // attendee.id || attendeeId
 
-  /**
-   * @todo remove this function
-   */
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNil)(attendee)) {
-      console.log('attendee', attendee);
+    if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(attendee)) {
+      if ('ID' in attendee) {
+        setAttendeeId(parseInt(attendee.ID));
+      }
+      if ('id' in attendee) {
+        setAttendeeId(parseInt(attendee.id));
+      }
     }
   }, [attendee]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setResetable(isResetButtonDisabled());
+  }, [product.status, attendee, isLoading]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setRemovable(isRemoveButtonDisabled());
+  }, [product.status, order.payment_method, isLoading]);
 
   /**
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || (0,lodash__WEBPACK_IMPORTED_MODULE_7__.isNil)(attendee) || isLoading;
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || (0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(attendee) || isLoading;
   }
 
   /**
@@ -380,88 +405,132 @@ const AttendeeFormFieldsetButtons = props => {
    * or payment method is not grant and purchase order
    */
   function isRemoveButtonDisabled() {
-    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || isLoading || quantity < 2 || order.payment_method !== "" && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.isGrantPaid)(order.payment_method) && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.isPurchaseOrderPaid)(order.payment_method);
+    return (0,_product_utils__WEBPACK_IMPORTED_MODULE_4__.isCourseClosed)(product.status) || isLoading || quantity < 2 || order.payment_method !== "" && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isGrantPaid)(order.payment_method) && !(0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isPurchaseOrderPaid)(order.payment_method);
   }
-  function handleResetAttendee(e) {
+
+  /**
+   * When product in attendee meta
+   * then remove product from attendee's meta.
+   * @throws Error
+   */
+  async function removeProductFromAttendee() {
+    if ((0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.isProductIdInAttendeeMeta)(product.id, attendee.meta)) {
+      setNotice({
+        status: 'info',
+        message: 'Removing product from attendee meta...'
+      });
+      const removeProductFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeRequest)(order.id, attendeeId, nonce, {
+        meta: {
+          product_ids: (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.filterProductIdFromAttendeeMeta)(product.id, attendee.meta)
+        }
+      });
+      const removeProductFromAttendeeResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeProductFromAttendeeRequest);
+      setNotice({
+        status: 'success',
+        message: 'Removed product from attendee meta.'
+      });
+    }
+  }
+
+  /**
+   * When order in attendee meta
+   * then remove order from attendee's meta.
+   * @throws Error
+   */
+  async function removeOrderFromAttendee() {
+    if ((0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.isOrderIdInAttendeeMeta)(order.id, attendee.meta)) {
+      setNotice({
+        status: 'info',
+        message: 'Removing order from attendee meta...'
+      });
+      const removeOrderFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeRequest)(order.id, attendeeId, nonce, {
+        meta: {
+          order_ids: (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.filterOrderIdFromAttendeeMeta)(order.id, attendee.meta)
+        }
+      });
+      const removeOrderFromAttendeeResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeOrderFromAttendeeRequest);
+      setNotice({
+        status: 'success',
+        message: 'Removed order from attendee meta.'
+      });
+    }
+  }
+
+  /**
+   * When attendee in order order
+   * then remove attendee from order's meta.
+   * @throws Error
+   */
+  async function removeAttendeeFromOrder() {
+    if ((0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isAttendeeIdInOrderMeta)(attendeeId, order.meta_data)) {
+      setNotice({
+        status: 'info',
+        message: 'Removing attendee from order meta...'
+      });
+      const removeAttendeeFromOrderRequest = (0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.getRemoveAttendeeFromShopOrderRequest)(order.id, attendeeId, nonce, {
+        meta: {
+          attendee_ids: (0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.filterAttendeeIdFromOrderMeta)(attendeeId, order.meta_data)
+        }
+      });
+      const removeAttendeeFromOrderResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeAttendeeFromOrderRequest);
+      setNotice({
+        status: 'success',
+        message: 'Removed attendee from order meta.'
+      });
+    }
+  }
+
+  /**
+   * When resetting an attendee for an order 
+   * - the product_id and order_id needs to be removed from the attendee being removed
+   * - the attendee_id needs to be removed from the order
+   * - order quantity is left untouched
+   */
+  async function handleResetAttendee(e) {
     e.preventDefault();
-    props.setAttendee(null);
+    try {
+      // @todo remove 
+      console.log('attendee', attendee);
+      setLoading(true);
+      _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default().createNonceMiddleware(props.nonce));
+      await removeAttendeeFromOrder();
+      await removeOrderFromAttendee();
+      await removeProductFromAttendee();
+      props.setAttendee(null);
+      setNotice({
+        status: 'success',
+        message: 'Reset attendee.'
+      });
+      setLoading(false);
+    } catch (e) {
+      console.error(e);
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      setLoading(false);
+    }
   }
+
+  /**
+   * When removing an attendee for an order 
+   * - the product_id and order_id needs to be removed from the attendee being removed
+   * - the attendee_id needs to be removed from the order
+   * - order quantity is decremented
+   */
   async function handleRemoveAttendee(e) {
     e.preventDefault();
     try {
-      setIsLoading(true);
+      setLoading(true);
       _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default().use(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default().createNonceMiddleware(props.nonce));
 
       /**
        * When existing attendee
        */
-      if ('ID' in attendee) {
-        /**
-         * When order in attendee meta
-         * then remove order from attendee's meta.
-         */
-        if ((0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.isOrderIdInAttendeeMeta)(order.id, attendee.meta)) {
-          setNotice({
-            status: 'info',
-            message: 'Removing order from attendee meta...'
-          });
-          const removeOrderFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeRequest)(order.id, attendee.ID, nonce, {
-            meta: {
-              order_ids: (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.filterOrderIdFromAttendeeMeta)(order.id, attendee.meta)
-            }
-          });
-          const removeOrderFromAttendeeResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeOrderFromAttendeeRequest);
-          setNotice({
-            status: 'success',
-            message: 'Removed order form attendee meta.'
-          });
-        }
-        console.log('product id', product.id);
-        console.log('attendee meta', attendee.meta);
-
-        /**
-         * When product in attendee meta
-         * then remove product from attendee's meta.
-         */
-        if ((0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.isProductIdInAttendeeMeta)(product.id, attendee.meta)) {
-          setNotice({
-            status: 'info',
-            message: 'Removing product from attendee meta...'
-          });
-          const removeProductFromAttendeeRequest = (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.getUpdateAttendeeRequest)(order.id, attendee.ID, nonce, {
-            meta: {
-              product_ids: (0,_attendee_utils__WEBPACK_IMPORTED_MODULE_8__.filterProductIdFromAttendeeMeta)(product.id, attendee.meta)
-            }
-          });
-          console.log('removeProductFromAttendeeRequest');
-          console.log(removeProductFromAttendeeRequest);
-          const removeProductFromAttendeeResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeProductFromAttendeeRequest);
-          setNotice({
-            status: 'success',
-            message: 'Removed product form attendee meta.'
-          });
-        }
-
-        /**
-         * When attendee in order order
-         * then remove attendee from order's meta.
-         */
-        if ((0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.isAttendeeIdInOrderMeta)(attendee.ID, order.meta_data)) {
-          setNotice({
-            status: 'info',
-            message: 'Removing attendee from order meta...'
-          });
-          const removeAttendeeFromOrderRequest = (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.getUpdateShopOrderRequest)(order.id, nonce, {
-            meta: {
-              attendee_ids: (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.filterAttendeeIdFromOrderMeta)(attendee.ID, order.meta_data)
-            }
-          });
-          const removeAttendeeFromOrderResponse = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(removeAttendeeFromOrderRequest);
-          setNotice({
-            status: 'success',
-            message: 'Removed attendee from order meta.'
-          });
-        }
+      if (!(0,lodash__WEBPACK_IMPORTED_MODULE_6__.isNil)(attendee) && 'ID' in attendee) {
+        await removeAttendeeFromOrder();
+        await removeOrderFromAttendee();
+        await removeProductFromAttendee();
       }
 
       /**
@@ -471,7 +540,7 @@ const AttendeeFormFieldsetButtons = props => {
         status: 'info',
         message: 'Decrementing order quantity...'
       });
-      const decrementOrderQuantityRequest = (0,_order_utils__WEBPACK_IMPORTED_MODULE_6__.getUpdateOrderRequest)(order.id, nonce, {
+      const decrementOrderQuantityRequest = (0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.getUpdateOrderRequest)(order.id, nonce, {
         total: order.total - product.price,
         line_items: Array.isArray(order?.line_items) ? order?.line_items.map(item => {
           return {
@@ -485,7 +554,11 @@ const AttendeeFormFieldsetButtons = props => {
       const orderRes = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_5___default()(decrementOrderQuantityRequest);
       setNotice({
         status: 'success',
-        message: 'Decremented order quantity. Reloading page...'
+        message: 'Decremented order quantity.'
+      });
+      setNotice({
+        status: 'success',
+        message: 'Removed attendee. Reloading page...'
       });
       document.location.reload();
     } catch (e) {
@@ -494,7 +567,7 @@ const AttendeeFormFieldsetButtons = props => {
         status: 'error',
         message: e.message
       });
-      setIsLoading(false);
+      setLoading(false);
     }
   }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -506,11 +579,11 @@ const AttendeeFormFieldsetButtons = props => {
   }, notice.message), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     class: "button alt save_order wp-element-button",
     onClick: handleResetAttendee,
-    disabled: isResetButtonDisabled()
+    disabled: isResetable
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Reset Attendee', 'lasntgadmin')), "\xA0", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
     class: "button alt save_order wp-element-button",
     onClick: handleRemoveAttendee,
-    disabled: isRemoveButtonDisabled()
+    disabled: isRemovable
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Remove Attendee', 'lasntgadmin')), isLoading && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, null)));
 };
 
@@ -1065,11 +1138,7 @@ const AttendeeForm = props => {
         status: 'success',
         message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Updated order. Redirecting...', 'lasntgadmin')
       });
-
-      /**
-       * @todo remove this line
-       */
-      //document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
+      document.location.assign((0,_order_utils__WEBPACK_IMPORTED_MODULE_7__.isWaitingOrder)(order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${orderId}&action=edit&tab=payment`);
     } catch (e) {
       console.error(e);
       setNotice({
@@ -1096,17 +1165,12 @@ const AttendeeForm = props => {
     value: order
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_context__WEBPACK_IMPORTED_MODULE_8__.AcfFieldsContext.Provider, {
     value: props.fields
-  }, attendees.length > 0 && attendees.map((attendee, index) => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_5__.AttendeeFormFieldset, {
+  }, quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_4__.range)(quantity).map(index => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_5__.AttendeeFormFieldset, {
     groupId: groupId,
     quantity: quantity,
     index: index,
-    attendee: attendees[index],
-    nonce: nonce
-  })), attendees.length == 0 && quantity > 0 && (0,lodash__WEBPACK_IMPORTED_MODULE_4__.range)(quantity).map(index => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_attendee_form_fieldset__WEBPACK_IMPORTED_MODULE_5__.AttendeeFormFieldset, {
-    groupId: groupId,
-    quantity: quantity,
-    index: index,
-    nonce: nonce
+    nonce: nonce,
+    attendee: attendees[index]
   }))))), quantity > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     class: "form-field"
   }, notice && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
@@ -2516,6 +2580,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getDraftStatus: () => (/* binding */ getDraftStatus),
 /* harmony export */   getLineItemByProductId: () => (/* binding */ getLineItemByProductId),
 /* harmony export */   getPendingStatus: () => (/* binding */ getPendingStatus),
+/* harmony export */   getRemoveAttendeeFromShopOrderRequest: () => (/* binding */ getRemoveAttendeeFromShopOrderRequest),
 /* harmony export */   getUpdateOrderRequest: () => (/* binding */ getUpdateOrderRequest),
 /* harmony export */   getUpdateShopOrderRequest: () => (/* binding */ getUpdateShopOrderRequest),
 /* harmony export */   getWaitingStatus: () => (/* binding */ getWaitingStatus),
@@ -2623,6 +2688,15 @@ function hasAttendees(order) {
 }
 function getAttendeesStatus() {
   return 'attendees';
+}
+
+/**
+ * @see OrderUtils::ensure_unique_enrolment called via rest_pre_insert_shop_order filter.
+ */
+function getRemoveAttendeeFromShopOrderRequest(orderId, attendeeId, nonce, data) {
+  let request = getUpdateShopOrderRequest(orderId, nonce, data);
+  request.path += `?attendee_id=${attendeeId}`;
+  return request;
 }
 
 /**

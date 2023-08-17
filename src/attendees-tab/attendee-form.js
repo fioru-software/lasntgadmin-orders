@@ -250,10 +250,7 @@ const AttendeeForm = props => {
         message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
       });
 
-      /**
-       * @todo remove this line
-       */
-      //document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
+      document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
 
     } catch (e) {
       console.error(e);
@@ -281,8 +278,7 @@ const AttendeeForm = props => {
               <OrderContext.Provider value={ order }>
                 <AcfFieldsContext.Provider value={ props.fields }>
 
-                  { attendees.length > 0 && attendees.map( ( attendee, index ) => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } attendee={ attendees[index] } nonce={ nonce } /> ) }
-                  { attendees.length == 0 && quantity > 0 && range( quantity ).map( index => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } nonce={ nonce } />) }
+                  { quantity > 0 && range( quantity ).map( index => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } nonce={ nonce } attendee={ attendees[index] } />) }
 
                 </AcfFieldsContext.Provider>
               </OrderContext.Provider>

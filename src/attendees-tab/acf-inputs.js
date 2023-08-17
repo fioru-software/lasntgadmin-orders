@@ -58,8 +58,12 @@ const Checkbox = props => {
   const [ checked, setChecked ] = useState(false);
 
   useEffect( () => {
-    if( isArray( props.checked ) ) {
-      setChecked( props.checked.map(Number).includes( props.value ) );
+    if( ! isNil( props.checked ) ) {
+      if( isArray( props.checked ) ) {
+        setChecked( props.checked.map(Number).includes( props.value ) );
+      }
+    } else {
+      setChecked(false);
     }
   }, [ props?.checked ]);
 
@@ -83,6 +87,8 @@ const TextInput = props => {
   useEffect( () => {
     if( ! isNil( props.value ) ) {
       setValue( props.value);
+    } else {
+      setValue( "" );
     }
   }, [ props.value]);
 
@@ -107,6 +113,8 @@ const EmailInput = props => {
   useEffect( () => {
     if( ! isNil( props.value ) ) {
       setValue( props.value);
+    } else {
+      setValue( "" );
     }
   }, [ props.value]);
 
@@ -131,6 +139,8 @@ const TextArea = props => {
   useEffect( () => {
     if( ! isNil( props.value ) ) {
       setValue( props.value);
+    } else {
+      setValue( "" );
     }
   }, [ props.value]);
 
@@ -160,6 +170,8 @@ const DateInput = props => {
         dt = DateTime.fromFormat(props.value, 'dd/MM/yyyy' );
       }
       setValue( dt.toISODate() );
+    } else {
+      setValue( "" );
     }
   }, [ props.value ]);
 
@@ -208,6 +220,8 @@ const TelInput = props => {
   useEffect( () => {
     if( ! isNil( props?.value ) ) {
       setValue( props.value );
+    } else {
+      setValue("");
     }
   }, [ props?.value ]);
 

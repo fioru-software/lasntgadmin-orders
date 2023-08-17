@@ -111,6 +111,15 @@ function getAttendeesStatus() {
 }
 
 /**
+ * @see OrderUtils::ensure_unique_enrolment called via rest_pre_insert_shop_order filter.
+ */
+function getRemoveAttendeeFromShopOrderRequest( orderId, attendeeId, nonce, data ) {
+  let request = getUpdateShopOrderRequest( orderId, nonce, data );
+  request.path += `?attendee_id=${ attendeeId }`
+  return request;
+}
+
+/**
  * apiFetch HTTP requests have a data property
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-api-fetch/
@@ -149,6 +158,7 @@ function getUpdateOrderRequest( orderId, nonce, data) {
 
 export {
   filterAttendeeIdFromOrderMeta,
+  getRemoveAttendeeFromShopOrderRequest,
   getUpdateShopOrderRequest,
   getUpdateOrderRequest,
   getLineItemByProductId,

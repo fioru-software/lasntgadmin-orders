@@ -51,7 +51,22 @@ class OrderUtils {
     public static function ensure_unique_enrolment( $post, WP_REST_Request $req ) {
         if ( ! is_wp_error( $post ) ) {
             $params      = $req->get_params();
+            error_log(print_r($params, true));
+
+            /**
+             * We only set ?attendee_id query param when removing an attendee from the order.
+             * Additionally we make sure the attendee_id is being removed from order's attendee_ids.
+             */
+            if( isset( $params['attendee_id'] ) && ! in_array( $attendee_id, $params['meta']['attendee_ids'], false ) ) {
+                return $post;
+            }
+
+            /**
+             * We check that each attendee is not already enrolled in this course 
+             * by checking that the attendee's product_ids does not contain this order's product id
+             */
             if ( isset( $params['id'] ) && isset( $params['meta']['attendee_ids'] ) ) {
+
                 $attendee_ids = $params['meta']['attendee_ids'];
                 $order_id = intval( $params['id'] );
                 $order       = wc_get_order( $order_id );

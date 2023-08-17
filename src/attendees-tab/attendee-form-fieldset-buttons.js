@@ -5,8 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
+import { isNil } from 'lodash';
 
 import { 
+  getRemoveAttendeeFromShopOrderRequest,
   getUpdateShopOrderRequest, 
   getUpdateOrderRequest, 
   filterOrderMetaByKey, 
@@ -17,7 +19,6 @@ import {
   isAttendeeIdInOrderMeta
 } from '../order-utils';
 
-import { isNil } from 'lodash';
 import { 
   filterOrderIdFromAttendeeMeta,
   filterProductIdFromAttendeeMeta,
@@ -40,17 +41,30 @@ const AttendeeFormFieldsetButtons = props => {
   const attendee = useContext( AttendeeContext );
   const order = useContext( OrderContext );
 
-  const [ isLoading, setIsLoading ] = useState(false);
+  const [ isLoading, setLoading ] = useState(false);
   const [ notice, setNotice ] = useState(null);
+  const [ isRemovable, setRemovable ] = useState();
+  const [ isResetable, setResetable ] = useState();
+  const [ attendeeId, setAttendeeId ] = useState(); // attendee.id || attendeeId
 
-  /**
-   * @todo remove this function
-   */
   useEffect( () => {
-    if( !isNil( attendee ) ) {
-      console.log('attendee', attendee);
+    if( ! isNil( attendee ) ) {
+      if( 'ID' in attendee ) {
+        setAttendeeId( parseInt( attendee.ID ) );
+      }
+      if( 'id' in attendee ) {
+        setAttendeeId( parseInt( attendee.id ) );
+      }
     }
   }, [ attendee ]);
+
+  useEffect( () => {
+    setResetable( isResetButtonDisabled() );
+  }, [ product.status, attendee, isLoading ]);
+
+  useEffect( () => {
+    setRemovable( isRemoveButtonDisabled() );
+  }, [ product.status, order.payment_method, isLoading ]);
 
   /**
    * Reset button is disabled when the course has a status considered to be closed
@@ -68,128 +82,175 @@ const AttendeeFormFieldsetButtons = props => {
     return isCourseClosed( product.status ) || isLoading || quantity < 2 || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
   }
 
-  function handleResetAttendee( e ) {
-    e.preventDefault();
-    props.setAttendee(null);
+  /**
+   * When product in attendee meta
+   * then remove product from attendee's meta.
+   * @throws Error
+   */
+  async function removeProductFromAttendee() {
+
+    if( isProductIdInAttendeeMeta( product.id, attendee.meta ) ) {
+
+      setNotice({
+        status: 'info',
+        message: 'Removing product from attendee meta...'
+      });
+
+      const removeProductFromAttendeeRequest = getUpdateAttendeeRequest(
+        order.id,
+        attendeeId,
+        nonce,
+        {
+          meta: {
+            product_ids: filterProductIdFromAttendeeMeta( product.id, attendee.meta )
+          }
+        }
+      );
+
+      const removeProductFromAttendeeResponse = await apiFetch(
+        removeProductFromAttendeeRequest
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Removed product from attendee meta.'
+      });
+    }
+
   }
 
+  /**
+   * When order in attendee meta
+   * then remove order from attendee's meta.
+   * @throws Error
+   */
+  async function removeOrderFromAttendee() {
+    if( isOrderIdInAttendeeMeta( order.id, attendee.meta ) ) {
+
+      setNotice({
+        status: 'info',
+        message: 'Removing order from attendee meta...'
+      });
+
+      const removeOrderFromAttendeeRequest = getUpdateAttendeeRequest(
+        order.id,
+        attendeeId,
+        nonce,
+        {
+          meta: {
+            order_ids: filterOrderIdFromAttendeeMeta( order.id, attendee.meta )
+          }
+        }
+      );
+
+      const removeOrderFromAttendeeResponse = await apiFetch(
+        removeOrderFromAttendeeRequest
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Removed order from attendee meta.'
+      });
+    }
+  }
+
+  /**
+   * When attendee in order order
+   * then remove attendee from order's meta.
+   * @throws Error
+   */
+  async function removeAttendeeFromOrder() {
+    if( isAttendeeIdInOrderMeta( attendeeId, order.meta_data ) ) {
+
+      setNotice({
+        status: 'info',
+        message: 'Removing attendee from order meta...'
+      });
+
+      const removeAttendeeFromOrderRequest = getRemoveAttendeeFromShopOrderRequest(
+        order.id,
+        attendeeId,
+        nonce,
+        {
+          meta: {
+            attendee_ids: filterAttendeeIdFromOrderMeta( attendeeId, order.meta_data )
+          }
+        }
+      );
+
+      const removeAttendeeFromOrderResponse = await apiFetch(
+        removeAttendeeFromOrderRequest
+      );
+
+      setNotice({
+        status: 'success',
+        message: 'Removed attendee from order meta.'
+      });
+
+    }
+  }
+
+  /**
+   * When resetting an attendee for an order 
+   * - the product_id and order_id needs to be removed from the attendee being removed
+   * - the attendee_id needs to be removed from the order
+   * - order quantity is left untouched
+   */
+  async function handleResetAttendee( e ) {
+    e.preventDefault();
+    try {
+
+      // @todo remove 
+      console.log( 'attendee', attendee );
+
+      setLoading(true);
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+
+      await removeAttendeeFromOrder();
+      await removeOrderFromAttendee();
+      await removeProductFromAttendee();
+
+      props.setAttendee(null);
+
+      setNotice({
+        status: 'success',
+        message: 'Reset attendee.'
+      });
+
+      setLoading(false);
+
+    } catch (e) {
+      console.error(e);
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      setLoading(false);
+    }
+  }
+
+  /**
+   * When removing an attendee for an order 
+   * - the product_id and order_id needs to be removed from the attendee being removed
+   * - the attendee_id needs to be removed from the order
+   * - order quantity is decremented
+   */
   async function handleRemoveAttendee( e ) {
 
     e.preventDefault();
 
     try {
 
-      setIsLoading(true);
+      setLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
       /**
        * When existing attendee
        */
-      if( 'ID' in attendee ) {
-
-        /**
-         * When order in attendee meta
-         * then remove order from attendee's meta.
-         */
-        if( isOrderIdInAttendeeMeta( order.id, attendee.meta ) ) {
-
-          setNotice({
-            status: 'info',
-            message: 'Removing order from attendee meta...'
-          });
-
-          const removeOrderFromAttendeeRequest = getUpdateAttendeeRequest(
-            order.id,
-            attendee.ID,
-            nonce,
-            {
-              meta: {
-                order_ids: filterOrderIdFromAttendeeMeta( order.id, attendee.meta )
-              }
-            }
-          );
-
-          const removeOrderFromAttendeeResponse = await apiFetch(
-            removeOrderFromAttendeeRequest
-          );
-
-          setNotice({
-            status: 'success',
-            message: 'Removed order form attendee meta.'
-          });
-        }
-
-        console.log('product id', product.id);
-        console.log('attendee meta', attendee.meta);
-
-        /**
-         * When product in attendee meta
-         * then remove product from attendee's meta.
-         */
-        if( isProductIdInAttendeeMeta( product.id, attendee.meta ) ) {
-
-          setNotice({
-            status: 'info',
-            message: 'Removing product from attendee meta...'
-          });
-
-          const removeProductFromAttendeeRequest = getUpdateAttendeeRequest(
-            order.id,
-            attendee.ID,
-            nonce,
-            {
-              meta: {
-                product_ids: filterProductIdFromAttendeeMeta( product.id, attendee.meta )
-              }
-            }
-          );
-
-          console.log('removeProductFromAttendeeRequest');
-          console.log(removeProductFromAttendeeRequest);
-
-          const removeProductFromAttendeeResponse = await apiFetch(
-            removeProductFromAttendeeRequest
-          );
-
-          setNotice({
-            status: 'success',
-            message: 'Removed product form attendee meta.'
-          });
-        }
-
-
-        /**
-         * When attendee in order order
-         * then remove attendee from order's meta.
-         */
-        if( isAttendeeIdInOrderMeta( attendee.ID, order.meta_data ) ) {
-
-          setNotice({
-            status: 'info',
-            message: 'Removing attendee from order meta...'
-          });
-
-          const removeAttendeeFromOrderRequest = getUpdateShopOrderRequest(
-            order.id,
-            nonce,
-            {
-              meta: {
-                attendee_ids: filterAttendeeIdFromOrderMeta( attendee.ID, order.meta_data )
-              }
-            }
-          );
-
-          const removeAttendeeFromOrderResponse = await apiFetch(
-            removeAttendeeFromOrderRequest
-          );
-
-          setNotice({
-            status: 'success',
-            message: 'Removed attendee from order meta.'
-          });
-
-        }
-
+      if( ! isNil( attendee ) && 'ID' in attendee ) {
+        await removeAttendeeFromOrder();
+        await removeOrderFromAttendee();
+        await removeProductFromAttendee();
       }
 
       /**
@@ -222,7 +283,12 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'success',
-        message: 'Decremented order quantity. Reloading page...'
+        message: 'Decremented order quantity.'
+      });
+
+      setNotice({
+        status: 'success',
+        message: 'Removed attendee. Reloading page...'
       });
 
       document.location.reload();
@@ -233,7 +299,7 @@ const AttendeeFormFieldsetButtons = props => {
         status: 'error',
         message: e.message
       });
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
@@ -241,8 +307,8 @@ const AttendeeFormFieldsetButtons = props => {
     <>
       <div class="form-field">
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-        <button class="button alt save_order wp-element-button" onClick={ handleResetAttendee } disabled={ isResetButtonDisabled() } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>&nbsp;
-        <button class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } disabled={ isRemoveButtonDisabled() } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
+        <button class="button alt save_order wp-element-button" onClick={ handleResetAttendee } disabled={ isResetable } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>&nbsp;
+        <button class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } disabled={ isRemovable } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
         { isLoading && <Spinner/> }
       </div>
     </>

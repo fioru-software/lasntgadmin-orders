@@ -320,6 +320,8 @@ class PageUtils {
             $water_grant_fields
         );
 
+        $attendees = AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID );
+
 		echo sprintf(
 			'<div
                 id="%s-attendees-form"
@@ -339,7 +341,7 @@ class PageUtils {
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
+			esc_attr( json_encode( $attendees ) ),
 			esc_attr( json_encode( $product->get_data() ) )
 		);
 	}
