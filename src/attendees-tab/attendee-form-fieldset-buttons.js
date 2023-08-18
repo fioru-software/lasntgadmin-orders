@@ -93,7 +93,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'info',
-        message: 'Removing product from attendee meta...'
+        message: __( 'Removing product from attendee meta...', 'lasntgadmin' )
       });
 
       const removeProductFromAttendeeRequest = getUpdateAttendeeRequest(
@@ -113,7 +113,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'success',
-        message: 'Removed product from attendee meta.'
+        message: __( 'Removed product from attendee meta.', 'lasntgadmin' )
       });
     }
 
@@ -129,7 +129,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'info',
-        message: 'Removing order from attendee meta...'
+        message: __( 'Removing order from attendee meta...', 'lasntgadmin' )
       });
 
       const removeOrderFromAttendeeRequest = getUpdateAttendeeRequest(
@@ -149,7 +149,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'success',
-        message: 'Removed order from attendee meta.'
+        message: __( 'Removed order from attendee meta.', 'lasntgadmin' )
       });
     }
   }
@@ -164,7 +164,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'info',
-        message: 'Removing attendee from order meta...'
+        message: __( 'Removing attendee from order meta...', 'lasntgadmin' )
       });
 
       const removeAttendeeFromOrderRequest = getRemoveAttendeeFromShopOrderRequest(
@@ -184,7 +184,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'success',
-        message: 'Removed attendee from order meta.'
+        message: __( 'Removed attendee from order meta.', 'lasntgadmin' )
       });
 
     }
@@ -200,9 +200,6 @@ const AttendeeFormFieldsetButtons = props => {
     e.preventDefault();
     try {
 
-      // @todo remove 
-      console.log( 'attendee', attendee );
-
       setLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
@@ -214,7 +211,7 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'success',
-        message: 'Reset attendee.'
+        message: __( 'Reset attendee.', 'lasntgadmin' )
       });
 
       setLoading(false);
@@ -258,7 +255,7 @@ const AttendeeFormFieldsetButtons = props => {
        */
       setNotice({
         status: 'info',
-        message: 'Decrementing order quantity...'
+        message: __( 'Decrementing order quantity...', 'lasntgadmin' )
       });
 
       const decrementOrderQuantityRequest = getUpdateOrderRequest(
@@ -283,12 +280,12 @@ const AttendeeFormFieldsetButtons = props => {
 
       setNotice({
         status: 'success',
-        message: 'Decremented order quantity.'
+        message: __( 'Decremented order quantity.', 'lasntgadmin' )
       });
 
       setNotice({
         status: 'success',
-        message: 'Removed attendee. Reloading page...'
+        message: __( 'Removed attendee. Reloading page...', 'lasntgadmin' )
       });
 
       document.location.reload();

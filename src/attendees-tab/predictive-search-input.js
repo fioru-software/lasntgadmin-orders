@@ -57,7 +57,6 @@ const PredictiveSearchInput = props => {
         async function runFetch() {
           setIsLoading(true);
           const res = await fetchAttendees( searchText );
-          console.log(res);
           setIsLoading(false);
 					setAttendees( res );
         }
