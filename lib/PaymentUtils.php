@@ -41,7 +41,7 @@ class PaymentUtils {
 	public static function get_supported_admin_payment_gateways( WC_Product $product ): array {
 		return array_filter(
 			( WC_Payment_Gateways::instance() )->get_available_payment_gateways(),
-			function( $gateway ) use ( $product ) {
+			function ( $gateway ) use ( $product ) {
 				if ( in_array( $gateway->id, self::SUPPORTED_GATEWAY_SLUGS ) ) {
 					if ( GrantFundedPluginUtils::get_camel_case_name() === $gateway->id ) {
 						return ProductUtils::is_funded( $product );
@@ -52,7 +52,8 @@ class PaymentUtils {
 		);
 	}
 
-	public static function render_gateway( WC_Payment_Gateway $gateway ) { ?>
+	public static function render_gateway( WC_Payment_Gateway $gateway ) {
+		?>
 		<li class="wc_payment_method payment_method_<?php echo esc_attr( $gateway->id ); ?>">
 
 		<input id="payment_method_<?php echo esc_attr( $gateway->id ); ?>" type="radio" class="input-radio" name="payment_method" value="<?php echo esc_attr( $gateway->id ); ?>" <?php checked( $gateway->chosen, true ); ?> data-order_button_text="<?php echo esc_attr( $gateway->order_button_text ); ?>" required disabled />

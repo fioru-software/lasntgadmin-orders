@@ -57,7 +57,7 @@ class PageUtils {
 		 */
 		add_filter(
 			'admin_body_class',
-			function( $classes ) {
+			function ( $classes ) {
 				$classes .= ' woocommerce-order-pay ';
 				return $classes;
 			}
@@ -148,7 +148,7 @@ class PageUtils {
 		if ( 'payment' === $tab ) {
 			$order = wc_get_order( $post->ID );
 			if ( ! $order->needs_payment() ) {
-				echo sprintf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
+				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
 			}
 		}
 
@@ -298,7 +298,7 @@ class PageUtils {
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
 			esc_attr( $user->ID ),
 			esc_attr( json_encode( $user ) ),
-			esc_attr( json_encode( array_map( fn( $val) => $val[0], get_user_meta( $user->ID ) ) ) ),
+			esc_attr( json_encode( array_map( fn( $val ) => $val[0], get_user_meta( $user->ID ) ) ) ),
 			esc_attr( get_woocommerce_currency() )
 		);
 	}
@@ -307,22 +307,22 @@ class PageUtils {
 	 * @todo get_product_id calls wc_get_order again, fix
 	 */
 	public static function attendees( WP_Post $post ) {
-		$order                   = wc_get_order( $post->ID );
-		$product                 = OrderUtils::get_product( $order );
+		$order                            = wc_get_order( $post->ID );
+		$product                          = OrderUtils::get_product( $order );
 		$awarding_body_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
-		$water_grant_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'funding_sources', $product->get_id() );
-		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
-		$awarding_body_fields    = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
-        $water_grant_fields = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
-        $attendee_additional_fields = array_merge(
-            $attendee_profile_fields,
-            $awarding_body_fields,
-            $water_grant_fields
-        );
+		$water_grant_acf_field_group_id   = AttendeeUtils::get_acf_field_group_id( 'funding_sources', $product->get_id() );
+		$attendee_profile_fields          = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+		$awarding_body_fields             = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
+		$water_grant_fields               = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
+		$attendee_additional_fields       = array_merge(
+			$attendee_profile_fields,
+			$awarding_body_fields,
+			$water_grant_fields
+		);
 
-        $attendees = AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID );
+		$attendees = AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID );
 
-		echo sprintf(
+		printf(
 			'<div
                 id="%s-attendees-form"
                 data-nonce="%s"
