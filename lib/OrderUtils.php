@@ -51,7 +51,6 @@ class OrderUtils {
     public static function ensure_unique_enrolment( $post, WP_REST_Request $req ) {
         if ( ! is_wp_error( $post ) ) {
             $params      = $req->get_params();
-            error_log(print_r($params, true));
 
             /**
              * We only set ?attendee_id query param when removing an attendee from the order.
@@ -67,19 +66,27 @@ class OrderUtils {
              */
             if ( isset( $params['id'] ) && isset( $params['meta']['attendee_ids'] ) ) {
 
-                $attendee_ids = $params['meta']['attendee_ids'];
+                $request_attendee_ids = $params['meta']['attendee_ids'];
+
                 $order_id = intval( $params['id'] );
                 $order       = wc_get_order( $order_id );
+                $order_attendee_ids = get_post_meta( $order_id, 'attendee_ids', false);
+
                 $product_id  = OrderUtils::get_product_id( $order );
 
-                foreach( $attendee_ids as $attendee_id ) {
-                    if ( ! AttendeeUtils::is_unique_product_id( $product_id, intval( $attendee_id ) ) ) {
-                        $attendee = AttendeeUtils::get_attendee_with_profile( get_post( intval( $attendee_id ) ) );
-                        return new WP_Error(
-                            'attendee_already_enrolled',
-                            sprintf( __( 'Attendee with employee number %s is already enrolled in this course.', 'lasntadmin' ), $attendee->acf['employee_number'] ),
-                            $attendee
-                        );
+                foreach( $request_attendee_ids as $request_attendee_id ) {
+                    /**
+                     * Only check addition of new attendees.
+                     */
+                    if( ! in_array( $request_attendee_id, $order_attendee_ids ) ) {
+                        if ( ! AttendeeUtils::is_unique_product_id( $product_id, intval( $request_attendee_id ) ) ) {
+                            $attendee = AttendeeUtils::get_attendee_with_profile( get_post( intval( $request_attendee_id ) ) );
+                            return new WP_Error(
+                                'attendee_already_enrolled',
+                                sprintf( __( 'Attendee with employee number %s is already enrolled in this course.', 'lasntadmin' ), $attendee->acf['employee_number'] ),
+                                $attendee
+                            );
+                        }
                     }
                 }
             }
