@@ -497,6 +497,36 @@ describe("extractLastIndexOfDuplicateEmployeeNumberfield()", () => {
         expect( count ).toEqual(2);
       });
     });
+    describe("contains a space padded duplicate employee number", () => {
+      it("returns count > 1", () => {
+        const duplicateEmployeeNumber = faker.string.uuid();
+        const count = countOccurrencesOfEmployeeNumber(
+          duplicateEmployeeNumber,
+          [ faker.string.uuid(), duplicateEmployeeNumber, faker.string.uuid(), ` ${duplicateEmployeeNumber }` ]
+        );
+        expect( count ).toEqual(2);
+      });
+    });
+    describe("contains a duplicate employee number with different letter case", () => {
+      it("returns count > 1", () => {
+        const duplicateEmployeeNumber = faker.string.uuid();
+        const count = countOccurrencesOfEmployeeNumber(
+          duplicateEmployeeNumber,
+          [ faker.string.uuid(), duplicateEmployeeNumber.toUpperCase(), faker.string.uuid(), duplicateEmployeeNumber.toLowerCase() ]
+        );
+        expect( count ).toEqual(2);
+      });
+    });
+    describe("contains no duplicates", () => {
+      it("returns 1", () => {
+        const employeeNumber = faker.string.uuid();
+        const count = countOccurrencesOfEmployeeNumber(
+          employeeNumber,
+          [ faker.string.uuid(), employeeNumber, faker.string.uuid() ]
+        );
+        expect( count ).toEqual(1);
+      });
+    });
   });
 
   describe("with a duplicate", () => {

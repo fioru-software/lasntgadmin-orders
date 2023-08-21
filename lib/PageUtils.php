@@ -277,12 +277,8 @@ class PageUtils {
                 data-title="%s" 
                 data-status="%s" 
                 data-order="%s"
-                data-order-id="%d"
                 data-product-id="%d"
-                data-group-id="%s"
-                data-user-id="%d"
                 data-user="%s"
-                data-user-meta="%s"
                 data-currency="%s"
             ><p>' . __( 'Loading order...', 'lasntgadmin' ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
@@ -293,12 +289,8 @@ class PageUtils {
 			esc_attr( empty( $order->get_title() ) ? __( 'Enrolment', 'lasntgadmin' ) : $order->get_title() ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
-			esc_attr( $post->ID ),
 			esc_attr( $product_id ),
-			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( $user->ID ),
 			esc_attr( json_encode( $user ) ),
-			esc_attr( json_encode( array_map( fn( $val ) => $val[0], get_user_meta( $user->ID ) ) ) ),
 			esc_attr( get_woocommerce_currency() )
 		);
 	}

@@ -16,13 +16,9 @@ import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLi
  * @param { string } orderApiPath
  * @param { string } productApiPath
  * @param { string } title 
- * @param { string } status
  * @param { object } order
- * @param { number } orderId
  * @param { number } productId
- * @param { number } userId
  * @param { object } user
- * @param { object } userMeta
  * @param { string } currency
  */
 const OrderForm = props => {

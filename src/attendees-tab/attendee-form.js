@@ -8,7 +8,7 @@ import { isNil, delay, range } from 'lodash';
 
 import { AttendeeFormFieldset } from './attendee-form-fieldset';
 import { isCourseClosed } from '../product-utils';
-import { isWaitingOrder, hasAttendees, getUpdateShopOrderRequest } from '../order-utils';
+import { isWaitingOrder, isPaidOrder, getUpdateShopOrderRequest } from '../order-utils';
 
 import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-context';
 
@@ -240,7 +240,7 @@ const AttendeeForm = props => {
           orderId,
           nonce,
           {
-            status: hasAttendees( order ) || isWaitingOrder( order ) ? `wc-${order.status}` : 'wc-pending'
+            status: isPaidOrder( order ) || isWaitingOrder( order ) ? `wc-${order.status}` : 'wc-pending'
           }
         )
       );

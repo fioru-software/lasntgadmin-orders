@@ -102,10 +102,6 @@ function getDraftStatus() {
   return 'auto-draft';
 }
 
-function hasAttendees( order ) {
-  return Array.isArray(order.attendees) && order.attendees > 0;
-}
-
 function getAttendeesStatus() {
   return 'attendees';
 }
@@ -178,6 +174,5 @@ export {
   isPurchaseOrderPaid,
   isAttendeeIdInOrderMeta,
   isPaidOrder,
-  isDraftStatus,
-  hasAttendees
+  isDraftStatus
 };

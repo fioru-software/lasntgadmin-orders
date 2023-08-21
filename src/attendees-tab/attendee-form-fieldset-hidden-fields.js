@@ -21,6 +21,8 @@ const HiddenFields = props => {
 
       { attendee?.meta['product_ids'] && attendee?.meta['product_ids'].map( productId => <input type="hidden" name={ `attendees[${index}]['meta']['product_ids']` } value={ productId } /> ) }
 
+      { <input type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } />}
+
       { attendee?.meta['groups-read'] && attendee?.meta['groups-read'].map( groupId => <input type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } /> ) }
 
       { attendee?.acf?.course_prerequisites_met && attendee?.acf?.course_prerequisites_met.map( productId => <input type="hidden" name={ `attendees[${index}]['meta']['course_prerequisites_met']` } value={ productId } /> ) }

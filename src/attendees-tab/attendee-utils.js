@@ -306,7 +306,7 @@ function extractLastIndexOfDuplicateEmployeeNumberField( employeeNumbers ) {
 function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
   return employeeNumbers.reduce(
     ( accumulator, currentValue, currentIndex  ) => {
-      return accumulator += currentValue === employeeNumber ? 1 : 0;
+      return accumulator += currentValue.trim().toUpperCase() === employeeNumber.trim().toUpperCase() ? 1 : 0;
     }, 0 );
 }
 

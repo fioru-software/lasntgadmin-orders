@@ -22,12 +22,8 @@ window.addEventListener(
           title={ orderComponent.dataset.title }
           status={ orderComponent.dataset.status }
           order={ JSON.parse(orderComponent.dataset.order) }
-          orderId={ orderComponent.dataset.orderId }
           productId={ orderComponent.dataset.productId }
-          groupId={ JSON.parse(orderComponent.dataset.groupId) }
-          userId={ orderComponent.dataset.userId }
           user={ JSON.parse(orderComponent.dataset.user) }
-          userMeta={ JSON.parse(orderComponent.dataset.userMeta) }
         />,
         orderComponent
       );
