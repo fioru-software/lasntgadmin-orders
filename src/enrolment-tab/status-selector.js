@@ -5,7 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Option } from './option.js';
-import { isDraftStatus } from './order-utils.js';
+import { isDraftStatus } from '../order-utils.js';
 
 const StatusSelector = props => {
 

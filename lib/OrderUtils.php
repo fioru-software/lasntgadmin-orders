@@ -12,7 +12,7 @@ use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
-use WC_Abstract_Order;
+use WC_Abstract_Order, WP_Error;
 
 /**
  * Order Utility Class
@@ -40,6 +40,58 @@ class OrderUtils {
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
+		add_filter( 'rest_pre_insert_shop_order', [ self::class, 'ensure_unique_enrolment' ], 10, 2 );
+	}
+
+	/**
+	 * Prevents an attendee from enrolling into the same course more than once.
+	 *
+	 * @return stdClass|WP_Error Post object or WP_Error.
+	 */
+	public static function ensure_unique_enrolment( $post, WP_REST_Request $req ) {
+		if ( ! is_wp_error( $post ) ) {
+			$params = $req->get_params();
+
+			/**
+			 * We only set ?attendee_id query param when removing an attendee from the order.
+			 * Additionally we make sure the attendee_id is being removed from order's attendee_ids.
+			 */
+			if ( isset( $params['attendee_id'] ) && ! in_array( $attendee_id, $params['meta']['attendee_ids'], false ) ) {
+				return $post;
+			}
+
+			/**
+			 * We check that each attendee is not already enrolled in this course
+			 * by checking that the attendee's product_ids does not contain this order's product id
+			 */
+			if ( isset( $params['id'] ) && isset( $params['meta']['attendee_ids'] ) ) {
+				$request_attendee_ids = $params['meta']['attendee_ids'];
+
+				$order_id           = intval( $params['id'] );
+				$order              = wc_get_order( $order_id );
+				$order_attendee_ids = get_post_meta( $order_id, 'attendee_ids', false );
+
+				$product_id = self::get_product_id( $order );
+
+				foreach ( $request_attendee_ids as $request_attendee_id ) {
+					/**
+					 * Only check addition of new attendees.
+					 */
+					if ( ! in_array( $request_attendee_id, $order_attendee_ids ) ) {
+						if ( ! AttendeeUtils::is_unique_product_id( $product_id, intval( $request_attendee_id ) ) ) {
+							$attendee = AttendeeUtils::get_attendee_with_profile( get_post( intval( $request_attendee_id ) ) );
+							return new WP_Error(
+								'attendee_already_enrolled',
+								// translators: An employee number.
+								sprintf( __( 'Attendee with employee number %s is already enrolled in this course.', 'lasntgadmin' ), $attendee->acf['employee_number'] ),
+								$attendee
+							);
+						}
+					}
+				}
+			}//end if
+		}//end if
+		return $post;
 	}
 
 	public static function remove_product_ids_from_attendees_meta( int $order_id, WC_Order $order ): void {
@@ -241,12 +293,10 @@ class OrderUtils {
 	public static function get_product_ids( array $order_ids ): array {
 		$product_ids = array_filter(
 			array_map(
-				function( $order_id ) {
-					if ( is_int( $order_id ) ) {
-						$order = wc_get_order( $order_id );
-						if ( is_a( $order, 'WC_Abstract_Order' ) ) {
-							return self::get_product_id( wc_get_order( $order_id ) );
-						}
+				function ( $order_id ) {
+					$order = wc_get_order( (int) $order_id );
+					if ( is_a( $order, 'WC_Abstract_Order' ) ) {
+						return self::get_product_id( $order );
 					}
 				},
 				$order_ids

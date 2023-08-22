@@ -1,4 +1,66 @@
 
+function isGrantFunded( product ) {
+  if( 'meta_data' in product ) {
+    const grantYear = findFirstProductMetaByKey( 'grant_year', product.meta_data );
+    if( undefined !== grantYear ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isWaterGrantFunded( product ) {
+  if( 'meta_data' in product ) {
+    if( isGrantFunded( product ) ) {
+      const fundingSources = findFirstProductMetaByKey( 'funding_sources', product.meta_data );
+      if( undefined !== fundingSources && fundingSources.value.includes('water-grant')) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function findFirstProductMetaByKey( key, productMeta ) {
+  return productMeta.find( item => item.key === key );
+}
+
+function isCourseClosed( status ) {
+  return isClosedStatus(status) || isCancelledStatus( status ) || isArchivedStatus(status);
+}
+
+function isDraftStatus( status ) {
+  return status === 'draft';
+}
+
+function isOpenForEnrolmentStatus( status ) {
+  return status === 'open_for_enrollment';
+}
+
+function isClosedStatus( status ) {
+  return status === 'closed';
+}
+
+function isCancelledStatus( status ) {
+  return status === 'cancelled';
+}
+
+function isTemplateStatus( status ) {
+  return status === 'template';
+}
+
+function isEnrolmentClosedStatus( status ) {
+  return status === 'enrollment_closed';
+}
+
+function isDatePassedStatus( status ) {
+  return status === 'date_passed';
+}
+
+function isArchivedStatus( status ) {
+  return status === 'archived';
+}
+
 function findProductById( productId, products ) {
   return products.find( product => product.id === parseInt(productId) );
 }
@@ -41,5 +103,9 @@ export {
   findProductById,
   findGroupQuotas,
   findGroupQuota,
-  calculateAvailableSpaces
+  calculateAvailableSpaces,
+  isCourseClosed,
+  isGrantFunded,
+  isWaterGrantFunded,
+  findFirstProductMetaByKey
 };

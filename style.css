@@ -1,3 +1,15 @@
+.wp-core-ui .button-link:disabled {
+    color: #777;
+    cursor: text;
+}
+
+fieldset {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border: 1px solid #c3c4c7
+}
 
 #post-body-content, #titlediv { display:none }
 

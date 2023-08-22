@@ -1,8 +1,8 @@
 
 import { render } from '@wordpress/element';
 
-import { OrderForm } from './order-form';
-import { Attendees } from './attendees';
+import { OrderForm } from './enrolment-tab/order-form';
+import { AttendeeForm } from './attendees-tab/attendee-form';
 
 /**
  * Render components
@@ -22,21 +22,17 @@ window.addEventListener(
           title={ orderComponent.dataset.title }
           status={ orderComponent.dataset.status }
           order={ JSON.parse(orderComponent.dataset.order) }
-          orderId={ orderComponent.dataset.orderId }
           productId={ orderComponent.dataset.productId }
-          groupId={ JSON.parse(orderComponent.dataset.groupId) }
-          userId={ orderComponent.dataset.userId }
           user={ JSON.parse(orderComponent.dataset.user) }
-          userMeta={ JSON.parse(orderComponent.dataset.userMeta) }
         />,
         orderComponent
       );
     }
 
-    const attendeesComponent = document.querySelector( '#lasntgadmin-orders-attendees' );
+    const attendeesComponent = document.querySelector( '#lasntgadmin-orders-attendees-form' );
     if( attendeesComponent ) {
       render(
-        <Attendees 
+        <AttendeeForm
           quantity={ attendeesComponent.dataset.quantity }
           nonce={ attendeesComponent.dataset.nonce } 
           fields={ JSON.parse( attendeesComponent.dataset.fields ) }

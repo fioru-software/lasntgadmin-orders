@@ -39,7 +39,7 @@ class PageUtils {
 		add_action( 'add_meta_boxes', [ self::class, 'add_metaboxes' ], 50, 2 );
 		add_action( 'admin_init', [ self::class, 'remove_title' ] );
 
-		add_action( 'admin_notices', [ self::class, 'show_notices' ] );
+		add_action( 'admin_notices', [ self::class, 'show_wc_notices' ] );
 
 		/**
 		 * Enqueue admin order component
@@ -57,7 +57,7 @@ class PageUtils {
 		 */
 		add_filter(
 			'admin_body_class',
-			function( $classes ) {
+			function ( $classes ) {
 				$classes .= ' woocommerce-order-pay ';
 				return $classes;
 			}
@@ -82,7 +82,7 @@ class PageUtils {
 	 *
 	 * @see self::after_pay()
 	 */
-	public static function show_notices() {
+	public static function show_wc_notices() {
 		$notices = PaymentUtils::get_notices();
 		if ( isset( $notices['error'] ) ) {
 			PaymentUtils::delete_notices();
@@ -148,7 +148,7 @@ class PageUtils {
 		if ( 'payment' === $tab ) {
 			$order = wc_get_order( $post->ID );
 			if ( ! $order->needs_payment() ) {
-				echo sprintf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
+				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
 			}
 		}
 
@@ -277,12 +277,8 @@ class PageUtils {
                 data-title="%s" 
                 data-status="%s" 
                 data-order="%s"
-                data-order-id="%d"
                 data-product-id="%d"
-                data-group-id="%s"
-                data-user-id="%d"
                 data-user="%s"
-                data-user-meta="%s"
                 data-currency="%s"
             ><p>' . __( 'Loading order...', 'lasntgadmin' ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
@@ -293,12 +289,8 @@ class PageUtils {
 			esc_attr( empty( $order->get_title() ) ? __( 'Enrolment', 'lasntgadmin' ) : $order->get_title() ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
-			esc_attr( $post->ID ),
 			esc_attr( $product_id ),
-			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( $user->ID ),
 			esc_attr( json_encode( $user ) ),
-			esc_attr( json_encode( array_map( fn( $val) => $val[0], get_user_meta( $user->ID ) ) ) ),
 			esc_attr( get_woocommerce_currency() )
 		);
 	}
@@ -307,15 +299,24 @@ class PageUtils {
 	 * @todo get_product_id calls wc_get_order again, fix
 	 */
 	public static function attendees( WP_Post $post ) {
-		$order                   = wc_get_order( $post->ID );
-		$product                 = OrderUtils::get_product( $order );
-		$acf_field_group_id      = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
-		$attendee_profile_fields = acf_get_fields( AttendeeActionsFilters::$field_group_id );
-		$awarding_body_fields    = acf_get_fields( $acf_field_group_id );
+		$order                            = wc_get_order( $post->ID );
+		$product                          = OrderUtils::get_product( $order );
+		$awarding_body_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
+		$water_grant_acf_field_group_id   = AttendeeUtils::get_acf_field_group_id( 'funding_sources', $product->get_id() );
+		$attendee_profile_fields          = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+		$awarding_body_fields             = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
+		$water_grant_fields               = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
+		$attendee_additional_fields       = array_merge(
+			$attendee_profile_fields,
+			$awarding_body_fields,
+			$water_grant_fields
+		);
 
-		echo sprintf(
+		$attendees = AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID );
+
+		printf(
 			'<div
-                id="%s-attendees"
+                id="%s-attendees-form"
                 data-nonce="%s"
                 data-quantity="%d"
                 data-fields="%s"
@@ -328,18 +329,11 @@ class PageUtils {
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
 			esc_attr( self::get_order_quantity( $order ) ),
-			esc_attr(
-				json_encode(
-					array_merge(
-						$attendee_profile_fields,
-						$awarding_body_fields
-					)
-				)
-			),
+			esc_attr( json_encode( $attendee_additional_fields ) ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( json_encode( $order->get_meta( Groups_Access_Meta_Boxes::GROUPS_READ ) ) ),
-			esc_attr( json_encode( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) ) ),
+			esc_attr( json_encode( $attendees ) ),
 			esc_attr( json_encode( $product->get_data() ) )
 		);
 	}

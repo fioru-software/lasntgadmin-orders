@@ -1,0 +1,43 @@
+
+import { forceUpdate, useEffect, createContext, useState } from '@wordpress/element';
+
+import { AttendeeFormFieldsetFields } from './attendee-form-fieldset-fields';
+import { AttendeeFormFieldsetButtons } from './attendee-form-fieldset-buttons';
+import { AttendeeContext } from './attendee-context';
+
+import { isNil } from 'lodash';
+
+const AttendeeFormFieldset = props => {
+
+  const index = parseInt( props.index );
+  const quantity = parseInt( props.quantity );
+  const groupId = parseInt( props.groupId );
+  const nonce = props.nonce;
+
+  const [ attendee, setAttendee ] = useState(null);
+
+  useEffect( () => {
+    if( ! isNil(props.attendee) ) {
+      setAttendee( props.attendee );
+    }
+  }, [ props.attendee]);
+
+  return (
+
+    <AttendeeContext.Provider value={ attendee }>
+      <fieldset>
+
+        <legend>Attendee { index + 1 }</legend>
+
+        <AttendeeFormFieldsetFields groupId={ groupId } quantity={ quantity } index={ index } setAttendee={ setAttendee }/>
+
+        <AttendeeFormFieldsetButtons setAttendee={ setAttendee } nonce={ nonce } quantity={ quantity } />
+
+      </fieldset>
+    </AttendeeContext.Provider>
+  );
+};
+
+export {
+  AttendeeFormFieldset
+};

@@ -1,7 +1,133 @@
 
-import { findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from "./product-utils";
+import { 
+  findGroupQuotas, findGroupQuota, calculateAvailableSpaces,
+  findFirstProductMetaByKey, isGrantFunded, isWaterGrantFunded
+} from "./product-utils";
 
 import { faker } from "@faker-js/faker";
+
+describe("isGrantFunded()", () => {
+  describe("product with meta", () => {
+    describe("is grant funded", () => {
+      it("returns true", () => {
+        const product = {
+          meta_data: [
+            {
+              id: faker.number.int(),
+              key: `grant_year`,
+              value: `${faker.date.recent().getFullYear()}`
+            },
+            {
+              id: faker.number.int(),
+              key: `_quotas_field_${faker.number.int()}`,
+              value: faker.number.int()
+            },
+            {
+              id: faker.number.int(),
+              key: `funding_sources`,
+              value: [ faker.word.sample() ]
+            }
+          ]
+        };
+        expect( isGrantFunded( product ) ).toEqual( true );
+      });
+    });
+    describe("is not grant funded", () => {
+      it("returns false", () => {
+        const product = {
+          meta_data: [
+            {
+              id: faker.number.int(),
+              key: `_quotas_field_${faker.number.int()}`,
+              value: faker.number.int()
+            },
+            {
+              id: faker.number.int(),
+              key: `funding_sources`,
+              value: [ faker.word.sample() ]
+            }
+          ]
+        };
+        expect( isGrantFunded( product ) ).toEqual( false );
+      });
+    });
+  });
+});
+
+describe("isWaterGrantFunded()", () => {
+  describe("is water grant funded", () => {
+    it("returns true", () => {
+        const product = {
+          meta_data: [
+            {
+              id: faker.number.int(),
+              key: `funding_sources`,
+              value: [ `water-grant` ]
+            },
+            {
+              id: faker.number.int(),
+              key: `grant_year`,
+              value: `${faker.date.recent().getFullYear()}`
+            },
+          ]
+        };
+        expect( isWaterGrantFunded( product ) ).toEqual( true );
+    });
+  });
+  describe("is not water grant funded", () => {
+    it("returns false", () => {
+        const product = {
+          meta_data: [
+            {
+              id: faker.number.int(),
+              key: `grant_year`,
+              value: `${faker.date.recent().getFullYear()}`
+            },
+            {
+              id: faker.number.int(),
+              key: `_quotas_field_${faker.number.int()}`,
+              value: faker.number.int()
+            },
+          ]
+        };
+        expect( isWaterGrantFunded( product ) ).toEqual( false );
+    });
+  });
+});
+
+describe("findFirstProductMetaByKey()", () => {
+
+  describe("found", () => {
+    it("returns meta data object", () => {
+      const metaData = [
+        {
+          id: faker.number.int(),
+          key: `funding_sources`,
+          value: [ `${faker.number.int()}` ]
+        },
+        {
+          id: faker.number.int(),
+          key: `_quotas_field_${faker.number.int()}`,
+          value: faker.number.int()
+        },
+        {
+          id: faker.number.int(),
+          key: `funding_sources`,
+          value: [ `${faker.number.int()}` ]
+        }
+      ];
+      expect( findFirstProductMetaByKey( 'funding_sources', metaData ) ).toEqual( metaData[0] );
+    });
+  });
+
+  describe("not found", () => {
+    it("returns undefined", () => {
+      const metaData = [];
+      expect( findFirstProductMetaByKey( 'funding_sources', metaData ) ).toEqual( undefined );
+    });
+  });
+
+});
 
 describe("findGroupQuotas()", () => {
 
@@ -9,24 +135,24 @@ describe("findGroupQuotas()", () => {
 
     const metaData = [
       {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         key: `groups-read`,
-        value: faker.datatype.number()
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         key: `groups-read`,
-        value: faker.datatype.number()
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       }
     ];
     expect( findGroupQuotas( metaData ) ).toEqual( [metaData[1], metaData[3] ] );
@@ -41,24 +167,24 @@ describe("findGroupQuotas()", () => {
 describe("findGroupQuota()", () => {
   it("group in quotas", () => {
 
-    const groupId = faker.datatype.number();
-    const quota = faker.datatype.number();
+    const groupId = faker.number.int();
+    const quota = faker.number.int();
 
     const quotas = [
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       },
       {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         key: `_quotas_field_${ groupId }`,
         value: quota
       },
       {
-        id: faker.datatype.number(),
-        key: `_quotas_field_${faker.datatype.number()}`,
-        value: faker.datatype.number()
+        id: faker.number.int(),
+        key: `_quotas_field_${faker.number.int()}`,
+        value: faker.number.int()
       }
     ];
 
@@ -67,7 +193,7 @@ describe("findGroupQuota()", () => {
   });
 
   it("group not in quotas", () => {
-    const groupId = faker.datatype.number();
+    const groupId = faker.number.int();
     expect( findGroupQuota( groupId, [] ) ).toBe( "" );
   });
 });
