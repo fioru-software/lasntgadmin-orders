@@ -1,6 +1,6 @@
 {
     "name": "fioru/lasntgadmin-orders",
-    "version": "1.7.16",
+    "version": "1.7.17-rc1",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-orders"

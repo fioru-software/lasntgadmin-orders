@@ -205,9 +205,14 @@ const AttendeeFormFieldsetButtons = props => {
       setLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
-      await removeAttendeeFromOrder();
-      await removeOrderFromAttendee();
-      await removeProductFromAttendee();
+      /**
+       * When existing attendee
+       */
+      if( ! isNil( attendee ) && 'ID' in attendee ) {
+        await removeAttendeeFromOrder();
+        await removeOrderFromAttendee();
+        await removeProductFromAttendee();
+      }
 
       props.setAttendee(null);
 
@@ -233,6 +238,7 @@ const AttendeeFormFieldsetButtons = props => {
    * - the product_id and order_id needs to be removed from the attendee being removed
    * - the attendee_id needs to be removed from the order
    * - order quantity is decremented
+   * @todo recover from a failing request by reverting or retrying
    */
   async function handleRemoveAttendee( e ) {
 
