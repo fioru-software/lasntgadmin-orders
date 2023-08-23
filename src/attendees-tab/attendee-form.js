@@ -174,9 +174,9 @@ const AttendeeForm = props => {
       );
 
       const validAttendeeIds = extractAttendeeIdsFromResponse( attendeeAcfFieldsBatchRes.responses );
-      // Valid attendees are missing additional acf fields.
+      // Valid attendees are missing additional acf fields from the response.
       const validAttendees = extractValidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
-      // Invalid attendees contain additional acf fields.
+      // Invalid attendees contain additional acf fields in the response.
       const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
 
       if( validAttendees.length ) {
