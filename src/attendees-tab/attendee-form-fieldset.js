@@ -31,7 +31,7 @@ const AttendeeFormFieldset = props => {
 
         <AttendeeFormFieldsetFields groupId={ groupId } quantity={ quantity } index={ index } setAttendee={ setAttendee }/>
 
-        <AttendeeFormFieldsetButtons setAttendee={ setAttendee } nonce={ nonce } quantity={ quantity } />
+        <AttendeeFormFieldsetButtons index={ index } setAttendee={ setAttendee } setAttendees={ props.setAttendees } nonce={ nonce } quantity={ quantity } setFormNotice={ props.setFormNotice } setOrderQuantity={ props.setOrderQuantity }  />
 
       </fieldset>
     </AttendeeContext.Provider>

@@ -6,11 +6,12 @@ import { __ } from '@wordpress/i18n';
 
 import { isNil, delay, range } from 'lodash';
 
-import { AttendeeFormFieldset } from './attendee-form-fieldset';
+import { AttendeeFormFieldsets } from './attendee-form-fieldsets';
+
 import { isCourseClosed } from '../product-utils';
 import { isWaitingOrder, isPaidOrder, getUpdateShopOrderRequest } from '../order-utils';
 
-import { ProductContext, OrderContext, AcfFieldsContext } from './attendee-context';
+import { ProductContext, OrderContext, AcfFieldsContext, AttendeesContext } from './attendee-context';
 
 import { 
   extractValidAttendeesFromResponse,
@@ -35,22 +36,35 @@ import {
  */
 const AttendeeForm = props => {
 
-  const quantity = parseInt( props.quantity );
   const nonce = props.nonce;
   const order = props.order;
   const groupId = parseInt( props.groupId );
   const orderId = parseInt( props.order.id );
   const productId = parseInt( props.product.id );
 
-  const [ attendees, setAttendees ] = useState([]);
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setLoading ] = useState(false);
+  const [ attendees, setAttendees ] = useState([]);
+  const [ quantity, setQuantity ] = useState( parseInt( props.quantity ) );
 
   useEffect( () => {
-    if( ! isNil( props.attendees ) ) {
-      setAttendees( props.attendees );
+    if( Array.isArray( props.attendees ) ) {
+      if( props.attendees.length > 0 ) {
+        setAttendees( props.attendees );
+      } else {
+        setAttendees(  
+          range( quantity ).map( index => new Object() )
+        );
+      }
     }
   }, [ props.attendees ]);
+
+  useEffect( () => {
+    if( Array.isArray( attendees) && attendees.length > 0 ) {
+      setAttendees( attendees );
+    }
+  }, [ attendees ]);
+
 
   /**
    * @param {Number} quantity Order quantity
@@ -156,7 +170,7 @@ const AttendeeForm = props => {
       const validAttendees = extractValidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
       // Invalid attendees contain additional acf fields.
       const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
-      
+
       if( validAttendees.length ) {
         const attendeeReqBodies = attendeeBatchReqs.map( req => req.body );
         const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
@@ -277,9 +291,9 @@ const AttendeeForm = props => {
             <ProductContext.Provider value={ props.product }>
               <OrderContext.Provider value={ order }>
                 <AcfFieldsContext.Provider value={ props.fields }>
-
-                  { quantity > 0 && range( quantity ).map( index => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } nonce={ nonce } attendee={ attendees[index] } />) }
-
+                  <AttendeesContext.Provider value={ attendees }>
+                    <AttendeeFormFieldsets nonce={ nonce } groupId={ groupId } quantity={ quantity } setAttendees={ setAttendees } setFormNotice={ setNotice } setOrderQuantity={ setQuantity } />
+                  </AttendeesContext.Provider>
                 </AcfFieldsContext.Provider>
               </OrderContext.Provider>
             </ProductContext.Provider>

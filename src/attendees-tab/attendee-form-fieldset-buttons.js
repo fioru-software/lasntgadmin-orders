@@ -2,7 +2,7 @@
 import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
+import { ProductContext, OrderContext, AttendeeContext, AttendeesContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
 import { isNil } from 'lodash';
@@ -36,9 +36,11 @@ const AttendeeFormFieldsetButtons = props => {
 
   const nonce = props.nonce;
   const quantity = props.quantity;
+  const index = props.index;
 
   const product = useContext( ProductContext );
-  const attendee = useContext( AttendeeContext );
+  const attendees = useContext( AttendeesContext ); // All attendees
+  const attendee = useContext( AttendeeContext ); // Attendee relevant to this button
   const order = useContext( OrderContext );
 
   const [ isLoading, setLoading ] = useState(false);
@@ -238,6 +240,12 @@ const AttendeeFormFieldsetButtons = props => {
 
     try {
 
+      setNotice({
+        status: 'info',
+        message: __( 'Removing attendee...', 'lasntgadmin' )
+      });
+
+      props.setFormNotice(null);
       setLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
@@ -257,6 +265,8 @@ const AttendeeFormFieldsetButtons = props => {
         status: 'info',
         message: __( 'Decrementing order quantity...', 'lasntgadmin' )
       });
+
+      props.setOrderQuantity( quantity-1 );
 
       const decrementOrderQuantityRequest = getUpdateOrderRequest(
         order.id,
@@ -284,11 +294,36 @@ const AttendeeFormFieldsetButtons = props => {
       });
 
       setNotice({
-        status: 'success',
-        message: __( 'Removed attendee. Reloading page...', 'lasntgadmin' )
+        status: 'info',
+        message: __( 'Removing attendee.', 'lasntgadmin' )
       });
 
-      document.location.reload();
+      /**
+       * @todo test remove by index vs remove by attendee id
+       */
+      console.log('attendees', attendees );
+      console.log('attendeeId', attendeeId);
+      const remainingAttendees = attendees.filter( ( a, i )  => {
+        return i !== index;
+        /*
+          if( 'ID' in a ) {
+            return a.ID !== attendeeId;
+          }
+          if( 'id' in a ) {
+            return a.id !== attendeeId;
+          }
+          */
+        return false;
+      } );
+      console.log('remaining attendees', remainingAttendees );
+      props.setAttendees( remainingAttendees );
+
+      setNotice({
+        status: 'success',
+        message: __( 'Removed attendee.', 'lasntgadmin' )
+      });
+
+      setLoading(false);
 
     } catch (e) {
       console.error(e);
