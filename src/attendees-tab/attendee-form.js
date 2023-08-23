@@ -58,10 +58,18 @@ const AttendeeForm = props => {
    */
   function showDuplicateEmployeeNumberValidationError( quantity, index ) {
     if( index !== false ) {
+      setNotice(null);
       const input = document.querySelector(`input[name="attendees[${index}]['acf']['employee_number']"]`);
       const validationErrorMsg = __('Employee number must be unique.', 'lasntgadmin' );
       input.setCustomValidity( validationErrorMsg );
       input.reportValidity();
+      /**
+       * Browser error messages don't show for disabled fields. 
+       */
+      setNotice({
+        status: 'error',
+        message: validationErrorMsg
+      });
     }
   }
 
