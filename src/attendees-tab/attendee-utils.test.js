@@ -22,6 +22,7 @@ import {
 import { 
   generateFormDataForAttendeeWithIndex,
   generateAttendeeUpdateRequestErrorResponse,
+  generateOrderUpdateRequestErrorResponse,
   generateAttendeeUpdateRequestSuccessResponse,
   generateAttendeeBody,
   generateAttendeePostData
@@ -127,7 +128,11 @@ describe("addIdToValidAttendees()", () => {
 
       const successRes = generateAttendeeUpdateRequestSuccessResponse( Object.assign( { id: faker.number.int() }, newAttendee ) ); // only response contains id
 
-      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( existingAttendee ) ); // request and response contains id
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( 
+        'attendee_already_enrolled',
+        `Attendee with employee number ${ existingAttendee.acf.employee_number } is already enrolled in this course.`,
+        generateAttendeePostData( existingAttendee ) 
+      ); // request and response contains id
       const attendeeBatchRes = [ errorRes, successRes ];
 
       // new attendee has been created, so we need to convert the attendee to an existing attendee in the form
@@ -163,7 +168,11 @@ describe("addIdToValidAttendees()", () => {
 
       const successRes = generateAttendeeUpdateRequestSuccessResponse( existingAttendee ); // request and response contains id
 
-      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( newAttendee ) ); // neither request nor response contains id
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( 
+        'duplicate_employee_number',
+        `Duplicate employee number ${ existingAttendee.acf.employee_number }.`,
+        generateAttendeePostData( newAttendee ) 
+      ); // neither request nor response contains id
       const attendeeBatchRes = [ successRes, errorRes ];
 
       const validAttendees = extractValidAttendeesFromResponse( attendeeBatchRes ); 
@@ -214,7 +223,11 @@ describe("extractInvalidAttendeesFromResponse()", () => {
       const attendeeReqBodies = [ existingAttendee, newAttendee ];
 
       const successRes = generateAttendeeUpdateRequestSuccessResponse( existingAttendee ); // request and response contains id
-      const errorRes = generateAttendeeUpdateRequestErrorResponse( generateAttendeePostData( newAttendee ) );
+      const errorRes = generateAttendeeUpdateRequestErrorResponse( 
+        'attendee_already_enrolled',
+        `Attendee with employee number ${ existingAttendee.acf.employee_number } is already enrolled in this course.`,
+        generateAttendeePostData( newAttendee ) 
+      );
 
       const res = [ errorRes, successRes ];
       const invalidAttendees = extractInvalidAttendeesFromResponse( res );

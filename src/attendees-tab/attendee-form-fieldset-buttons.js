@@ -2,7 +2,7 @@
 import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ProductContext, OrderContext, AttendeeContext } from './attendee-context';
+import { ProductContext, OrderContext, AttendeeContext, AttendeesContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
 import { isNil } from 'lodash';
@@ -36,9 +36,11 @@ const AttendeeFormFieldsetButtons = props => {
 
   const nonce = props.nonce;
   const quantity = props.quantity;
+  const index = props.index;
 
   const product = useContext( ProductContext );
-  const attendee = useContext( AttendeeContext );
+  const attendees = useContext( AttendeesContext ); // All attendees
+  const attendee = useContext( AttendeeContext ); // Attendee relevant to this button
   const order = useContext( OrderContext );
 
   const [ isLoading, setLoading ] = useState(false);
@@ -203,9 +205,14 @@ const AttendeeFormFieldsetButtons = props => {
       setLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
-      await removeAttendeeFromOrder();
-      await removeOrderFromAttendee();
-      await removeProductFromAttendee();
+      /**
+       * When existing attendee
+       */
+      if( ! isNil( attendee ) && 'ID' in attendee ) {
+        await removeAttendeeFromOrder();
+        await removeOrderFromAttendee();
+        await removeProductFromAttendee();
+      }
 
       props.setAttendee(null);
 
@@ -231,6 +238,7 @@ const AttendeeFormFieldsetButtons = props => {
    * - the product_id and order_id needs to be removed from the attendee being removed
    * - the attendee_id needs to be removed from the order
    * - order quantity is decremented
+   * @todo recover from a failing request by reverting or retrying
    */
   async function handleRemoveAttendee( e ) {
 
@@ -239,10 +247,14 @@ const AttendeeFormFieldsetButtons = props => {
     try {
 
       setLoading(true);
+      props.setFormNotice(null);
+
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
       /**
-       * When existing attendee
+       * When existing attendee 
+       *  - The page reloaded or just loaded. 
+       *  - Props set via PHP in lib/PageUtils.php
        */
       if( ! isNil( attendee ) && 'ID' in attendee ) {
         await removeAttendeeFromOrder();
@@ -257,6 +269,8 @@ const AttendeeFormFieldsetButtons = props => {
         status: 'info',
         message: __( 'Decrementing order quantity...', 'lasntgadmin' )
       });
+
+      props.setOrderQuantity( quantity-1 );
 
       const decrementOrderQuantityRequest = getUpdateOrderRequest(
         order.id,
@@ -284,11 +298,24 @@ const AttendeeFormFieldsetButtons = props => {
       });
 
       setNotice({
-        status: 'success',
-        message: __( 'Removed attendee. Reloading page...', 'lasntgadmin' )
+        status: 'info',
+        message: __( 'Removing attendee.', 'lasntgadmin' )
       });
 
-      document.location.reload();
+      /**
+       * Remove attendee by index and update UI
+       */
+      const remainingAttendees = attendees.filter( ( a, i )  => {
+        return i !== index;
+      } );
+      props.setAttendees( remainingAttendees );
+
+      setNotice({
+        status: 'success',
+        message: __( 'Removed attendee.', 'lasntgadmin' )
+      });
+
+      setLoading(false);
 
     } catch (e) {
       console.error(e);

@@ -2,7 +2,21 @@
 import { isUndefined, range, isNull } from "lodash";
 
 /**
- * @return {Boolean}
+ * @return { String }
+ */
+function getAttendeeAcfValueByField( field, attendee ) {
+  if( attendee && 'acf' in attendee && 'name' in field && field.name in attendee.acf ) {
+    return attendee.acf[field.name];
+  } 
+  if( 'default_value' in field ) {
+    return field.default_value
+  }
+  return "";
+}
+
+
+/**
+ * @return { Boolean }
  */
 function isOrderIdInAttendeeMeta( orderId, attendeeMeta ) {
   if( 'order_ids' in attendeeMeta && Array.isArray( attendeeMeta.order_ids ) ) {
@@ -13,7 +27,7 @@ function isOrderIdInAttendeeMeta( orderId, attendeeMeta ) {
 }
 
 /**
- * @return {Array}
+ * @return { Array }
  */
 function filterOrderIdFromAttendeeMeta( orderId, attendeeMeta) {
   if( 'order_ids' in attendeeMeta && Array.isArray( attendeeMeta.order_ids ) ) {
@@ -27,7 +41,7 @@ function filterOrderIdFromAttendeeMeta( orderId, attendeeMeta) {
 }
 
 /**
- * @return {Boolean}
+ * @return { Boolean }
  */
 function isProductIdInAttendeeMeta( productId, attendeeMeta ) {
   if( 'product_ids' in attendeeMeta && Array.isArray( attendeeMeta.product_ids ) ) {
@@ -311,6 +325,7 @@ function countOccurrencesOfEmployeeNumber( employeeNumber, employeeNumbers ) {
 }
 
 export {
+  getAttendeeAcfValueByField,
   filterOrderIdFromAttendeeMeta,
   isProductIdInAttendeeMeta,
   filterProductIdFromAttendeeMeta,

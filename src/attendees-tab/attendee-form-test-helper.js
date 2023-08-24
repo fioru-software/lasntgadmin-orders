@@ -103,11 +103,26 @@ function generateAttendeePostData( attendee ) {
 /**
  * Contains additional acf fields
  */
-function generateAttendeeUpdateRequestErrorResponse( data ) {
+
+function generateAttendeeUpdateRequestErrorResponse( code, message, data ) {
   return {
     body: {
-      code: "attendee_already_enrolled",
-      message: "Attendee is already enrolled.",
+      code,
+      message,
+      data
+    },
+    status: 500,
+    headers: {
+      Allow: "GET, POST, PUT, PATCH, DELETE"
+    }
+  };
+}
+
+function generateOrderUpdateRequestErrorResponse( code, message, data ) {
+  return {
+    body: {
+      code,
+      message,
       data
     },
     status: 500,
@@ -179,6 +194,7 @@ function generateAttendeeUpdateRequestSuccessResponse( body ) {
 
 export {
   generateAttendeeUpdateRequestErrorResponse,
+  generateOrderUpdateRequestErrorResponse,
   generateAttendeeUpdateRequestSuccessResponse,
   generateFormDataForAttendeeWithIndex,
   generateAttendeeBody,

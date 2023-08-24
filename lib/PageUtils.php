@@ -312,7 +312,7 @@ class PageUtils {
 			$water_grant_fields
 		);
 
-		$attendees = AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID );
+		$attendees = array_reverse( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) );
 
 		printf(
 			'<div
