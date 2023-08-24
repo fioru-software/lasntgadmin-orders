@@ -211,7 +211,7 @@ const AttendeeForm = props => {
 
       /**
        * Attendees have been added to the order
-       * To update the meta we need to reprocess the form as the form should now contains attendee ids
+       * To update the meta we need to reprocess the form as the form should now contain attendee ids
        */
       setNotice({
         status: 'info',

@@ -240,17 +240,15 @@ const AttendeeFormFieldsetButtons = props => {
 
     try {
 
-      setNotice({
-        status: 'info',
-        message: __( 'Removing attendee...', 'lasntgadmin' )
-      });
-
-      props.setFormNotice(null);
       setLoading(true);
+      props.setFormNotice(null);
+
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
       /**
-       * When existing attendee
+       * When existing attendee 
+       *  - The page reloaded or just loaded. 
+       *  - Props set via PHP in lib/PageUtils.php
        */
       if( ! isNil( attendee ) && 'ID' in attendee ) {
         await removeAttendeeFromOrder();
@@ -299,23 +297,11 @@ const AttendeeFormFieldsetButtons = props => {
       });
 
       /**
-       * @todo test remove by index vs remove by attendee id
+       * Remove attendee by index and update UI
        */
-      console.log('attendees', attendees );
-      console.log('attendeeId', attendeeId);
       const remainingAttendees = attendees.filter( ( a, i )  => {
         return i !== index;
-        /*
-          if( 'ID' in a ) {
-            return a.ID !== attendeeId;
-          }
-          if( 'id' in a ) {
-            return a.id !== attendeeId;
-          }
-          */
-        return false;
       } );
-      console.log('remaining attendees', remainingAttendees );
       props.setAttendees( remainingAttendees );
 
       setNotice({
