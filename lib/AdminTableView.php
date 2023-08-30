@@ -2,6 +2,8 @@
 
 namespace Lasntg\Admin\Orders;
 
+use Lasntg\Admin\Group\GroupUtils;
+
 use WP_Query;
 
 class AdminTableView {
@@ -23,6 +25,48 @@ class AdminTableView {
 
 		// Filter orders by product id.
 		add_filter( 'posts_clauses', [ self::class, 'handle_filter_clauses' ], 101, 2 );
+
+		/**
+		 * RTC Managers need the Group plugin's Administer Groups permission, so that they can assign groups when creating users,
+		 * but this setting also allows them to see all shop orders. These two filters work together to filter shop orders by group
+		 * for RTC Managers.
+		 */
+		add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'bypass_posts_where_for_regional_training_centre_managers' ], 10, 3 );
+		add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_orders_for_regional_training_centre_managers' ], 10, 2 );
+	}
+
+	/**
+	 * @see self::filter_orders_for_regional_training_centre_managers
+	 */
+	public static function bypass_posts_where_for_regional_training_centre_managers( bool $apply, string $where, WP_Query $query ) {
+		if ( ! is_search() && is_admin() && function_exists( 'get_current_screen' ) && wc_current_user_has_role( 'regional_training_centre_manager' ) && ! isset( $_GET['product_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$screen = get_current_screen();
+			if ( ! is_null( $screen ) ) {
+				if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && 'shop_order' === $query->query_vars['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$apply = false;
+				}
+			}
+		}
+		return $apply;
+	}
+
+	/**
+	 * @see self::bypass_posts_where_for_regional_training_centre_managers
+	 */
+	public static function filter_orders_for_regional_training_centre_managers( string $where, WP_Query $query ) {
+
+		if ( ! is_search() && is_admin() && function_exists( 'get_current_screen' ) && wc_current_user_has_role( 'regional_training_centre_manager' ) && ! isset( $_GET['product_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$screen = get_current_screen();
+			if ( ! is_null( $screen ) ) {
+				if ( 'shop_order' === $screen->post_type && 'edit-shop_order' === $screen->id && 'shop_order' === $query->query_vars['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$where .= GroupUtils::append_to_posts_where(
+						'shop_order',
+						GroupUtils::get_current_users_group_ids_deep()
+					);
+				}
+			}
+		}
+		return $where;
 	}
 
 	public static function register_post_type_shop_order( array $args ): array {
