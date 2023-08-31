@@ -20,6 +20,9 @@ import {
 } from '../order-utils';
 
 import { 
+  isExistingAttendee, 
+  isAttendeeLoadedViaProps, 
+  isAttendeeLoadedViaSearch,
   filterOrderIdFromAttendeeMeta,
   filterProductIdFromAttendeeMeta,
   isProductIdInAttendeeMeta,
@@ -51,10 +54,10 @@ const AttendeeFormFieldsetButtons = props => {
 
   useEffect( () => {
     if( ! isNil( attendee ) ) {
-      if( 'ID' in attendee ) {
+      if( isAttendeeLoadedViaProps( attendee ) ) {
         setAttendeeId( parseInt( attendee.ID ) );
       }
-      if( 'id' in attendee ) {
+      if( isAttendeeLoadedViaSearch( attendee ) ) {
         setAttendeeId( parseInt( attendee.id ) );
       }
     }
@@ -72,7 +75,7 @@ const AttendeeFormFieldsetButtons = props => {
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return isCourseClosed( product.status ) || isNil( attendee ) || isLoading ;
+    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading ;
   }
 
   /**
@@ -208,7 +211,7 @@ const AttendeeFormFieldsetButtons = props => {
       /**
        * When existing attendee
        */
-      if( ! isNil( attendee ) && 'ID' in attendee ) {
+      if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) ) {
         await removeAttendeeFromOrder();
         await removeOrderFromAttendee();
         await removeProductFromAttendee();
@@ -256,7 +259,7 @@ const AttendeeFormFieldsetButtons = props => {
        *  - The page reloaded or just loaded. 
        *  - Props set via PHP in lib/PageUtils.php
        */
-      if( ! isNil( attendee ) && 'ID' in attendee ) {
+      if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) ) {
         await removeAttendeeFromOrder();
         await removeOrderFromAttendee();
         await removeProductFromAttendee();
