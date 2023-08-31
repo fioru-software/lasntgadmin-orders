@@ -1,6 +1,31 @@
 
 import { isUndefined, range, isNull } from "lodash";
 
+function isExistingAttendee( attendee ) {
+  return isAttendeeLoadedViaProps( attendee ) || isAttendeeLoadedViaSearch( attendee );
+}
+
+/**
+ * Existing attendee's are passed in via props on page load.
+ *
+ */
+function isAttendeeLoadedViaProps( attendee ) {
+  if( ! isNull( attendee ) ) {
+    return 'ID' in attendee;
+  }
+  return false;
+}
+
+/**
+ * Existing attendee's can be loaded via search.
+ */
+function isAttendeeLoadedViaSearch( attendee ) {
+  if( ! isNull( attendee ) ) {
+    return 'id' in attendee;
+  }
+  return false;
+}
+
 /**
  * @return { String }
  */
@@ -347,5 +372,8 @@ export {
   extractIndexedEmployeeNumbersFromForm,
   extractLastIndexOfDuplicateEmployeeNumberField,
   countOccurrencesOfEmployeeNumber,
-  addIdToValidAttendees
+  addIdToValidAttendees,
+  isExistingAttendee,
+  isAttendeeLoadedViaProps,
+  isAttendeeLoadedViaSearch
 }

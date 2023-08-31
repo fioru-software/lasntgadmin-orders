@@ -1,6 +1,7 @@
 
 import { faker } from "@faker-js/faker";
 import { DateTime } from "luxon";
+import { isAttendeeLoadedViaSearch } from "./attendee-utils";
 
 /**
  * @param {Number} index
@@ -52,7 +53,7 @@ function generateAttendeeBody( attendee = {} ) {
 }
 
 function generateAttendeePostData( attendee ) {
-  const id = "id" in attendee ? attendee.id : faker.number.int()
+  const id = isAttendeeLoadedViaSearch( attendee ) ? attendee.id : faker.number.int()
   return {
     "ID": id,
     "post_author": "1",
