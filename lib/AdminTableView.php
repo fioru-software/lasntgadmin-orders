@@ -31,14 +31,17 @@ class AdminTableView {
 		 * but this setting also allows them to see all shop orders. These two filters work together to filter shop orders by group
 		 * for RTC Managers.
 		 */
-		add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'bypass_posts_where_for_regional_training_centre_managers' ], 10, 3 );
-		add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_orders_for_regional_training_centre_managers' ], 10, 2 );
+		add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'apply_default_order_list_filter_by_group_membership' ], 10, 3 );
+		add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_order_list_for_regional_training_centre_managers' ], 10, 2 );
 	}
 
 	/**
-	 * @see self::filter_orders_for_regional_training_centre_managers
+	 * Order list page, should we apply the default order list filtered by group membership?
+	 * Don't apply when role is regional_training_centre_manager.
+	 *
+	 * @see https://github.com/fioru-software/lasntgadmin-itthinx-groups/blob/master/lib/access/class-groups-post-access.php#L223
 	 */
-	public static function bypass_posts_where_for_regional_training_centre_managers( bool $apply, string $where, WP_Query $query ) {
+	public static function apply_default_order_list_filter_by_group_membership( bool $apply, string $where, WP_Query $query ) {
 		if ( ! is_search() && is_admin() && function_exists( 'get_current_screen' ) && wc_current_user_has_role( 'regional_training_centre_manager' ) && ! isset( $_GET['product_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$screen = get_current_screen();
 			if ( ! is_null( $screen ) ) {
@@ -53,7 +56,7 @@ class AdminTableView {
 	/**
 	 * @see self::bypass_posts_where_for_regional_training_centre_managers
 	 */
-	public static function filter_orders_for_regional_training_centre_managers( string $where, WP_Query $query ) {
+	public static function filter_order_list_for_regional_training_centre_managers( string $where, WP_Query $query ) {
 
 		if ( ! is_search() && is_admin() && function_exists( 'get_current_screen' ) && wc_current_user_has_role( 'regional_training_centre_manager' ) && ! isset( $_GET['product_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$screen = get_current_screen();
