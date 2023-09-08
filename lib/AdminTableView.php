@@ -66,9 +66,23 @@ class AdminTableView {
 						'shop_order',
 						GroupUtils::get_current_users_group_ids_deep()
 					);
+
+					$post_status = $query->get( 'post_status' );
+					if ( empty( $post_status ) ) {
+						// No filter.
+						$where .= sprintf(
+							" AND post_status NOT IN ( 'trash' )",
+						);
+					} else {
+						// Filter by clicking post status link.
+						$where .= sprintf(
+							" AND post_status IN ( '%s' )",
+							is_array( $post_status ) ? implode( "','", $post_status ) : esc_sql( $post_status ),
+						);
+					}
 				}
-			}
-		}
+			}//end if
+		}//end if
 		return $where;
 	}
 
