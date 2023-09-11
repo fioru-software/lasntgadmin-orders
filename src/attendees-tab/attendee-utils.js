@@ -1,5 +1,5 @@
 
-import { isUndefined, range, isNull } from "lodash";
+import { isUndefined, range, isNull, isString } from "lodash";
 
 function isExistingAttendee( attendee ) {
   return isAttendeeLoadedViaProps( attendee ) || isAttendeeLoadedViaSearch( attendee );
@@ -33,7 +33,7 @@ function getAttendeeAcfValueByField( field, attendee ) {
   if( attendee && 'acf' in attendee && 'name' in field && field.name in attendee.acf ) {
     return attendee.acf[field.name];
   } 
-  if( 'default_value' in field ) {
+  if( 'default_value' in field && isString( field.default_value ) ) {
     return field.default_value
   }
   return "";

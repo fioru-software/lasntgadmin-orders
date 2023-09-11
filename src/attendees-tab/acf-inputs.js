@@ -21,7 +21,7 @@ const SelectInput = props => {
   return (
     <>
       <select id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } value={ value } onChange={ handleChange } >
-        { ! props.value && <option disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option> }
+        { ! props.value && <option disabled value="">{ __( '- Select -', 'lasntgadmin' ) }</option> }
         { props.children }
       </select> 
       { props?.disabled && <input type="hidden" name={ props.name } value={ value } />}
