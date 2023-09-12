@@ -8,7 +8,7 @@ import { isNil } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
-import { isPendingStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId, getWaitingStatus, getPendingStatus, getDraftStatus, getAttendeesStatus } from '../order-utils';
+import { isPendingPaymentStatus, isDraftStatus, isWaitingStatus, isExistingOrder, getLineItemByProductId, getWaitingStatus, getPendingPaymentStatus, getDraftStatus, getPendingAttendeesStatus } from '../order-utils';
 
 /**
  * @param { string } nonce
@@ -66,7 +66,7 @@ const OrderForm = props => {
 
   function determineStatus() {
     if( isDraftStatus( status ) ) {
-      return getAttendeesStatus();
+      return getPendingAttendeesStatus();
     }
     if( isWaitingStatus( status ) ) {
       return getWaitingStatus();
@@ -142,7 +142,7 @@ const OrderForm = props => {
       });
       
       // if the order is being moved from waiting-list to pending 
-      if ( isWaitingStatus( oldStatus ) && isPendingStatus( status ) ) {
+      if ( isWaitingStatus( oldStatus ) && isPendingPaymentStatus( status ) ) {
         setNotice({
           status: 'success',
           message: __( 'Updated enrolment. Client will be notified.', 'lasntgadmin' )
@@ -161,11 +161,11 @@ const OrderForm = props => {
           document.location.assign(`/wp-admin/edit.php?post_type=shop_order`);
           break;
 
-        case getAttendeesStatus():
+        case getPendingAttendeesStatus():
           document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
           break;
 
-        case getPendingStatus():
+        case getPendingPaymentStatus():
           document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment`);
           break;
 
