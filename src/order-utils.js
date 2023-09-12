@@ -82,11 +82,11 @@ function getWaitingStatus() {
   return 'waiting-list';
 }
 
-function isPendingStatus( status ) {
-  return status === getPendingStatus();
+function isPendingPaymentStatus( status ) {
+  return status === getPendingPaymentStatus();
 }
 
-function getPendingStatus() {
+function getPendingPaymentStatus() {
   return 'pending';
 }
 
@@ -102,7 +102,11 @@ function getDraftStatus() {
   return 'auto-draft';
 }
 
-function getAttendeesStatus() {
+function isPendingAttendeesStatus( status ) {
+  return status === getPendingAttendeesStatus();
+}
+
+function getPendingAttendeesStatus() {
   return 'attendees';
 }
 
@@ -158,16 +162,17 @@ export {
   getUpdateShopOrderRequest,
   getUpdateOrderRequest,
   getLineItemByProductId,
-  getPendingStatus,
+  getPendingPaymentStatus,
   getWaitingStatus,
   getDraftStatus,
-  getAttendeesStatus,
+  getPendingAttendeesStatus,
   findOrderMetaByKey,
   filterOrderMetaByKey,
+  isPendingAttendeesStatus,
   isExistingOrder,
   isWaitingOrder,
   isWaitingStatus, 
-  isPendingStatus,
+  isPendingPaymentStatus,
   isDraftOrder,
   isPaidStatus,
   isGrantPaid,

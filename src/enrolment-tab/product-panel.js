@@ -7,7 +7,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
 import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from '../product-utils';
-import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder } from '../order-utils';
+import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isPaidStatus, isPendingAttendeesStatus, isWaitingStatus } from '../order-utils';
 
 import { isObject, isNil, isNull, isUndefined } from "lodash";
 
@@ -57,16 +57,11 @@ const ProductPanel = props => {
   }, [ groupId ]);
 
   const handleNotice = () => {
-    if(!productId){
+    if( ! productId) {
       setNotice(null);
       return;
     }
-    if( ! isExistingOrder( props.order ) 
-          || 
-        ( 'attendees' == props.order.status 
-        || 'attendees' === props.status
-        ||'waiting-list' === props.status) 
-      ) {
+    if( ! isExistingOrder( props.order ) || ( isPendingAttendeesStatus( props.order.status )  || isPendingAttendeesStatus( props.status ) || isWaitingStatus( props.status ) ) ) {
         if( ! stock ) {
           setNotice({
             status: "error",
@@ -85,7 +80,7 @@ const ProductPanel = props => {
   }
 
   useEffect( () => {
-    if( ! isNil(spaces) ) {
+    if( ! isNil(spaces) && ! isPaidStatus( props.order.status ) ) {
       const stock = parseInt( product.stock_quantity );
       const price = parseInt( product.price );
       setPrice( price );
@@ -96,12 +91,10 @@ const ProductPanel = props => {
       } else {
         props.setStatus(props.order.status);
       }
-
       handleNotice();
-
-      
     }
   }, [ spaces ]);
+
   useEffect(() => {
     if( 
         'attendees' == props.status ||
