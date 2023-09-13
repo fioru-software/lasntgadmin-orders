@@ -13,6 +13,7 @@ use Lasntg\Admin\Group\GroupUtils;
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
 use WC_Abstract_Order, WP_Error;
+use DateTime;
 
 /**
  * Order Utility Class
@@ -227,14 +228,16 @@ class OrderUtils {
 	}
 
 	public static function manage_edit_shop_order_columns( $columns ) {
-		$new_columns = [];
+		$columns['order_date'] = 'Order Date';
+		$new_columns           = [];
 		foreach ( $columns as $column_name => $column_info ) {
 			$new_columns[ $column_name ] = $column_info;
 			if ( 'order_number' === $column_name ) {
-				$new_columns['order_product']        = __( 'Product', 'lasntgadmin' );
-				$new_columns['order_quantity']       = __( 'Quantity', 'lasntgadmin' );
-				$new_columns['order_group']          = __( 'Group', 'lasntgadmin' );
-				$new_columns['order_payment_method'] = __( 'Payment Method', 'lasntgadmin' );
+				$new_columns['order_product']                = __( 'Course', 'lasntgadmin' );
+				$new_columns['order_product_start_datetime'] = __( 'Course Start', 'lasntgadmin' );
+				$new_columns['order_quantity']               = __( 'Quantity', 'lasntgadmin' );
+				$new_columns['order_group']                  = __( 'Group', 'lasntgadmin' );
+				$new_columns['order_payment_method']         = __( 'Payment Method', 'lasntgadmin' );
 			}
 		}
 		return $new_columns;
@@ -255,7 +258,7 @@ class OrderUtils {
 			echo esc_html( $order->get_payment_method_title() );
 		}
 
-		if ( in_array( $column, [ 'order_product', 'order_quantity' ] ) ) {
+		if ( in_array( $column, [ 'order_product', 'order_quantity', 'order_product_start_datetime' ] ) ) {
 			$line_item = current( $order->get_items( 'line_item' ) );
 			if ( $line_item ) {
 				if ( 'order_product' === $column ) {
@@ -264,6 +267,14 @@ class OrderUtils {
 				}
 				if ( 'order_quantity' === $column ) {
 					echo esc_html( $line_item->get_quantity() );
+				}
+				if ( 'order_product_start_datetime' === $column ) {
+					$product           = $line_item->get_product();
+					$course_start_date = get_field( 'field_63881aee31478', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					$course_start_time = get_field( 'field_63881b0531479', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					if ( ! empty( $course_start_date ) && ! empty( $course_start_time ) ) {
+						echo wp_kses_data( date_format( DateTime::createFromFormat( 'd/m/Y g:i a', "$course_start_date $course_start_time" ), 'H:i M j, Y' ) );
+					}
 				}
 			}
 		}
