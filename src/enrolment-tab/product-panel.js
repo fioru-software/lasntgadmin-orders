@@ -109,9 +109,11 @@ const ProductPanel = props => {
     }
     handleNotice();
   }, [props.status, stock]);
+
   useEffect( () => {
     if( isObject(product) && isExistingOrder( props.order ) ) {
       const lineItem = getLineItemByProductId( product.id, props.order );
+      setPrice( product.price );
       setQuantity( lineItem.quantity );
       setTotal( product.price*lineItem.quantity );
     }
@@ -224,6 +226,7 @@ const ProductPanel = props => {
           </div> 
         }
 
+      { console.log( 'price', !!price, 'product id', productId, 'group id', groupId ) }
         { !!price && productId > 0 && groupId &&
           <>
             <div class="form-field form-row">

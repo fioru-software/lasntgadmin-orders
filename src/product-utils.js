@@ -99,6 +99,19 @@ function calculateAvailableSpaces( stockQuantity, groupQuota ) {
   return groupQuota;
 }
 
+function getUpdateProductRequest( productId, nonce, data ) {
+  return  {
+    path: `/wc/v3/products/${productId}`,
+    method: 'PUT',
+    headers: {
+      "X-WP-Nonce": nonce
+    },
+    data: Object.assign( 
+      data
+    )
+  };
+}
+
 export {
   findProductById,
   findGroupQuotas,
@@ -107,5 +120,6 @@ export {
   isCourseClosed,
   isGrantFunded,
   isWaterGrantFunded,
-  findFirstProductMetaByKey
+  findFirstProductMetaByKey,
+  getUpdateProductRequest
 };

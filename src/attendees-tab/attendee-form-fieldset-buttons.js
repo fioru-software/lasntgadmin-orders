@@ -13,11 +13,16 @@ import {
   getUpdateOrderRequest, 
   filterOrderMetaByKey, 
   filterAttendeeIdFromOrderMeta,
+  isPaidOrder,
   isPaidStatus, 
   isGrantPaid, 
   isPurchaseOrderPaid, 
   isAttendeeIdInOrderMeta
 } from '../order-utils';
+
+import {
+  getUpdateProductRequest
+} from '../product-utils';
 
 import { 
   isExistingAttendee, 
@@ -65,17 +70,17 @@ const AttendeeFormFieldsetButtons = props => {
 
   useEffect( () => {
     setResetable( isResetButtonDisabled() );
-  }, [ product.status, attendee, isLoading ]);
+  }, [ product.status, attendee, isLoading, quantity ]);
 
   useEffect( () => {
     setRemovable( isRemoveButtonDisabled() );
-  }, [ product.status, order.payment_method, isLoading ]);
+  }, [ product.status, order.payment_method, isLoading, attendee, quantity ]);
 
   /**
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading ;
+    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading;
   }
 
   /**
@@ -196,6 +201,76 @@ const AttendeeFormFieldsetButtons = props => {
   }
 
   /**
+   * When removing an attendee then decrement the order quantity.
+   */
+  async function decrementOrderQuantity() {
+
+    setNotice({
+      status: 'info',
+      message: __( 'Decrementing order quantity...', 'lasntgadmin' )
+    });
+
+    props.setOrderQuantity( quantity-1 );
+
+    const decrementOrderQuantityRequest = getUpdateOrderRequest(
+      order.id,
+      nonce,
+      {
+        total: order.total - product.price,
+        line_items: Array.isArray( order?.line_items ) ? order?.line_items.map( item => {
+          return {
+            id: item.id,
+            quantity: item.quantity - 1,
+            total: `${item.total - product.price}`,
+            subtotal: `${item.subtotal - product.price}`
+          };
+        }) : [],
+      }
+    );
+
+    const orderRes = await apiFetch(
+      decrementOrderQuantityRequest
+    );
+
+    setNotice({
+      status: 'success',
+      message: __( 'Decremented order quantity.', 'lasntgadmin' )
+    });
+
+  }
+
+  async function incrementProductStock() {
+
+    if( isPaidOrder( order ) ) {
+
+      setNotice({
+        status: 'info',
+        message: __( 'Incrementing course spaces...', 'lasntgadmin' )
+      });
+
+      const incrementProductStockQuantityRequest = getUpdateProductRequest(
+        product.id,
+        nonce,
+        {
+          stock_quantity: product.stock_quantity + 1,
+          stock_status:  'instock' // instock, onbackorder, outofstock
+        }
+      );
+
+      const productRes = await apiFetch(
+        incrementProductStockQuantityRequest
+      );
+
+      setNotice({
+        status: 'success',
+        message: __( 'Incremented course spaces.', 'lasntgadmin' )
+      });
+
+    }
+
+  }
+
+  /**
    * When resetting an attendee for an order 
    * - the product_id and order_id needs to be removed from the attendee being removed
    * - the attendee_id needs to be removed from the order
@@ -265,40 +340,8 @@ const AttendeeFormFieldsetButtons = props => {
         await removeProductFromAttendee();
       }
 
-      /**
-       * Decrementing order quantity.
-       */
-      setNotice({
-        status: 'info',
-        message: __( 'Decrementing order quantity...', 'lasntgadmin' )
-      });
-
-      props.setOrderQuantity( quantity-1 );
-
-      const decrementOrderQuantityRequest = getUpdateOrderRequest(
-        order.id,
-        nonce,
-        {
-          total: order.total - product.price,
-          line_items: Array.isArray( order?.line_items ) ? order?.line_items.map( item => {
-            return {
-              id: item.id,
-              quantity: item.quantity - 1,
-              total: `${item.total - product.price}`,
-              subtotal: `${item.subtotal - product.price}`
-            };
-          }) : [],
-        }
-      );
-
-      const orderRes = await apiFetch(
-        decrementOrderQuantityRequest
-      );
-
-      setNotice({
-        status: 'success',
-        message: __( 'Decremented order quantity.', 'lasntgadmin' )
-      });
+      await decrementOrderQuantity();
+      await incrementProductStock();
 
       setNotice({
         status: 'info',
@@ -313,6 +356,10 @@ const AttendeeFormFieldsetButtons = props => {
       } );
       props.setAttendees( remainingAttendees );
 
+      /**
+       * This part of the code is never reached
+       * as this attendee has been removed from the DOM.
+       */
       setNotice({
         status: 'success',
         message: __( 'Removed attendee.', 'lasntgadmin' )

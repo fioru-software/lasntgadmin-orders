@@ -49,13 +49,15 @@ const AttendeeForm = props => {
 
   useEffect( () => {
     if( Array.isArray( props.attendees ) ) {
-      if( props.attendees.length > 0 ) {
-        setAttendees( props.attendees );
-      } else {
-        setAttendees(  
-          range( quantity ).map( index => new Object() )
-        );
+      let accumulator = [];
+      for( let i=0; i<quantity; i++) {
+        if( ! isNil( props.attendees[i] ) ) {
+          accumulator.push( props.attendees[i] )
+        } else {
+          accumulator.push( new Object() );
+        }
       }
+      setAttendees( accumulator );
     }
   }, [ props.attendees ]);
 
@@ -64,7 +66,6 @@ const AttendeeForm = props => {
       setAttendees( attendees );
     }
   }, [ attendees ]);
-
 
   /**
    * @param {Number} quantity Order quantity
