@@ -226,7 +226,6 @@ const ProductPanel = props => {
           </div> 
         }
 
-      { console.log( 'price', !!price, 'product id', productId, 'group id', groupId ) }
         { !!price && productId > 0 && groupId &&
           <>
             <div class="form-field form-row">
