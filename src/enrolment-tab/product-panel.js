@@ -99,7 +99,7 @@ const ProductPanel = props => {
     if( 
         'attendees' == props.status ||
         'waiting-list' == props.status
-      ){
+      ) {
       setQuantityIsDisabled(false);
       setGroupId(groupId);
       handleFetchedGroups()
@@ -109,9 +109,11 @@ const ProductPanel = props => {
     }
     handleNotice();
   }, [props.status, stock]);
+
   useEffect( () => {
     if( isObject(product) && isExistingOrder( props.order ) ) {
       const lineItem = getLineItemByProductId( product.id, props.order );
+      setPrice( product.price );
       setQuantity( lineItem.quantity );
       setTotal( product.price*lineItem.quantity );
     }
@@ -119,9 +121,16 @@ const ProductPanel = props => {
 
   function handleQuantitySelect(e) {
     const quantity = parseInt(e.target.value);
+
+    /**
+     * user changed order quantity > stock, auto switching order status to waiting list, 
+     */
     if ( quantity > spaces || quantity > stock ) {
       props.setStatus("waiting-list");
-    } else {
+    } else { 
+      /**
+       * user reduced quantity < stock, auto switching to original order status
+       */
       props.setStatus(props.order.status);
     }
     setQuantity(quantity);

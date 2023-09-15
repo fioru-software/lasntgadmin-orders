@@ -2,7 +2,7 @@
 import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ProductContext, OrderContext, AttendeeContext, AttendeesContext } from './attendee-context';
+import { ProductContext, OrderContext, AttendeeContext, AttendeesContext, AttendeeFormContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
 import { isNil } from 'lodash';
@@ -13,11 +13,17 @@ import {
   getUpdateOrderRequest, 
   filterOrderMetaByKey, 
   filterAttendeeIdFromOrderMeta,
+  filterItemFromOrderMeta,
+  isPaidOrder,
   isPaidStatus, 
   isGrantPaid, 
   isPurchaseOrderPaid, 
   isAttendeeIdInOrderMeta
 } from '../order-utils';
+
+import {
+  getUpdateProductRequest
+} from '../product-utils';
 
 import { 
   isExistingAttendee, 
@@ -45,6 +51,7 @@ const AttendeeFormFieldsetButtons = props => {
   const attendees = useContext( AttendeesContext ); // All attendees
   const attendee = useContext( AttendeeContext ); // Attendee relevant to this button
   const order = useContext( OrderContext );
+  const attendeeFormContext = useContext( AttendeeFormContext );
 
   const [ isLoading, setLoading ] = useState(false);
   const [ notice, setNotice ] = useState(null);
@@ -65,17 +72,17 @@ const AttendeeFormFieldsetButtons = props => {
 
   useEffect( () => {
     setResetable( isResetButtonDisabled() );
-  }, [ product.status, attendee, isLoading ]);
+  }, [ product.status, attendee, isLoading, quantity, attendeeFormContext.isLoading ]);
 
   useEffect( () => {
     setRemovable( isRemoveButtonDisabled() );
-  }, [ product.status, order.payment_method, isLoading ]);
+  }, [ product.status, order.payment_method, isLoading, attendee, quantity, attendeeFormContext.isLoading ]);
 
   /**
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading ;
+    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading || attendeeFormContext.isLoading;
   }
 
   /**
@@ -84,7 +91,7 @@ const AttendeeFormFieldsetButtons = props => {
    * or payment method is not grant and purchase order
    */
   function isRemoveButtonDisabled() {
-    return isCourseClosed( product.status ) || isLoading || quantity < 2 || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
+    return attendeeFormContext.isLoading || isCourseClosed( product.status ) || isLoading || quantity < 2 || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
   }
 
   /**
@@ -172,6 +179,7 @@ const AttendeeFormFieldsetButtons = props => {
         message: __( 'Removing attendee from order meta...', 'lasntgadmin' )
       });
 
+      order.meta_data = filterItemFromOrderMeta( 'attendee_ids', attendeeId, order.meta_data );
       const removeAttendeeFromOrderRequest = getRemoveAttendeeFromShopOrderRequest(
         order.id,
         attendeeId,
@@ -193,6 +201,76 @@ const AttendeeFormFieldsetButtons = props => {
       });
 
     }
+  }
+
+  /**
+   * When removing an attendee then decrement the order quantity.
+   */
+  async function decrementOrderQuantity() {
+
+    setNotice({
+      status: 'info',
+      message: __( 'Decrementing order quantity...', 'lasntgadmin' )
+    });
+
+    props.setOrderQuantity( quantity-1 );
+
+    const decrementOrderQuantityRequest = getUpdateOrderRequest(
+      order.id,
+      nonce,
+      {
+        total: order.total - product.price,
+        line_items: Array.isArray( order?.line_items ) ? order?.line_items.map( item => {
+          return {
+            id: item.id,
+            quantity: item.quantity - 1,
+            total: `${item.total - product.price}`,
+            subtotal: `${item.subtotal - product.price}`
+          };
+        }) : [],
+      }
+    );
+
+    const orderRes = await apiFetch(
+      decrementOrderQuantityRequest
+    );
+
+    setNotice({
+      status: 'success',
+      message: __( 'Decremented order quantity.', 'lasntgadmin' )
+    });
+
+  }
+
+  async function incrementProductStock() {
+
+    if( isPaidOrder( order ) ) {
+
+      setNotice({
+        status: 'info',
+        message: __( 'Incrementing course spaces...', 'lasntgadmin' )
+      });
+
+      const incrementProductStockQuantityRequest = getUpdateProductRequest(
+        product.id,
+        nonce,
+        {
+          stock_quantity: product.stock_quantity + 1,
+          stock_status:  'instock' // instock, onbackorder, outofstock
+        }
+      );
+
+      const productRes = await apiFetch(
+        incrementProductStockQuantityRequest
+      );
+
+      setNotice({
+        status: 'success',
+        message: __( 'Incremented course spaces.', 'lasntgadmin' )
+      });
+
+    }
+
   }
 
   /**
@@ -265,40 +343,8 @@ const AttendeeFormFieldsetButtons = props => {
         await removeProductFromAttendee();
       }
 
-      /**
-       * Decrementing order quantity.
-       */
-      setNotice({
-        status: 'info',
-        message: __( 'Decrementing order quantity...', 'lasntgadmin' )
-      });
-
-      props.setOrderQuantity( quantity-1 );
-
-      const decrementOrderQuantityRequest = getUpdateOrderRequest(
-        order.id,
-        nonce,
-        {
-          total: order.total - product.price,
-          line_items: Array.isArray( order?.line_items ) ? order?.line_items.map( item => {
-            return {
-              id: item.id,
-              quantity: item.quantity - 1,
-              total: `${item.total - product.price}`,
-              subtotal: `${item.subtotal - product.price}`
-            };
-          }) : [],
-        }
-      );
-
-      const orderRes = await apiFetch(
-        decrementOrderQuantityRequest
-      );
-
-      setNotice({
-        status: 'success',
-        message: __( 'Decremented order quantity.', 'lasntgadmin' )
-      });
+      await decrementOrderQuantity();
+      await incrementProductStock();
 
       setNotice({
         status: 'info',
@@ -313,6 +359,10 @@ const AttendeeFormFieldsetButtons = props => {
       } );
       props.setAttendees( remainingAttendees );
 
+      /**
+       * This part of the code is never reached
+       * as this attendee has been removed from the DOM.
+       */
       setNotice({
         status: 'success',
         message: __( 'Removed attendee.', 'lasntgadmin' )
