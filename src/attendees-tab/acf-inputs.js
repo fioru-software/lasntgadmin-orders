@@ -5,26 +5,32 @@ import { __ } from '@wordpress/i18n';
 
 const SelectInput = props => {
 
-  const [ value, setValue ] = useState("");
+  const selectInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
-    if( ! isNil( props?.value ) ) {
-      setValue( props.value );
+    if( ! isNil( props.value ) ) {
+      selectInput.current.value = props.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.value;
+      }
     }
   }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      selectInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <select id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } value={ value } onChange={ handleChange } >
+      <select ref={ selectInput } id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } defaultValue={ props?.value } onChange={ handleChange } >
         { ! props.value && <option disabled value="">{ __( '- Select -', 'lasntgadmin' ) }</option> }
         { props.children }
       </select> 
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } />}
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } />}
     </>
   );
 
@@ -32,75 +38,100 @@ const SelectInput = props => {
 
 const TrueFalse = props => {
 
-  const [ checked, setChecked ] = useState(false);
+  const checkInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
-    if( ! isBoolean( props.checked ) ) {
-      setChecked( props.checked);
+    if( isBoolean( props.checked ) ) {
+      checkInput.current.checked = props.checked;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.checked;
+      }
+    } else {
+      checkInput.current.checked = false;
+      if( props?.disabled ) {
+        hiddenInput.current.value = false;
+      }
     }
-  }, [ props?.checked ]);
+  }, [ props.checked ]);
 
   function handleChange( e ) {
-    props.checked = e.target.checked;
-    setChecked( e.target.checked );
+    checkInput.current.checked = e.target.checked;
+    if( props?.disabled ) {
+      hiddenInput.current.value = e.target.checked;
+    }
   }
 
   return (
     <>
-      <input type="checkbox" id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } checked={ props.checked } onChange={ handleChange } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ checked } />}
+      <input ref={ checkInput } type="checkbox" id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } defaultChecked={ props?.checked } onChange={ handleChange } />
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.checked } />}
     </>
   );
 };
 
 const Checkbox = props => {
 
-  const [ checked, setChecked ] = useState(false);
+  const checkInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
     if( ! isNil( props.checked ) ) {
       if( isArray( props.checked ) ) {
-        setChecked( props.checked.map(Number).includes( props.value ) );
+        let checked = props.checked.map(Number).includes( props.value );
+        checkInput.current.checked = checked;
+        if( props?.disabled ) {
+          hiddenInput.current.value = checked;
+        }
       }
     } else {
-      setChecked(false);
+      checkInput.current.checked = false;
+      if( props?.disabled ) {
+        hiddenInput.current.value = false;
+      }
     }
-  }, [ props?.checked ]);
+  }, [ props.checked ]);
 
   function handleChange( e ) {
-    props.checked = e.target.checked;
-    setChecked( e.target.checked );
+      checkInput.current.checked = e.target.checked;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.checked;
+      }
   }
 
   return (
     <>
-      <input type="checkbox" id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } checked={ checked } onChange={ handleChange } value={ props.value } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ checked } />}
+      <input ref={ checkInput } type="checkbox" id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } defaultChecked={ props?.checked } onChange={ handleChange } value={ props.value } />
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.checked } />}
     </>
   );
 }
 
 const TextInput = props => {
 
-  const [ value, setValue ] = useState("");
+  const textInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
     if( ! isNil( props.value ) ) {
-      setValue( props.value);
-    } else {
-      setValue( "" );
+      textInput.current.value = props.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.value;
+      }
     }
-  }, [ props.value]);
+  }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      textInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <input name={ props.name } id={ props.id } type="text" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } value={ value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern }  disabled={ props?.disabled || false } onChange={ handleChange }/>
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } />}
+      <input ref={ textInput } name={ props.name } id={ props.id } type="text" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern }  disabled={ props?.disabled || false } onChange={ handleChange }/>
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } />}
     </>
   );
 
@@ -108,25 +139,29 @@ const TextInput = props => {
 
 const EmailInput = props => {
 
-  const [ value, setValue ] = useState("");
+  const textInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
     if( ! isNil( props.value ) ) {
-      setValue( props.value);
-    } else {
-      setValue( "" );
+      textInput.current.value = props.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.value;
+      }
     }
-  }, [ props.value]);
+  }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      textInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <input name={ props.name } id={ props.id } type="email" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } value={ value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^[^@\s]+@[^@\s]+\.[^@\s]+$" } disabled={ props?.disabled || false } onChange={ handleChange } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } /> }
+      <input ref={ textInput } name={ props.name } id={ props.id } type="email" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled || false } onChange={ handleChange } />
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
   );
 
@@ -134,25 +169,29 @@ const EmailInput = props => {
 
 const TextArea = props => {
 
-  const [ value, setValue ] = useState("");
+  const textInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
     if( ! isNil( props.value ) ) {
-      setValue( props.value);
-    } else {
-      setValue( "" );
+      textInput.current.value = props.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.value;
+      }
     }
-  }, [ props.value]);
+  }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      textInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <textarea id={ props?.id } disabled={ props?.disabled || false } name={ props?.name } value={  value } required={ props?.required } onChange={ handleChange } /> 
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } /> }
+      <textarea ref={ textInput } id={ props?.id } disabled={ props?.disabled || false } name={ props?.name } defaultValue={  props?.value } required={ props?.required } onChange={ handleChange } /> 
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
 
   );
@@ -161,7 +200,8 @@ const TextArea = props => {
 
 const DateInput = props => {
 
-  const [ value, setValue ] = useState("");
+  const dateInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
     if( ! isNil( props?.value ) ) {
@@ -169,21 +209,29 @@ const DateInput = props => {
       if(dt.invalid) {
         dt = DateTime.fromFormat(props.value, 'dd/MM/yyyy' );
       }
-      setValue( dt.toISODate() );
+      dateInput.current.value = dt.toISODate();
+      if( props?.disabled ) {
+        hiddenInput.current.value = dt.toISODate();
+      }
     } else {
-      setValue( "" );
+      dateInput.current.value = "";
+      if( props?.disabled ) {
+        hiddenInput.current.value = "";
+      }
     }
   }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      dateInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <input name={ props.name } id={ props.id } type="date" value={ value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled || false }  onChange={ handleChange } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } /> }
+      <input ref={ dateInput } name={ props.name } id={ props.id } type="date" defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled || false } onChange={ handleChange } />
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
   );
 
@@ -191,23 +239,29 @@ const DateInput = props => {
 
 const NumberInput = props => {
 
-  const [ value, setValue ] = useState("");
+  const numberInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
-    if( ! isNil( props?.value ) ) {
-      setValue( parseInt( props.value ) );
+    if( ! isNil( props.value ) ) {
+      numberInput.current.value = props.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.value;
+      }
     }
-  }, [ props?.value ]);
+  }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      numberInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <input name={ props.name } id={ props.id } type="number" value={ value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^\d+" } max={ props?.max } min={ props?.min || 0 } step={ props?.step || 1 } disabled={ props?.disabled || false } onChange={ handleChange } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } /> }
+      <input ref={ numberInput } name={ props.name } id={ props.id } type="number" defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "^\d+" } max={ props?.max } min={ props?.min || 0 } step={ props?.step || 1 } disabled={ props?.disabled || false } onChange={ handleChange } />
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
   );
 
@@ -215,25 +269,29 @@ const NumberInput = props => {
 
 const TelInput = props => {
 
-  const [ value, setValue ] = useState("");
+  const telInput = useRef(null);
+  const hiddenInput = useRef(null);
 
   useEffect( () => {
-    if( ! isNil( props?.value ) ) {
-      setValue( props.value );
-    } else {
-      setValue("");
+    if( ! isNil( props.value ) ) {
+      telInput.current.value = props.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = props.value;
+      }
     }
-  }, [ props?.value ]);
+  }, [ props.value ]);
 
-  function handleChange(e) {
-    props.value = e.target.value;
-    setValue(e.target.value);
+  function handleChange( e ) {
+      telInput.current.value = e.target.value;
+      if( props?.disabled ) {
+        hiddenInput.current.value = e.target.value;
+      }
   }
 
   return (
     <>
-      <input name={ props.name } id={ props.id } type="tel" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } value={ value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "[0-9+\s]+"} disabled={ props?.disabled || false } onChange={ handleChange } />
-      { props?.disabled && <input type="hidden" name={ props.name } value={ value } /> }
+      <input ref={ telInput } name={ props.name } id={ props.id } type="tel" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "[0-9+\s]+"} disabled={ props?.disabled || false } onChange={ handleChange } />
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
   );
 

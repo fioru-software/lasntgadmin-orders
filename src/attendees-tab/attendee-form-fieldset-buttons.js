@@ -2,7 +2,7 @@
 import { useContext, useState, useEffect } from '@wordpress/element';
 import { Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ProductContext, OrderContext, AttendeeContext, AttendeesContext } from './attendee-context';
+import { ProductContext, OrderContext, AttendeeContext, AttendeesContext, AttendeeFormContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
 import { isNil } from 'lodash';
@@ -13,6 +13,7 @@ import {
   getUpdateOrderRequest, 
   filterOrderMetaByKey, 
   filterAttendeeIdFromOrderMeta,
+  filterItemFromOrderMeta,
   isPaidOrder,
   isPaidStatus, 
   isGrantPaid, 
@@ -50,6 +51,7 @@ const AttendeeFormFieldsetButtons = props => {
   const attendees = useContext( AttendeesContext ); // All attendees
   const attendee = useContext( AttendeeContext ); // Attendee relevant to this button
   const order = useContext( OrderContext );
+  const attendeeFormContext = useContext( AttendeeFormContext );
 
   const [ isLoading, setLoading ] = useState(false);
   const [ notice, setNotice ] = useState(null);
@@ -70,17 +72,17 @@ const AttendeeFormFieldsetButtons = props => {
 
   useEffect( () => {
     setResetable( isResetButtonDisabled() );
-  }, [ product.status, attendee, isLoading, quantity ]);
+  }, [ product.status, attendee, isLoading, quantity, attendeeFormContext.isLoading ]);
 
   useEffect( () => {
     setRemovable( isRemoveButtonDisabled() );
-  }, [ product.status, order.payment_method, isLoading, attendee, quantity ]);
+  }, [ product.status, order.payment_method, isLoading, attendee, quantity, attendeeFormContext.isLoading ]);
 
   /**
    * Reset button is disabled when the course has a status considered to be closed
    */
   function isResetButtonDisabled() {
-    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading;
+    return isCourseClosed( product.status ) || ! isExistingAttendee( attendee ) || isLoading || attendeeFormContext.isLoading;
   }
 
   /**
@@ -89,7 +91,7 @@ const AttendeeFormFieldsetButtons = props => {
    * or payment method is not grant and purchase order
    */
   function isRemoveButtonDisabled() {
-    return isCourseClosed( product.status ) || isLoading || quantity < 2 || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
+    return attendeeFormContext.isLoading || isCourseClosed( product.status ) || isLoading || quantity < 2 || ( order.payment_method !== "" && ! isGrantPaid( order.payment_method ) && ! isPurchaseOrderPaid( order.payment_method ) );
   }
 
   /**
@@ -177,6 +179,7 @@ const AttendeeFormFieldsetButtons = props => {
         message: __( 'Removing attendee from order meta...', 'lasntgadmin' )
       });
 
+      order.meta_data = filterItemFromOrderMeta( 'attendee_ids', attendeeId, order.meta_data );
       const removeAttendeeFromOrderRequest = getRemoveAttendeeFromShopOrderRequest(
         order.id,
         attendeeId,

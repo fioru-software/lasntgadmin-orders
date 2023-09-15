@@ -17,14 +17,33 @@ function filterAttendeeIdFromOrderMeta( attendeeId, orderMeta ) {
   return [];
 }
 
+function filterItemFromOrderMeta( key, value, orderMeta ) {
+  return orderMeta.filter( item => {
+    if( item.key != key ) {
+      return true;
+    } else if( item.value != value ) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+}
+
 /**
  * @return { Boolean }
  */
 function isAttendeeIdInOrderMeta( attendeeId, orderMeta ) {
-  const attendeeIds = findOrderMetaByKey( 'attendee_ids', orderMeta);
-  if( attendeeIds !== undefined ) {
-    const attendeeIdsOrderMeta = filterOrderMetaByKey( 'attendee_ids', orderMeta );
-    return attendeeIdsOrderMeta.map( meta => meta.value ).map(Number).includes( parseInt(attendeeId) );
+  return isItemInOrderMeta( 'attendee_ids', attendeeId, orderMeta );
+}
+
+/**
+ * @return { Boolean }
+ */
+function isItemInOrderMeta( key, value, orderMeta ) {
+  const items = findOrderMetaByKey( key, orderMeta);
+  if( items !== undefined ) {
+    const filteredItems = filterOrderMetaByKey( key, orderMeta );
+    return filteredItems.map( meta => meta.value ).map(Number).includes( parseInt(value) );
   }
   return false;
 }
@@ -168,6 +187,7 @@ export {
   getPendingAttendeesStatus,
   findOrderMetaByKey,
   filterOrderMetaByKey,
+  filterItemFromOrderMeta,
   isPendingAttendeesStatus,
   isExistingOrder,
   isWaitingOrder,
@@ -178,6 +198,7 @@ export {
   isGrantPaid,
   isPurchaseOrderPaid,
   isAttendeeIdInOrderMeta,
+  isItemInOrderMeta,
   isPaidOrder,
   isDraftStatus
 };

@@ -43,33 +43,33 @@ const AttendeeFormFieldsetFields = props => {
             <div class="form-field form-row">
 
               { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && 
-                <TextInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={ getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength } required={ !!field.required }  disabled={ isFieldDisabled() }/> 
+                <TextInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={ getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength } required={ !!field.required }  disabled={ isFieldDisabled() }/> 
               }
 
-              { field.type === 'email' && <EmailInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={  getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength } required={ !!field.required } disabled={ isFieldDisabled() } /> }
+              { field.type === 'email' && <EmailInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={  getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength } required={ !!field.required } disabled={ isFieldDisabled() } /> }
 
               { field.type === 'textarea' && 
-              <TextArea id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={  getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
+              <TextArea id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={  getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
               }
 
               { field.type === 'date_picker' && 
-                <DateInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={ getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
+                <DateInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={ getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
               }
 
               { field.type === 'true_false' && 
-                <TrueFalse id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={  getAttendeeAcfValueByField( field, attendee ) } />
+                <TrueFalse id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={  getAttendeeAcfValueByField( field, attendee ) } />
               }
 
               { field.type === 'checkbox' && field.name === 'course_prerequisites_met' &&
-                <Checkbox id={ field.key } value={ product.id } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={ attendee?.acf?.course_prerequisites_met } />
+                <Checkbox id={ `attendee[${index}]['${field.key}']` } value={ product.id } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={ attendee?.acf?.course_prerequisites_met } />
               }
 
               { field.type === 'number' && 
-                <NumberInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={  getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
+                <NumberInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={  getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
               }
 
               { field.type === 'select' && 
-                <SelectInput id={ field.key } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } required={ !!field.required } value={ getAttendeeAcfValueByField( field, attendee ) } disabled={ isFieldDisabled() } >
+                <SelectInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } required={ !!field.required } value={ getAttendeeAcfValueByField( field, attendee ) } disabled={ isFieldDisabled() } >
                   { Object.keys(field.choices).map( ( key, index ) => {
                     return <option key={ key } value={ field.name === 'local_authority' ? key : field.choices[key] }>{ field.choices[key] }</option>
                   } ) }

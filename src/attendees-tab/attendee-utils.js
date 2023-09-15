@@ -142,7 +142,7 @@ function extractAcfInputName( name ) {
  */
 function extractAcfFieldValue( index, name, formData ) {
   const value = formData.get(`attendees[${index}]['acf']['${name}']`);
-  return value === "true" ? true : value === "false" ? false : value
+  return value === "on" ? true : value === null ? false : value
 } 
 
 function extractCoursePrerequisitesMetFieldValues( index, formData ) {

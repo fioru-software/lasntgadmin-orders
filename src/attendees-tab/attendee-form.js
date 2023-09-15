@@ -11,7 +11,7 @@ import { AttendeeFormFieldsets } from './attendee-form-fieldsets';
 import { isCourseClosed } from '../product-utils';
 import { isWaitingOrder, isPaidOrder, getUpdateShopOrderRequest } from '../order-utils';
 
-import { ProductContext, OrderContext, AcfFieldsContext, AttendeesContext } from './attendee-context';
+import { ProductContext, OrderContext, AcfFieldsContext, AttendeesContext, AttendeeFormContext } from './attendee-context';
 
 import { 
   extractValidAttendeesFromResponse,
@@ -293,29 +293,31 @@ const AttendeeForm = props => {
     <>
       <div class="form-wrap">
 
-        <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
+        <AttendeeFormContext.Provider value={ { isLoading } }>
+          <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
 
-          <div id="order_data" class="panel woocommerce-order-data">
+            <div id="order_data" class="panel woocommerce-order-data">
 
-            <ProductContext.Provider value={ props.product }>
-              <OrderContext.Provider value={ order }>
-                <AcfFieldsContext.Provider value={ props.fields }>
-                  <AttendeesContext.Provider value={ attendees }>
-                    <AttendeeFormFieldsets nonce={ nonce } groupId={ groupId } quantity={ quantity } setAttendees={ setAttendees } setFormNotice={ setNotice } setOrderQuantity={ setQuantity } />
-                  </AttendeesContext.Provider>
-                </AcfFieldsContext.Provider>
-              </OrderContext.Provider>
-            </ProductContext.Provider>
+              <ProductContext.Provider value={ props.product }>
+                <OrderContext.Provider value={ order }>
+                  <AcfFieldsContext.Provider value={ props.fields }>
+                    <AttendeesContext.Provider value={ attendees }>
+                      <AttendeeFormFieldsets nonce={ nonce } groupId={ groupId } quantity={ quantity } setAttendees={ setAttendees } setFormNotice={ setNotice } setOrderQuantity={ setQuantity } />
+                    </AttendeesContext.Provider>
+                  </AcfFieldsContext.Provider>
+                </OrderContext.Provider>
+              </ProductContext.Provider>
 
-            { quantity > 0 && 
-            <div class="form-field">
-              { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-              <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
-              { isLoading && <Spinner/> }
-            </div>}
+              { quantity > 0 && 
+              <div class="form-field">
+                { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
+                <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
+                { isLoading && <Spinner/> }
+              </div>}
 
-          </div>
-        </form>
+            </div>
+          </form>
+        </AttendeeFormContext.Provider>
       </div> 
     </>
   );
