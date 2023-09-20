@@ -4,7 +4,6 @@ import { Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Option } from './option.js';
 import { isDraftStatus } from '../order-utils.js';
 
 const StatusSelector = props => {
@@ -70,17 +69,17 @@ const StatusSelector = props => {
       { isLoading && <Spinner/> }
       { !isLoading && <select id={ props.id } disabled={ props.disabled } required value={ props.status } onChange={ handleChange } >
         { isDraftStatus( props.status ) &&
-        <option selected value="auto-draft">{ __( 'Draft', 'lasntgadmin' ) }</option>
+        <option value="auto-draft">{ __( 'Draft', 'lasntgadmin' ) }</option>
         }
         { ! isDraftStatus( props.status ) && 
-        <option selected disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option>
+        <option disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option>
         }
         { statuses.map( status => 
-          <Option value={ status.id }>{ status.name }</Option>
+          <option key={ status.id } value={ status.id }>{ status.name }</option>
         )}
       </select> }
       { ! isDraftStatus( props.status ) &&
-        <input type="hidden" name={ props.name } value={ props?.status } />
+        <input type="hidden" name={ props.name } defaultValue={ props?.status } />
       }
     </>
   );

@@ -36,17 +36,17 @@ const AttendeeFormFieldsetFields = props => {
 
       { isArray( fields ) && fields.map( field => {
         return (
-          <>
+          <div key={ `attendees[${index}]['${field.prefix}']['${field.name}']` } >
 
             <PredictiveSearchFields quantity={ quantity } index={ index } field={ field } onChange={ props.setAttendee } />
 
-            <div class="form-field form-row">
+            <div className="form-field form-row">
 
               { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && 
-                <TextInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={ getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength } required={ !!field.required }  disabled={ isFieldDisabled() }/> 
+                <TextInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={ getAttendeeAcfValueByField( field, attendee ) } maxLength={ field.maxlength } required={ !!field.required }  disabled={ isFieldDisabled() }/> 
               }
 
-              { field.type === 'email' && <EmailInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={  getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength } required={ !!field.required } disabled={ isFieldDisabled() } /> }
+              { field.type === 'email' && <EmailInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={  getAttendeeAcfValueByField( field, attendee ) } maxLength={ field.maxlength } required={ !!field.required } disabled={ isFieldDisabled() } /> }
 
               { field.type === 'textarea' && 
               <TextArea id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } value={  getAttendeeAcfValueByField( field, attendee ) } required={ !!field.required } disabled={ isFieldDisabled() } /> 
@@ -60,7 +60,7 @@ const AttendeeFormFieldsetFields = props => {
                 <TrueFalse id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={  getAttendeeAcfValueByField( field, attendee ) } />
               }
 
-              { field.type === 'checkbox' && field.name === 'course_prerequisites_met' &&
+              { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && 
                 <Checkbox id={ `attendee[${index}]['${field.key}']` } value={ product.id } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={ attendee?.acf?.course_prerequisites_met } />
               }
 
@@ -77,7 +77,7 @@ const AttendeeFormFieldsetFields = props => {
               }
 
             </div>
-          </>
+          </div>
         )
       })}
     </>

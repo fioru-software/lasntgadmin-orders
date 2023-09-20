@@ -21,15 +21,15 @@ const HiddenFields = props => {
 
       { ( attendee?.post_status || attendee?.status ) && <input type="hidden" name={ `attendees[${index}]['status']` } value={ attendee?.post_status || attendee?.status } /> }
 
-      { attendeeMetaExists( 'order_ids', attendee ) && attendee?.meta['order_ids'].map( orderId => <input type="hidden" name={ `attendees[${index}]['meta']['order_ids']` } value={ orderId } /> ) }
+      { attendeeMetaExists( 'order_ids', attendee ) && attendee?.meta['order_ids'].map( orderId => <input key={ orderId } type="hidden" name={ `attendees[${index}]['meta']['order_ids']` } value={ orderId } /> ) }
 
-      { attendeeMetaExists( 'product_ids', attendee ) && attendee?.meta['product_ids'].map( productId => <input type="hidden" name={ `attendees[${index}]['meta']['product_ids']` } value={ productId } /> ) }
+      { attendeeMetaExists( 'product_ids', attendee ) && attendee?.meta['product_ids'].map( productId => <input key={ productId } type="hidden" name={ `attendees[${index}]['meta']['product_ids']` } value={ productId } /> ) }
 
       { <input type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } />}
 
-      { attendeeMetaExists( 'groups-read', attendee ) && attendee?.meta['groups-read'].map( groupId => <input type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } /> ) }
+      { attendeeMetaExists( 'groups-read', attendee ) && attendee?.meta['groups-read'].map( groupId => <input key={ groupId } type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } /> ) }
 
-      { attendee?.acf?.course_prerequisites_met && attendee?.acf?.course_prerequisites_met.map( productId => <input type="hidden" name={ `attendees[${index}]['meta']['course_prerequisites_met']` } value={ productId } /> ) }
+      { attendee?.acf?.course_prerequisites_met && attendee?.acf?.course_prerequisites_met.map( productId => <input key={ productId } type="hidden" name={ `attendees[${index}]['meta']['course_prerequisites_met']` } value={ productId } /> ) }
 
     </>
   );

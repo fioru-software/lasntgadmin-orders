@@ -68,6 +68,7 @@ const TrueFalse = props => {
       { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.checked } />}
     </>
   );
+
 };
 
 const Checkbox = props => {
@@ -93,10 +94,10 @@ const Checkbox = props => {
   }, [ props.checked ]);
 
   function handleChange( e ) {
-      checkInput.current.checked = e.target.checked;
-      if( props?.disabled ) {
-        hiddenInput.current.value = e.target.checked;
-      }
+    checkInput.current.checked = e.target.checked;
+    if( props?.disabled ) {
+      hiddenInput.current.value = e.target.checked;
+    }
   }
 
   return (
@@ -105,7 +106,8 @@ const Checkbox = props => {
       { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.checked } />}
     </>
   );
-}
+
+};
 
 const TextInput = props => {
 
@@ -130,7 +132,7 @@ const TextInput = props => {
 
   return (
     <>
-      <input ref={ textInput } name={ props.name } id={ props.id } type="text" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern }  disabled={ props?.disabled || false } onChange={ handleChange }/>
+      <input ref={ textInput } name={ props.name } id={ props.id } type="text" maxLength={ props?.maxlength || 32 } minLength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern }  disabled={ props?.disabled || false } onChange={ handleChange }/>
       { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } />}
     </>
   );
@@ -160,7 +162,7 @@ const EmailInput = props => {
 
   return (
     <>
-      <input ref={ textInput } name={ props.name } id={ props.id } type="email" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled || false } onChange={ handleChange } />
+      <input ref={ textInput } name={ props.name } id={ props.id } type="email" maxLength={ props?.maxlength || 32 } minLength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ props?.disabled || false } onChange={ handleChange } />
       { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
   );
@@ -290,7 +292,7 @@ const TelInput = props => {
 
   return (
     <>
-      <input ref={ telInput } name={ props.name } id={ props.id } type="tel" maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "[0-9+\s]+"} disabled={ props?.disabled || false } onChange={ handleChange } />
+      <input ref={ telInput } name={ props.name } id={ props.id } type="tel" maxLength={ props?.maxlength || 32 } minLength={ props?.minlength || 1 } defaultValue={ props?.value } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern || "[0-9+\s]+"} disabled={ props?.disabled || false } onChange={ handleChange } />
       { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } /> }
     </>
   );

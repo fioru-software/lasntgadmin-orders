@@ -1,5 +1,5 @@
 
-import { render } from '@wordpress/element';
+import { createRoot, createElement, render } from '@wordpress/element';
 
 import { OrderForm } from './enrolment-tab/order-form';
 import { AttendeeForm } from './attendees-tab/attendee-form';
@@ -11,39 +11,50 @@ window.addEventListener(
   'load',
   function (e) {
 
-    const orderComponent = document.querySelector( '#lasntgadmin-orders-form' );
-    if( orderComponent ) {
-      render(
-        <OrderForm
-          groupApiPath={ orderComponent.dataset.groupApiPath } 
-          orderApiPath={ orderComponent.dataset.orderApiPath }
-          productApiPath={ orderComponent.dataset.productApiPath } 
-          nonce={ orderComponent.dataset.nonce } 
-          title={ orderComponent.dataset.title }
-          status={ orderComponent.dataset.status }
-          order={ JSON.parse(orderComponent.dataset.order) }
-          productId={ orderComponent.dataset.productId }
-          user={ JSON.parse(orderComponent.dataset.user) }
-        />,
-        orderComponent
-      );
+    const domElement = document.querySelector( '#lasntgadmin-orders-form' );
+    if( domElement ) {
+      const uiElement = createElement( OrderForm, {
+        groupApiPath: domElement.dataset.groupApiPath, 
+        orderApiPath: domElement.dataset.orderApiPath,
+        productApiPath: domElement.dataset.productApiPath, 
+        nonce: domElement.dataset.nonce, 
+        title: domElement.dataset.title,
+        status: domElement.dataset.status,
+        order: JSON.parse(domElement.dataset.order),
+        productId: domElement.dataset.productId,
+        user: JSON.parse(domElement.dataset.user)
+      });
+      if ( createRoot ) {
+        createRoot( domElement ).render( uiElement );
+      } else {
+        render( uiElement, domElement );
+      }
     }
+  },
+  false
+);
 
-    const attendeesComponent = document.querySelector( '#lasntgadmin-orders-attendees-form' );
-    if( attendeesComponent ) {
-      render(
-        <AttendeeForm
-          quantity={ attendeesComponent.dataset.quantity }
-          nonce={ attendeesComponent.dataset.nonce } 
-          fields={ JSON.parse( attendeesComponent.dataset.fields ) }
-          status={ attendeesComponent.dataset.status }
-          order={ JSON.parse(attendeesComponent.dataset.order) }
-          groupId={ JSON.parse(attendeesComponent.dataset.groupId) }
-          attendees={ JSON.parse(attendeesComponent.dataset.attendees) }
-          product={ JSON.parse(attendeesComponent.dataset.product) }
-        />,
-        attendeesComponent
-      );
+window.addEventListener(
+  'load',
+  function (e) {
+
+    const domElement = document.querySelector( '#lasntgadmin-orders-attendees-form' );
+    if( domElement ) {
+      const uiElement = createElement( AttendeeForm, {
+        quantity: domElement.dataset.quantity,
+        nonce: domElement.dataset.nonce, 
+        fields: JSON.parse( domElement.dataset.fields ),
+        status: domElement.dataset.status,
+        order: JSON.parse(domElement.dataset.order),
+        groupId: JSON.parse(domElement.dataset.groupId),
+        attendees: JSON.parse(domElement.dataset.attendees),
+        product: JSON.parse(domElement.dataset.product)
+      });
+      if ( createRoot ) {
+        createRoot( domElement ).render( uiElement );
+      } else {
+        render( uiElement, domElement );
+      }
     }
 
   },

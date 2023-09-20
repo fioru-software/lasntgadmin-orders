@@ -382,10 +382,10 @@ const AttendeeFormFieldsetButtons = props => {
 
   return (
     <>
-      <div class="form-field">
+      <div className="form-field">
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-        <button class="button alt save_order wp-element-button" onClick={ handleResetAttendee } disabled={ isResetable } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>&nbsp;
-        <button class="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } disabled={ isRemovable } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
+        <button className="button alt save_order wp-element-button" onClick={ handleResetAttendee } disabled={ isResetable } >{ __( 'Reset Attendee', 'lasntgadmin' ) }</button>&nbsp;
+        <button className="button alt save_order wp-element-button" onClick={ handleRemoveAttendee } disabled={ isRemovable } >{ __( 'Remove Attendee', 'lasntgadmin' ) }</button>
         { isLoading && <Spinner/> }
       </div>
     </>

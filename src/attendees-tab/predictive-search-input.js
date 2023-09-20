@@ -139,14 +139,14 @@ const PredictiveSearchInput = props => {
 
   return (
 		<>
-			<p class="description">{ props.helpText }</p>
-			<input class={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxlength={ props?.maxlength || 32 } minlength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ handleInput } />
+			<p className="description">{ props.helpText }</p>
+			<input className={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxLength={ props?.maxlength || 32 } minLength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ handleInput } />
       { disabled && <input type="hidden" name={ props.name } value={ props?.defaultValue } /> }
 
 			{ showSearchResult() && <RadioControl options={ options } onChange={ handleSelect } />}
 
-      { showSearchButton() && <button class="button-link" disabled={ isSearchButtonDisabled() } onClick={ handleSearch }>Search</button> }
-      { showCancelButton() && <button class="button-link" onClick={ handleCancel }>Cancel</button> }
+      { showSearchButton() && <button className="button-link" disabled={ isSearchButtonDisabled() } onClick={ handleSearch }>Search</button> }
+      { showCancelButton() && <button className="button-link" onClick={ handleCancel }>Cancel</button> }
 			{ showSpinner() && <Spinner/>  }
 		</>
   );

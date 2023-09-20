@@ -16,7 +16,7 @@ import { isUndefined, isNil } from "lodash";
  */
 const GroupSelector = props => {
 
-  const [ groupId, setGroupId ] = useState(null);
+  const [ groupId, setGroupId ] = useState("");
   const [ groups, setGroups ] = useState([]);
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(true);
@@ -29,7 +29,7 @@ const GroupSelector = props => {
   }, [props?.disabled]);
 
   useEffect(() => {
-    if( ! isUndefined( props.groupId) ) {
+    if( ! isNil( props.groupId) ) {
       setGroupId(props.groupId);
     }
   }, [ props?.groupId ]);
@@ -70,8 +70,8 @@ const GroupSelector = props => {
     <>
       { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ props.disabled } required onChange={ props.onChange } value={ groupId } defaultValue={ groupId }>
-        { ! groupId && <option selected disabled value="">Please select</option> }
+      { !isLoading && <select id={ props.id } disabled={ props.disabled } required onChange={ props.onChange } value={ groupId }>
+        <option disabled value="">Please select</option> 
         { groups.map( (group) => {
           return <option key={ group.group_id.toString() } value={ group.group_id } >{ group.name }</option>
         })}

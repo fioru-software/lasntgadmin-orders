@@ -47,14 +47,14 @@ const PredictiveSearchFields = props => {
   }
 
   return (
-    <div class="form-field form-row">
-      <label for={ `attendee[${index}]['${field.key}']` }>{ field.label }{ !!field.required && <span class="required"> *</span> }</label>
+    <div className="form-field form-row">
+      <label htmlFor={ `attendee[${index}]['${field.key}']` }>{ field.label }{ !!field.required && <span className="required"> *</span> }</label>
 
-      { field.type === 'text' && field.name === 'first_name' && <PredictiveSearchInput nonce={ nonce } acfFieldName={ field.name } acfClarifyingFieldName="last_name" helpText="Enter or search for existing first names" id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength} required={ !!field.required } onChange={ handleSelect } onInput={ handleInput } /> }
+      { field.type === 'text' && field.name === 'first_name' && <PredictiveSearchInput nonce={ nonce } acfFieldName={ field.name } acfClarifyingFieldName="last_name" helpText="Enter or search for existing first names" id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ getAttendeeAcfValueByField( field, attendee ) } maxLength={ field.maxlength} required={ !!field.required } onChange={ handleSelect } onInput={ handleInput } /> }
 
-      { field.type === 'text' && field.name === 'last_name' && <PredictiveSearchInput nonce={ nonce } acfFieldName={ field.name } acfClarifyingFieldName="first_name" helpText="Enter or search for existing last names" id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength} required={ !!field.required } onChange={ handleSelect } onInput={ handleInput } /> }
+      { field.type === 'text' && field.name === 'last_name' && <PredictiveSearchInput nonce={ nonce } acfFieldName={ field.name } acfClarifyingFieldName="first_name" helpText="Enter or search for existing last names" id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ getAttendeeAcfValueByField( field, attendee ) } maxLength={ field.maxlength} required={ !!field.required } onChange={ handleSelect } onInput={ handleInput } /> }
 
-      { field.type === 'text' && field.name === 'employee_number' && <PredictiveSearchInput capitalise={ true } nonce={ nonce } acfFieldName={ field.name } helpText="Enter or search for existing employee numbers" id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ getAttendeeAcfValueByField( field, attendee ) } maxlength={ field.maxlength} required={ !!field.required } onChange={ handleSelect } onInput={ handleInput } /> }
+      { field.type === 'text' && field.name === 'employee_number' && <PredictiveSearchInput capitalise={ true } nonce={ nonce } acfFieldName={ field.name } helpText="Enter or search for existing employee numbers" id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } defaultValue={ getAttendeeAcfValueByField( field, attendee ) } maxLength={ field.maxlength} required={ !!field.required } onChange={ handleSelect } onInput={ handleInput } /> }
 
     </div>
   );

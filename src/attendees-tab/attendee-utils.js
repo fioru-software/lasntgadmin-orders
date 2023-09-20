@@ -147,12 +147,12 @@ function extractAcfFieldValue( index, name, formData ) {
 
 function extractCoursePrerequisitesMetFieldValues( index, formData ) {
   const existingCoursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['meta']['course_prerequisites_met']`).map(Number).filter(Number);
-  const courePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
+  const coursePrerequisitesMetProductIds = formData.getAll(`attendees[${index}]['acf']['course_prerequisites_met']`).map(Number).filter(Number);
   // use set to ensure array values are unique
   const set = new Set(
     [
       ... existingCoursePrerequisitesMetProductIds,
-      ... courePrerequisitesMetProductIds
+      ... coursePrerequisitesMetProductIds
     ]
   );
   return [ ... set ];
