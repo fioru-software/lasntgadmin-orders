@@ -263,17 +263,21 @@ class OrderUtils {
 			if ( $line_item ) {
 				if ( 'order_product' === $column ) {
 					$product = $line_item->get_product();
-					echo esc_html( $product->get_name() );
+					if ( is_a( $product, 'WC_Product' ) ) {
+						echo esc_html( $product->get_name() );
+					}
 				}
 				if ( 'order_quantity' === $column ) {
 					echo esc_html( $line_item->get_quantity() );
 				}
 				if ( 'order_product_start_datetime' === $column ) {
 					$product           = $line_item->get_product();
-					$course_start_date = get_field( 'field_63881aee31478', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					$course_start_time = get_field( 'field_63881b0531479', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					if ( ! empty( $course_start_date ) && ! empty( $course_start_time ) ) {
-						echo wp_kses_data( date_format( DateTime::createFromFormat( 'd/m/Y g:i a', "$course_start_date $course_start_time" ), 'H:i M j, Y' ) );
+					if ( is_a( $product, 'WC_Product' ) ) {
+						$course_start_date = get_field( 'field_63881aee31478', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						$course_start_time = get_field( 'field_63881b0531479', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						if ( ! empty( $course_start_date ) && ! empty( $course_start_time ) ) {
+							echo wp_kses_data( date_format( DateTime::createFromFormat( 'd/m/Y g:i a', "$course_start_date $course_start_time" ), 'H:i M j, Y' ) );
+						}
 					}
 				}
 			}
