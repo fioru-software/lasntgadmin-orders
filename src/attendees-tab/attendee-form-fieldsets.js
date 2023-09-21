@@ -16,7 +16,7 @@ const AttendeeFormFieldsets = props => {
   const attendees = useContext( AttendeesContext ); // All attendees
 
   return (
-      attendees.map( ( attendee, index ) => <AttendeeFormFieldset groupId={ groupId } quantity={ quantity } index={ index } nonce={ nonce } attendee={ attendee } setAttendees={ props.setAttendees } setFormNotice={ props.setFormNotice } setOrderQuantity={ props.setOrderQuantity } /> )
+    attendees.map( ( attendee, index ) => <AttendeeFormFieldset key={ index } groupId={ groupId } quantity={ quantity } index={ index } nonce={ nonce } attendee={ attendee } setAttendees={ props.setAttendees } setFormNotice={ props.setFormNotice } setOrderQuantity={ props.setOrderQuantity } /> )
   );
 
 };

@@ -17,9 +17,9 @@ import { isObject, isNil, isNull, isUndefined } from "lodash";
 const ProductPanel = props => {
 
   const [ notice, setNotice ] = useState(null);
-  const [ price, setPrice ] =  useState(null);
-  const [ quantity, setQuantity ] = useState(null);
-  const [ total, setTotal ] = useState(null);
+  const [ price, setPrice ] =  useState(0);
+  const [ quantity, setQuantity ] = useState(0);
+  const [ total, setTotal ] = useState(0);
   const [ products, setProducts ] = useState([]);
   const [ spaces, setSpaces ] = useState(null);
   const [ stock, setStock ] = useState(null);
@@ -139,12 +139,12 @@ const ProductPanel = props => {
 
 
   function reset() {
-    setTotal(null);
-    setQuantity(null);
+    setTotal(0);
+    setQuantity(0);
     setNotice(null);
-    setPrice(null);
-    setStock(null);
-    setGroupId(null);
+    setPrice(0);
+    setStock(0);
+    setGroupId("");
   }
 
   /**
@@ -220,35 +220,35 @@ const ProductPanel = props => {
   return (
     <>
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-        <div class="form-field form-row">
-          <label for="product">{ __( 'Course', 'lasntgadmin' ) }<span class="required"> *</span></label>
+        <div className="form-field form-row">
+          <label htmlFor="product">{ __( 'Course', 'lasntgadmin' ) }<span className="required"> *</span></label>
           <ProductSelector id="product" name="product" disabled={ isProductFormDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
         </div>
         { props?.lineItem?.id && <input type="hidden" name="line_item_id" value={ props.lineItem.id } /> }
 
         { product && 
-          <div class="form-field form-row">
-            <label for="order_group">{ __( 'Group', 'lasntgadmin' ) }<span class="required"> *</span></label>
+          <div className="form-field form-row">
+            <label htmlFor="order_group">{ __( 'Group', 'lasntgadmin' ) }<span className="required"> *</span></label>
             <GroupSelector productId={ productId } disabled={ isProductFormDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
           </div> 
         }
 
         { !!price && productId > 0 && groupId &&
           <>
-            <div class="form-field form-row">
-              <label for="price">{ __( 'Price', 'lasntgadmin' ) }</label>
+            <div className="form-field form-row">
+              <label htmlFor="price">{ __( 'Price', 'lasntgadmin' ) }</label>
               <input type="number" id="price" disabled placeholder="0" value={ price } />
               <input type="hidden" name="price" value={ price } />
             </div>
 
-            <div class="form-field form-row">
-              <label for="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span class="required"> *</span></label>
-              <input type="number" id="quantity" disabled={ isProductFormDisabled && isQuantityDisabled } step="1" min="1" max={ props.max } autocomplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
+            <div className="form-field form-row">
+              <label htmlFor="quantity">{ __( 'Quantity', 'lasntgadmin' ) }<span className="required"> *</span></label>
+              <input type="number" id="quantity" disabled={ isProductFormDisabled && isQuantityDisabled } step="1" min="1" max={ props.max } autoComplete="off" placeholder="0" onChange={ handleQuantitySelect } value={ quantity } required />
               <input type="hidden" name="quantity" value={ quantity } />
             </div>
 
-            <div class="form-field form-row">
-              <label for="total">{ __( 'Total', 'lasntgadmin' ) }</label>
+            <div className="form-field form-row">
+              <label htmlFor="total">{ __( 'Total', 'lasntgadmin' ) }</label>
               <input type="number" id="total" type="number" disabled placeholder="0" value={ total } />
               <input type="hidden" name="total" value={ total } />
             </div>

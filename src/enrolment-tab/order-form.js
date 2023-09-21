@@ -129,7 +129,7 @@ const OrderForm = props => {
       setIsLoading(true);
       setSubmitButtonDisabled(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-      props.order = await apiFetch( 
+      const order = await apiFetch( 
         {
           path: isExistingOrder( props.order ) ? `/wc/v3/orders/${ props.order.id }` : `/wc/v3/orders`,
           method,
@@ -155,18 +155,18 @@ const OrderForm = props => {
         });
       }
 
-      switch( props.order.status ) {
+      switch( order.status ) {
 
         case getWaitingStatus():
           document.location.assign(`/wp-admin/edit.php?post_type=shop_order`);
           break;
 
         case getPendingAttendeesStatus():
-          document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=attendees`);
+          document.location.assign(`/wp-admin/post.php?post=${ order.id }&action=edit&tab=attendees`);
           break;
 
         case getPendingPaymentStatus():
-          document.location.assign(`/wp-admin/post.php?post=${ props.order.id }&action=edit&tab=payment`);
+          document.location.assign(`/wp-admin/post.php?post=${ order.id }&action=edit&tab=payment`);
           break;
 
         default:
@@ -186,19 +186,19 @@ const OrderForm = props => {
   }
 
   return (
-    <form class="panel-wrap woocommerce" onSubmit={ handleSubmit } >
+    <form className="panel-wrap woocommerce" onSubmit={ handleSubmit } >
 
       <input type="hidden" name="email" value={ props.order.billing.email || props.user.data.user_email } />
       <input type="hidden" name="currency" value={ props.order.currency || props.currency } />
       <input type="hidden" name="customer_id" value={ props.order.customer_id || props.user.ID } />
 
-      <div id="order_data" class="panel woocommerce-order-data">
+      <div id="order_data" className="panel woocommerce-order-data">
 
-        <div class="form-wrap">
+        <div className="form-wrap">
 
           { ! isDraftStatus( props.status ) && 
-            <div class="form-field form-row">
-              <label for="order_status">{ __( 'Status', 'lasntgadmin' ) }<span class="required"> *</span></label>
+            <div className="form-field form-row">
+              <label htmlFor="order_status">{ __( 'Status', 'lasntgadmin' ) }<span className="required"> *</span></label>
               <StatusSelector id="order_status" disabled={ submitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
             </div>
           }
@@ -208,10 +208,10 @@ const OrderForm = props => {
         </div>
 
 
-        <div class="form-wrap">
-          <div class="form-field">
+        <div className="form-wrap">
+          <div className="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ submitButtonDisabled && ! canUserEdit() } type="submit" class="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
+          <button disabled={ submitButtonDisabled && ! canUserEdit() } type="submit" className="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
           </div>
         </div>

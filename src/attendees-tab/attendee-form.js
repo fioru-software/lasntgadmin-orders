@@ -291,12 +291,12 @@ const AttendeeForm = props => {
 
   return (
     <>
-      <div class="form-wrap">
+      <div className="form-wrap">
 
         <AttendeeFormContext.Provider value={ { isLoading } }>
-          <form class="panel-wrap woocommerce" onSubmit={ handleSubmit }>
+          <form className="panel-wrap woocommerce" onSubmit={ handleSubmit }>
 
-            <div id="order_data" class="panel woocommerce-order-data">
+            <div id="order_data" className="panel woocommerce-order-data">
 
               <ProductContext.Provider value={ props.product }>
                 <OrderContext.Provider value={ order }>
@@ -309,9 +309,9 @@ const AttendeeForm = props => {
               </ProductContext.Provider>
 
               { quantity > 0 && 
-              <div class="form-field">
+              <div className="form-field">
                 { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-                <button type="submit" class="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
+                <button type="submit" className="button alt save_order wp-element-button button-primary" name="save" value="Create" disabled={ isSubmitButtonDisabled() } >{ __( 'Save attendees', 'lasntgadmin' ) }</button>
                 { isLoading && <Spinner/> }
               </div>}
 

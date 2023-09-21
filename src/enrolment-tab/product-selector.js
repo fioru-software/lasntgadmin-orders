@@ -20,7 +20,7 @@ import { isNil, isBoolean } from "lodash";
 const ProductSelector = props => {
 
   const [ isLoading, setIsLoading ] = useState(true);
-  const [ productId, setProductId ] = useState(null);
+  const [ productId, setProductId ] = useState("");
   const [ isDisabled, setIsDisabled ]  = useState(true);
 
   useEffect( () => {
@@ -39,7 +39,7 @@ const ProductSelector = props => {
     async function runFetch() {
       try {
         setIsLoading(true);
-        setProductId(null);
+        setProductId("");
         apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
         const result = await apiFetch( {
           path: `${props.apiPath}`,
@@ -67,14 +67,14 @@ const ProductSelector = props => {
   return (
     <>
       { isLoading && <Spinner/> }
-      { !isLoading && <select id={ props.id } disabled={ isBoolean( props.disabled ) ? props.disabled : isDisabled } required onChange={ props.onChange } value={ productId } defaultValue={ productId } >
-        <option selected disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option>
+      { !isLoading && <select id={ props.id } disabled={ isBoolean( props.disabled ) ? props.disabled : isDisabled } required onChange={ props.onChange } value={ productId } >
+        <option disabled value="">{ __( 'Please select', 'lasntgadmin' ) }</option>
         { props.products.map( (product) => {
           return <option key={ product.id.toString() } value={ product.id }>{ product.name }</option>
         }
         )}
       </select> }
-      <input type="hidden" name={ props.name } value={ props?.productId } />
+      <input type="hidden" name={ props.name } defaultValue={ props?.productId } />
     </>
   );
 
