@@ -293,14 +293,14 @@ class OrderUtils {
 
 	public static function get_product( WC_Order $order ): WC_Product {
 		$items = $order->get_items();
-		if( count( $items ) ) {
+		if ( count( $items ) ) {
 			return reset( $items )->get_product();
 		}
 	}
 
 	public static function get_product_id( WC_Order $order ): int {
 		$product = self::get_product( $order );
-		if( is_a( $product, 'WC_Product' ) ) {
+		if ( is_a( $product, 'WC_Product' ) ) {
 			return $product->get_id();
 		}
 	}
