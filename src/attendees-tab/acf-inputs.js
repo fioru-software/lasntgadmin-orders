@@ -71,7 +71,7 @@ const TrueFalse = props => {
 
 };
 
-const Checkbox = props => {
+const CoursePrerequisitesMetCheckbox = props => {
 
   const checkInput = useRef(null);
   const hiddenInput = useRef(null);
@@ -82,7 +82,7 @@ const Checkbox = props => {
         let checked = props.checked.map(Number).includes( props.value );
         checkInput.current.checked = checked;
         if( props?.disabled ) {
-          hiddenInput.current.value = checked;
+          hiddenInput.current.value = props.value;
         }
       }
     } else {
@@ -103,7 +103,7 @@ const Checkbox = props => {
   return (
     <>
       <input ref={ checkInput } type="checkbox" id={ props.id } name={ props.name } disabled={ props?.disabled || false } required={ props?.required || false } defaultChecked={ props?.checked } onChange={ handleChange } value={ props.value } />
-      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.checked } />}
+      { props?.disabled && <input ref={ hiddenInput } type="hidden" name={ props.name } defaultValue={ props?.value } />}
     </>
   );
 
@@ -307,6 +307,6 @@ export {
   DateInput,
   NumberInput,
   TelInput,
-  Checkbox,
+  CoursePrerequisitesMetCheckbox,
   TrueFalse
 };

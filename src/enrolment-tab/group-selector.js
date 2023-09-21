@@ -76,7 +76,7 @@ const GroupSelector = props => {
           return <option key={ group.group_id.toString() } value={ group.group_id } >{ group.name }</option>
         })}
       </select> }
-      <input type="hidden" name={ props.name } value={ groupId } />
+      <input type="hidden" name={ props.name } defaultValue={ groupId } />
     </>
   );
 

@@ -1,7 +1,7 @@
 
 import { useContext, useState, useEffect } from '@wordpress/element';
 
-import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, TrueFalse, Checkbox } from './acf-inputs';
+import { TextArea, TextInput, SelectInput, EmailInput, DateInput, NumberInput, TrueFalse, CoursePrerequisitesMetCheckbox } from './acf-inputs';
 
 import { __ } from '@wordpress/i18n';
 
@@ -38,9 +38,12 @@ const AttendeeFormFieldsetFields = props => {
         return (
           <div key={ `attendees[${index}]['${field.prefix}']['${field.name}']` } >
 
-            <PredictiveSearchFields quantity={ quantity } index={ index } field={ field } onChange={ props.setAttendee } />
-
             <div className="form-field form-row">
+
+              <label htmlFor={ `attendee[${index}]['${field.key}']` }>{ field.label }{ !!field.required && <span className="required"> *</span> }</label>
+              { field.instructions && <p className="description">{ field.instructions }</p> }
+
+              <PredictiveSearchFields quantity={ quantity } index={ index } field={ field } onChange={ props.setAttendee } />
 
               { field.type === 'text' && field.name !== 'employee_number' && field.name !== 'last_name' && field.name !== 'first_name' && 
                 <TextInput id={ `attendee[${index}]['${field.key}']` } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } placeholder={ field.placeholder } value={ getAttendeeAcfValueByField( field, attendee ) } maxLength={ field.maxlength } required={ !!field.required }  disabled={ isFieldDisabled() }/> 
@@ -61,7 +64,7 @@ const AttendeeFormFieldsetFields = props => {
               }
 
               { field.type === 'checkbox' && field.name === 'course_prerequisites_met' && 
-                <Checkbox id={ `attendee[${index}]['${field.key}']` } value={ product.id } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={ attendee?.acf?.course_prerequisites_met } />
+                <CoursePrerequisitesMetCheckbox id={ `attendee[${index}]['${field.key}']` } value={ product.id } instructions={ field.instructions } name={ `attendees[${index}]['${field.prefix}']['${field.name}']` } disabled={ isFieldDisabled() } required={ !!field.required } checked={ attendee?.acf?.course_prerequisites_met } />
               }
 
               { field.type === 'number' && 
