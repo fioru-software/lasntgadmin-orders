@@ -271,7 +271,7 @@ class OrderUtils {
 					echo esc_html( $line_item->get_quantity() );
 				}
 				if ( 'order_product_start_datetime' === $column ) {
-					$product           = $line_item->get_product();
+					$product = $line_item->get_product();
 					if ( is_a( $product, 'WC_Product' ) ) {
 						$course_start_date = get_field( 'field_63881aee31478', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						$course_start_time = get_field( 'field_63881b0531479', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -280,8 +280,8 @@ class OrderUtils {
 						}
 					}
 				}
-			}
-		}
+			}//end if
+		}//end if
 	}
 
 	/**
