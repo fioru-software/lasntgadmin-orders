@@ -271,7 +271,7 @@ class OrderUtils {
 					echo esc_html( $line_item->get_quantity() );
 				}
 				if ( 'order_product_start_datetime' === $column ) {
-					$product           = $line_item->get_product();
+					$product = $line_item->get_product();
 					if ( is_a( $product, 'WC_Product' ) ) {
 						$course_start_date = get_field( 'field_63881aee31478', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						$course_start_time = get_field( 'field_63881b0531479', $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -280,8 +280,8 @@ class OrderUtils {
 						}
 					}
 				}
-			}
-		}
+			}//end if
+		}//end if
 	}
 
 	/**
@@ -322,6 +322,37 @@ class OrderUtils {
 			)
 		);
 		return $product_ids;
+	}
+
+	/**
+	 * Get All orders IDs for a given product ID.
+	 * Caching the result for 10 seconds, so WordPress doesn't run the query multiple times.
+	 */
+	public static function get_orders_ids_by_product_id( $product_id, $order_status = [ 'wc-completed', 'wc-on-hold' ] ) {
+		global $wpdb;
+
+		$order_statuses = implode( "','", $order_status );
+		$transient_id   = md5( "$product_id$order_statuses" );
+		$order_ids      = get_transient( $transient_id );
+
+		if ( false === $order_ids ) {
+			// It wasn't there, so regenerate the data and save the transient.
+			$statement = $wpdb->prepare(
+				'SELECT order_items.order_id ' .
+				"FROM {$wpdb->prefix}woocommerce_order_items as order_items " .
+				"LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta ON order_items.order_item_id = order_item_meta.order_item_id " .
+				"LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID " .
+				"WHERE posts.post_type = 'shop_order' " .
+				"AND posts.post_status IN ( '$order_statuses' ) " . // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"AND order_items.order_item_type = 'line_item' " .
+				"AND order_item_meta.meta_key = '_product_id' " .
+				'AND order_item_meta.meta_value = %d',
+				$product_id
+			);
+			$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			set_transient( $transient_id, $order_ids, MINUTE_IN_SECONDS / 6 );
+		}
+		return $order_ids;
 	}
 
 	public static function get_attendees( WC_Order $order ): array {
