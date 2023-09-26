@@ -45,6 +45,83 @@ class OrderUtils {
 	}
 
 	/**
+	 * Each order's meta data contains an array of attendee_ids, which we count and sum.
+	 */
+	public static function get_total_attendees_for_completed_orders_by_product_id_and_group_id( int $product_id, int $group_id = 0 ): int {
+		$completed_order_ids = self::get_order_ids_by_product_id( $product_id, $group_id, [ 'wc-completed', 'wc-on-hold' ] );
+		return array_reduce(
+			$completed_order_ids,
+			function ( $count, $order_id ) {
+				$count += count( get_post_meta( $order_id, 'attendee_ids', false ) );
+				return $count;
+			},
+			0
+		);
+	}
+
+	/**
+	 * Caching the result for 10 seconds, so WordPress can't run the query multiple times per request.
+	 *
+	 * @param int   $product_id Required. A product id.
+	 * @param int   $group_id Optional.  A group id.
+	 * @param array $order_status Optional array of order statuses.
+	 * @return int[]
+	 */
+	public static function get_order_ids_by_product_id( int $product_id, int $group_id = 0, array $order_status = [] ): array {
+		global $wpdb;
+
+		$order_statuses = implode( "','", $order_status );
+		$transient_id   = md5( "$product_id$group_id$order_statuses" );
+		$order_ids      = get_transient( $transient_id );
+
+		if ( false === $order_ids ) {
+			$args   = [ $product_id ];
+			$select = "SELECT ID FROM {$wpdb->posts}";
+			$joins  = [
+				"JOIN wp_woocommerce_order_items ON wp_woocommerce_order_items.order_id = {$wpdb->posts}.ID",
+				'JOIN wp_woocommerce_order_itemmeta ON wp_woocommerce_order_items.order_item_id = wp_woocommerce_order_itemmeta.order_item_id',
+			];
+			$wheres = [
+				"WHERE {$wpdb->posts}.post_type = 'shop_order'",
+				"AND wp_woocommerce_order_items.order_item_type = 'line_item' AND wp_woocommerce_order_itemmeta.meta_key = '_product_id'",
+				'AND wp_woocommerce_order_itemmeta.meta_value = %d',
+			];
+
+			if ( count( $order_status ) > 0 ) {
+				array_push(
+					$wheres,
+					"AND {$wpdb->posts}.post_status IN ( '$order_statuses' ) "
+				);
+			}
+
+			if ( $group_id > 0 ) {
+				array_push(
+					$joins,
+					"JOIN {$wpdb->postmeta} ON {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID"
+				);
+				array_push(
+					$wheres,
+					"AND {$wpdb->postmeta}.meta_key = 'groups-read' AND {$wpdb->postmeta}.meta_value = %d"
+				);
+				array_push(
+					$args,
+					$group_id
+				);
+			}
+
+			$join      = implode( ' ', $joins );
+			$where     = implode( ' ', $wheres );
+			$statement = $wpdb->prepare(
+				"$select $join $where", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				...$args
+			);
+			$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared    
+			set_transient( $transient_id, $order_ids, MINUTE_IN_SECONDS / 6 );
+		}//end if
+		return $order_ids;
+	}
+
+	/**
 	 * Prevents an attendee from enrolling into the same course more than once.
 	 *
 	 * @return stdClass|WP_Error Post object or WP_Error.
@@ -57,7 +134,7 @@ class OrderUtils {
 			 * We only set ?attendee_id query param when removing an attendee from the order.
 			 * Additionally we make sure the attendee_id is being removed from order's attendee_ids.
 			 */
-			if ( isset( $params['attendee_id'] ) && ! in_array( $attendee_id, $params['meta']['attendee_ids'], false ) ) {
+			if ( isset( $params['attendee_id'] ) && ! in_array( $params['attendee_id'], $params['meta']['attendee_ids'], false ) ) {
 				return $post;
 			}
 
