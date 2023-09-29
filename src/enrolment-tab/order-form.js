@@ -25,7 +25,7 @@ const OrderForm = props => {
 
   const [ notice, setNotice ] = useState(null);
   const [ isLoading, setIsLoading ] = useState(false);
-  const [ submitButtonDisabled, setSubmitButtonDisabled ] = useState(false);
+  const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create enrolment");
   const oldStatus = props.order.status;
@@ -199,11 +199,11 @@ const OrderForm = props => {
           { ! isDraftStatus( props.status ) && 
             <div className="form-field form-row">
               <label htmlFor="order_status">{ __( 'Status', 'lasntgadmin' ) }<span className="required"> *</span></label>
-              <StatusSelector id="order_status" disabled={ submitButtonDisabled } name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
+              <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
             </div>
           }
           
-          <ProductPanel max={ 12 } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
+          <ProductPanel max={ 12 } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } orderApiPath={ props.orderApiPath } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
 
         </div>
 
@@ -211,7 +211,7 @@ const OrderForm = props => {
         <div className="form-wrap">
           <div className="form-field">
           { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
-          <button disabled={ submitButtonDisabled && ! canUserEdit() } type="submit" className="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
+          <button disabled={ isSubmitButtonDisabled } type="submit" className="button save_order wp-element-button button-primary" name="save" value="Create">{ buttonText }</button>
           { isLoading && <Spinner/> }
           </div>
         </div>
