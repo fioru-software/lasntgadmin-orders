@@ -302,14 +302,11 @@ class PageUtils {
 		$order                            = wc_get_order( $post->ID );
 		$product                          = OrderUtils::get_product( $order );
 		$awarding_body_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
-		$water_grant_acf_field_group_id   = AttendeeUtils::get_acf_field_group_id( 'funding_sources', $product->get_id() );
 		$attendee_profile_fields          = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$awarding_body_fields             = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
-		$water_grant_fields               = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
 		$attendee_additional_fields       = array_merge(
 			$attendee_profile_fields,
-			$awarding_body_fields,
-			$water_grant_fields
+			$awarding_body_fields
 		);
 
 		$attendees = array_reverse( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) );
