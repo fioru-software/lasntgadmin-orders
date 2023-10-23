@@ -309,6 +309,15 @@ class PageUtils {
 			$awarding_body_fields
 		);
 
+		/**
+		 * Only show water grant fields for paid orders
+		 */
+		if ( $order->get_date_paid() ) {
+			$water_grant_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'funding_sources', $product->get_id() );
+			$water_grant_fields             = $water_grant_acf_field_group_id ? acf_get_fields( $water_grant_acf_field_group_id ) : [];
+			$attendee_additional_fields     = array_merge( $attendee_additional_fields, $water_grant_fields );
+		}
+
 		$attendees = array_reverse( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) );
 
 		printf(
