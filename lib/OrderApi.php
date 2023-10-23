@@ -37,8 +37,8 @@ class OrderApi {
 			self::PATH_PREFIX,
 			'/total_attendees',
 			[
-				'methods'  => 'GET',
-				'callback' => [ self::class, 'get_total_attendees' ],
+				'methods'             => 'GET',
+				'callback'            => [ self::class, 'get_total_attendees' ],
 				'permission_callback' => [ self::class, 'auth_nonce' ],
 			]
 		);
