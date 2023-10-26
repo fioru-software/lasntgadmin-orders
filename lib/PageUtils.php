@@ -17,7 +17,7 @@ use Automattic\WooCommerce\Internal\Admin\Loader;
 
 use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 
-use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout;
+use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout, WC_Product_Simple;
 use WC, WC_Session_Handler, WP_Post, WC_Order;
 
 use DateTimeImmutable, IntlDateFormatter;
@@ -298,17 +298,23 @@ class PageUtils {
 	}
 
 	/**
-	 * @todo get_product_id calls wc_get_order again, fix
+	 * Leaving here as client may change their mind.
+	 *
+	 * @deprecated
 	 */
-	public static function attendees( WP_Post $post ) {
-		$order                            = wc_get_order( $post->ID );
-		$product                          = OrderUtils::get_product( $order );
+	private static function get_awarding_body_fields( WC_Product_Simple $product ): array {
 		$awarding_body_acf_field_group_id = AttendeeUtils::get_acf_field_group_id( 'awarding_body', $product->get_id() );
-		$attendee_profile_fields          = acf_get_fields( AttendeeActionsFilters::$field_group_id );
 		$awarding_body_fields             = $awarding_body_acf_field_group_id ? acf_get_fields( $awarding_body_acf_field_group_id ) : [];
-		$attendee_additional_fields       = array_merge(
+		return [];
+	}
+
+	public static function attendees( WP_Post $post ) {
+		$order                      = wc_get_order( $post->ID );
+		$product                    = OrderUtils::get_product( $order );
+		$attendee_profile_fields    = acf_get_fields( AttendeeActionsFilters::$field_group_id );
+		$attendee_additional_fields = array_merge(
 			$attendee_profile_fields,
-			$awarding_body_fields
+			self::get_awarding_body_fields( $product )
 		);
 
 		/**
