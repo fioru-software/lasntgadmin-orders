@@ -1,6 +1,6 @@
 {
     "name": "fioru/lasntgadmin-orders",
-    "version": "1.7.34",
+    "version": "1.7.35-rc1",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-orders"
@@ -65,7 +65,7 @@
         "composer/installers": "~2.0",
         "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.5.0",
         "fioru/lasntgadmin-attendees": "^3.8.0",
-        "fioru/lasntgadmin-products": "^5.12.0",
+        "fioru/lasntgadmin-products": "^5.12.1",
         "fioru/lasntgadmin-groups": "^1.5.5",
         "fioru/lasntgadmin-subscriptions": "^2.1.11",
         "fioru/lasntgadmin-users": "^3.3.7",

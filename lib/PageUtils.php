@@ -109,7 +109,7 @@ class PageUtils {
 	 * @see https://developer.wordpress.org/reference/functions/add_meta_box/
 	 * @see https://developer.wordpress.org/reference/functions/remove_meta_box/
 	 */
-	public static function remove_metaboxes( string $screen_id, WP_Post $post ): void {
+	public static function remove_metaboxes( string $screen_id ): void {
 		if ( 'shop_order' === $screen_id ) {
 			remove_meta_box( 'woocommerce-order-data', $screen_id, 'normal' );
 			remove_meta_box( 'woocommerce-order-items', $screen_id, 'normal' );
@@ -227,7 +227,7 @@ class PageUtils {
 			PaymentUtils::render_gateway( $gateway );
 		}
 
-		if ( ProductUtils::$publish_status === $product->get_status() ) {
+		if ( ProductUtils::$publish_status === $product->get_status() || 'date_passed' === $product->get_status() ) {
 			echo '<button type="submit" class="button alt wp-element-button" id="place_order" disabled >' . esc_html( __( 'Pay for order', 'lasntgadmin' ) ) . '</button>';
 		} else {
 			echo '<div class="notice notice-warning is-dismissible"><p>Course is not open for enrolment.</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Course is not open for enrolment.</span></button></div>';
