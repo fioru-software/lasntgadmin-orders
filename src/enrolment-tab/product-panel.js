@@ -109,7 +109,7 @@ const ProductPanel = props => {
             groupId, 
             findGroupQuotas( product.meta_data ) 
           );
-          if( isNaN( quota ) || isNil( quota ) || quota === 0 || quota === '' ) {
+          if( isNaN( quota ) || isNil( quota ) || quota === '' ) {
             setSpaces( product.stock_quantity || product.quantity );
             setGroupQuota(null);
           } else {
@@ -136,6 +136,7 @@ const ProductPanel = props => {
    * @fires remainingGroupQuota
    */
   useEffect( () => {
+
     if( ! isNil( groupQuota ) && isGroupSelected(groupId) && ! isNil(product) && ! isNil( productId ) ) {
 
       async function calculateRemainingQuota( productId, groupId ) {    

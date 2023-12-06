@@ -20,7 +20,7 @@
 		"@faker-js/faker": "^8.0.2",
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^14.0.0",
-		"@wordpress/scripts": "^26.12.0"
+		"@wordpress/scripts": "^26.18.0"
 	},
 	"dependencies": {
 		"@wordpress/components": "^25.7.0",
