@@ -44,6 +44,10 @@ class OrderUtils {
 		add_filter( 'rest_pre_insert_shop_order', [ self::class, 'ensure_unique_enrolment' ], 10, 2 );
 	}
 
+	public static function get_order_quantity( WC_Order $order ): int {
+		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
+	}
+
 	/**
 	 * Each order's meta data contains an array of attendee_ids, which we count and sum.
 	 */
@@ -60,8 +64,6 @@ class OrderUtils {
 	}
 
 	/**
-	 * Caching the result for 10 seconds, so WordPress can't run the query multiple times per request.
-	 *
 	 * @param int   $product_id Required. A product id.
 	 * @param int   $group_id Optional.  A group id.
 	 * @param array $order_status Optional array of order statuses.
@@ -71,53 +73,48 @@ class OrderUtils {
 		global $wpdb;
 
 		$order_statuses = implode( "','", $order_status );
-		$transient_id   = md5( "$product_id$group_id$order_statuses" );
-		$order_ids      = get_transient( $transient_id );
 
-		if ( false === $order_ids ) {
-			$args   = [ $product_id ];
-			$select = "SELECT ID FROM {$wpdb->posts}";
-			$joins  = [
-				"JOIN wp_woocommerce_order_items ON wp_woocommerce_order_items.order_id = {$wpdb->posts}.ID",
-				'JOIN wp_woocommerce_order_itemmeta ON wp_woocommerce_order_items.order_item_id = wp_woocommerce_order_itemmeta.order_item_id',
-			];
-			$wheres = [
-				"WHERE {$wpdb->posts}.post_type = 'shop_order'",
-				"AND wp_woocommerce_order_items.order_item_type = 'line_item' AND wp_woocommerce_order_itemmeta.meta_key = '_product_id'",
-				'AND wp_woocommerce_order_itemmeta.meta_value = %d',
-			];
+		$args   = [ $product_id ];
+		$select = "SELECT ID FROM {$wpdb->posts}";
+		$joins  = [
+			"JOIN wp_woocommerce_order_items ON wp_woocommerce_order_items.order_id = {$wpdb->posts}.ID",
+			'JOIN wp_woocommerce_order_itemmeta ON wp_woocommerce_order_items.order_item_id = wp_woocommerce_order_itemmeta.order_item_id',
+		];
+		$wheres = [
+			"WHERE {$wpdb->posts}.post_type = 'shop_order'",
+			"AND wp_woocommerce_order_items.order_item_type = 'line_item' AND wp_woocommerce_order_itemmeta.meta_key = '_product_id'",
+			'AND wp_woocommerce_order_itemmeta.meta_value = %d',
+		];
 
-			if ( count( $order_status ) > 0 ) {
-				array_push(
-					$wheres,
-					"AND {$wpdb->posts}.post_status IN ( '$order_statuses' ) "
-				);
-			}
-
-			if ( $group_id > 0 ) {
-				array_push(
-					$joins,
-					"JOIN {$wpdb->postmeta} ON {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID"
-				);
-				array_push(
-					$wheres,
-					"AND {$wpdb->postmeta}.meta_key = 'groups-read' AND {$wpdb->postmeta}.meta_value = %d"
-				);
-				array_push(
-					$args,
-					$group_id
-				);
-			}
-
-			$join      = implode( ' ', $joins );
-			$where     = implode( ' ', $wheres );
-			$statement = $wpdb->prepare(
-				"$select $join $where", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				...$args
+		if ( count( $order_status ) > 0 ) {
+			array_push(
+				$wheres,
+				"AND {$wpdb->posts}.post_status IN ( '$order_statuses' ) "
 			);
-			$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared    
-			set_transient( $transient_id, $order_ids, MINUTE_IN_SECONDS / 6 );
-		}//end if
+		}
+
+		if ( $group_id > 0 ) {
+			array_push(
+				$joins,
+				"JOIN {$wpdb->postmeta} ON {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID"
+			);
+			array_push(
+				$wheres,
+				"AND {$wpdb->postmeta}.meta_key = 'groups-read' AND {$wpdb->postmeta}.meta_value = %d"
+			);
+			array_push(
+				$args,
+				$group_id
+			);
+		}
+
+		$join      = implode( ' ', $joins );
+		$where     = implode( ' ', $wheres );
+		$statement = $wpdb->prepare(
+			"$select $join $where", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			...$args
+		);
+		$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared    
 		return $order_ids;
 	}
 

@@ -2,7 +2,7 @@
 
 namespace Lasntg\Admin\Orders;
 
-use Lasntg\Admin\Orders\{ PluginUtils, OrderData };
+use Lasntg\Admin\Orders\{ OrderUtils, PluginUtils };
 use Lasntg\Admin\Group\GroupApi;
 use Lasntg\Admin\Products\{ ProductApi, ProductUtils };
 use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
@@ -254,10 +254,6 @@ class PageUtils {
 		echo '</div>';
 	}
 
-	private static function get_order_quantity( WC_Order $order ): int {
-		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
-	}
-
 	/**
 	 * Creates root element for admin order component
 	 *
@@ -342,7 +338,7 @@ class PageUtils {
             ><p>' . esc_html( __( 'Loading attendees...', 'lasntgadmin' ) ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
-			esc_attr( self::get_order_quantity( $order ) ),
+			esc_attr( OrderUtils::get_order_quantity( $order ) ),
 			esc_attr( json_encode( $attendee_additional_fields ) ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
