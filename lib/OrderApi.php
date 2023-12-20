@@ -75,7 +75,7 @@ class OrderApi {
 		if ( empty( $product_id ) ) {
 			return new WP_Error( 'missing_product_id', 'Missing product id param', array( 'status' => 400 ) );
 		}
-		return OrderUtils::get_order_ids_by_product_id( intval( $product_id ), intval( $group_id ), [ 'wc-completed', 'wc-on-hold' ] );
+		return OrderUtils::get_order_ids_by_product_id( intval( $product_id ), intval( $group_id ), [ 'wc-completed', 'wc-on-hold', 'wc-processing' ] );
 	}
 
 	/**

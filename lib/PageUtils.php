@@ -19,6 +19,7 @@ use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 
 use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout, WC_Product_Simple;
 use WC, WC_Session_Handler, WP_Post, WC_Order;
+use Automattic\WooCommerce\Checkout\Helpers\ReserveStockException;
 
 use DateTimeImmutable, IntlDateFormatter;
 
@@ -151,6 +152,12 @@ class PageUtils {
 			$order = wc_get_order( $post->ID );
 			if ( ! $order->needs_payment() ) {
 				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
+			} else {
+				try {
+					wc_reserve_stock_for_order( $post->ID );
+				} catch( ReserveStockException $e ) {
+					printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( $e->getMessage(), 'lasntgadmin' ) ) );
+				}
 			}
 		}
 

@@ -18,6 +18,8 @@ services:
         - db
       volumes:
         - .:/usr/local/src
+        - ../lasntgadmin-grant-funded-payment-gateway:/var/www/html/wp-content/plugins/lasntgadmin-grant-funded-payment-gateway
+        - ../lasntgadmin-products:/var/www/html/wp-content/plugins/lasntgadmin-products
       ports:
         - "8080:80"
         - "9443:443"

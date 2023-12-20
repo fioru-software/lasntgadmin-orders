@@ -15,6 +15,8 @@ use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC
 use WC_Abstract_Order, WP_Error;
 use DateTime;
 
+use Lasntg\Admin\Products\PaymentLock;
+
 /**
  * Order Utility Class
  */
@@ -30,6 +32,14 @@ class OrderUtils {
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 		add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
+		add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
+	}
+
+	/**
+	 * @see PageUtils::output_admin_order_markup
+	 */
+	public static function release_reserved_stock( int $order_id, WC_Order $order ) {
+		wc_release_stock_for_order( $order_id );
 	}
 
 	private static function add_filters() {
@@ -52,7 +62,7 @@ class OrderUtils {
 	 * Each order's meta data contains an array of attendee_ids, which we count and sum.
 	 */
 	public static function get_total_attendees_for_completed_orders_by_product_id_and_group_id( int $product_id, int $group_id = 0 ): int {
-		$completed_order_ids = self::get_order_ids_by_product_id( $product_id, $group_id, [ 'wc-completed', 'wc-on-hold' ] );
+		$completed_order_ids = self::get_order_ids_by_product_id( $product_id, $group_id, [ 'wc-completed', 'wc-on-hold', 'wc-processing' ] );
 		return array_reduce(
 			$completed_order_ids,
 			function ( $count, $order_id ) {
