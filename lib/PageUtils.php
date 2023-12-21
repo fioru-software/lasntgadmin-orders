@@ -156,7 +156,7 @@ class PageUtils {
 				try {
 					wc_reserve_stock_for_order( $post->ID );
 				} catch( ReserveStockException $e ) {
-					printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( $e->getMessage(), 'lasntgadmin' ) ) );
+					printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( 'Unfortunately the course is now full.', 'lasntgadmin' ) ) );
 				}
 			}
 		}
