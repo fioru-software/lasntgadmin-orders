@@ -153,10 +153,15 @@ class PageUtils {
 			if ( ! $order->needs_payment() ) {
 				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
 			} else {
-				try {
-					wc_reserve_stock_for_order( $post->ID );
-				} catch( ReserveStockException $e ) {
-					printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( 'Unfortunately the course is now full.', 'lasntgadmin' ) ) );
+				if( in_array( $order->get_status(), [ 'failed', 'wc-failed' ] ) ) {
+					printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( 'Order failed.', 'lasntgadmin' ) ) );
+					return;
+				} else {
+					try {
+						wc_reserve_stock_for_order( $post->ID );
+					} catch( ReserveStockException $e ) {
+						printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( 'Unfortunately the course is now full.', 'lasntgadmin' ) ) );
+					}
 				}
 			}
 		}

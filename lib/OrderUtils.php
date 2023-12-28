@@ -12,9 +12,9 @@ use Lasntg\Admin\Group\GroupUtils;
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
 use WC_Abstract_Order, WP_Error;
-use DateTime, Exception;
+use DateTime;
 
-use Lasntg\Admin\Products\QuotaUtils;
+use Lasntg\Admin\Products\{ QuotaUtils, QuotaException, SpacesException };
 
 /**
  * Order Utility Class
@@ -34,22 +34,9 @@ class OrderUtils {
 		add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
 		add_action( 'woocommerce_order_status_failed', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
 		add_action( 'woocommerce_pre_payment_complete', [ self::class, 'can_order_be_placed' ], 10, 2 );
-		add_action( 'woocommerce_order_status_processing', [ self::class, 'can_order_be_placed' ], 10, 2 );
-
-		add_action( 'woocommerce_pre_payment_complete', [ self::class, 'pre_payment_complete' ], 10, 2 );
-		add_action( 'woocommerce_order_status_processing', [ self::class, 'status_processing' ], 10, 2 );
-	}
-
-	public static function pre_payment_complete( int $order_id, string $transaction_id ) {
-		errror_log("=== pre payment complete ===");
-	}
-
-	public static function status_processing( int $order_id, WC_Order $order ) {} {
-		error_log("=== status processing ===");
 	}
 
 	public static function can_order_be_placed( int $order_id ) {
-		error_log("=== can order be placed? ===");
 
 		$order = wc_get_order( $order_id );
 		$product = OrderUtils::get_product( $order );
@@ -60,24 +47,18 @@ class OrderUtils {
 		 */     
 		$order_quantity = OrderUtils::get_order_quantity( $order );                              
 		$quota = QuotaUtils::remaining_quota( $product->get_id(), $group_id );          
-		error_log("product quota for group with id $group_id is $quota");
 		if ( is_numeric( $quota ) ) {                                                     
 			$total_attendees = OrderUtils::get_total_attendees_for_completed_orders_by_product_id_and_group_id(     
 				$product->get_id(),     
 				$group_id          
 			);                                             
-			error_log("total attendees is $total_attendees");
 			$remaining_quota = $quota - $total_attendees;     
-			error_log("remaining quota is $remaining_quota");
 			if ( $remaining_quota < $order_quantity ) {     
-				error_log("insufficient quota");
-				if( ! $order->update_status('wc-failed') ) {
-					error_log("unable to update order status");
-				}
+				$order->update_status('wc-failed');
 				// translators: Remaining course quota for group.     
 				$error_msg = sprintf( __( 'Remaining quota of %d is insufficient.', 'lasntgadmin' ), $remaining_quota );
 				wc_add_notice( $error_msg, 'error' );     
-				throw new Exception( $error_msg );
+				throw new QuotaException( $error_msg );
 			}                            
 		}                                                      
 
@@ -90,7 +71,7 @@ class OrderUtils {
 			// translators: Remaining spaces on course.                                            
 			$error_msg = sprintf( __( 'Remaining spaces of %d is insufficient.', 'lasntgadmin' ), $spaces );
 			wc_add_notice( $error_msg, 'error' );     
-			throw new Exception( $error_msg );
+			throw new SpacesException( $error_msg );
 		}
 
 	}
@@ -312,10 +293,12 @@ class OrderUtils {
 	public static function filter_order_list( string $where, WP_Query $query ) {
 		if ( $query->is_admin && $query->get( 'post_type' ) === 'shop_order' ) {
 			$screen = get_current_screen();
-
-			if ( 'edit-shop_order' === $screen->id && ! current_user_can( 'view_others_shop_orders' ) ) {
-				$where .= sprintf( " AND wp_posts.ID IN ( select post_id from wp_postmeta pm where pm.meta_key = '_customer_user' AND pm.meta_value = %d )", get_current_user_id() );
+			if( $screen ) {
+				if ( 'edit-shop_order' === $screen->id && ! current_user_can( 'view_others_shop_orders' ) ) {
+					$where .= sprintf( " AND wp_posts.ID IN ( select post_id from wp_postmeta pm where pm.meta_key = '_customer_user' AND pm.meta_value = %d )", get_current_user_id() );
+				}
 			}
+
 		}
 
 		return $where;
