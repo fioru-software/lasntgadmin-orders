@@ -14,7 +14,8 @@ use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC
 use WC_Abstract_Order, WP_Error;
 use DateTime;
 
-use Lasntg\Admin\Products\{ QuotaUtils, QuotaException, SpacesException };
+use Exception;
+use Lasntg\Admin\Products\{ QuotaUtils };
 
 /**
  * Order Utility Class
@@ -38,42 +39,41 @@ class OrderUtils {
 
 	public static function can_order_be_placed( int $order_id ) {
 
-		$order = wc_get_order( $order_id );
-		$product = OrderUtils::get_product( $order );
+		$order    = wc_get_order( $order_id );
+		$product  = self::get_product( $order );
 		$group_id = $order->get_meta( 'groups-read' );
 
-		/**     
-		 * Ensure sufficient group quota     
-		 */     
-		$order_quantity = OrderUtils::get_order_quantity( $order );                              
-		$quota = QuotaUtils::remaining_quota( $product->get_id(), $group_id );          
-		if ( is_numeric( $quota ) ) {                                                     
-			$total_attendees = OrderUtils::get_total_attendees_for_completed_orders_by_product_id_and_group_id(     
-				$product->get_id(),     
-				$group_id          
-			);                                             
-			$remaining_quota = $quota - $total_attendees;     
-			if ( $remaining_quota < $order_quantity ) {     
-				$order->update_status('wc-failed');
-				// translators: Remaining course quota for group.     
+		/**
+		 * Ensure sufficient group quota
+		 */
+		$order_quantity = self::get_order_quantity( $order );
+		$quota          = QuotaUtils::remaining_quota( $product->get_id(), $group_id );
+		if ( is_numeric( $quota ) ) {
+			$total_attendees = self::get_total_attendees_for_completed_orders_by_product_id_and_group_id(
+				$product->get_id(),
+				$group_id
+			);
+			$remaining_quota = $quota - $total_attendees;
+			if ( $remaining_quota < $order_quantity ) {
+				$order->update_status( 'wc-waiting-list' );
+				// translators: Remaining course quota for group.
 				$error_msg = sprintf( __( 'Remaining quota of %d is insufficient.', 'lasntgadmin' ), $remaining_quota );
-				wc_add_notice( $error_msg, 'error' );     
-				throw new QuotaException( $error_msg );
-			}                            
-		}                                                      
-
-		/**                                                                                      
-		 * Ensure sufficient spaces available on course              
-		 */     
-		$spaces = $product->get_stock_quantity() - wc_get_held_stock_quantity( $product );     
-		if ( $order_quantity > $spaces ) {          
-			$order->update_status('wc-failed');
-			// translators: Remaining spaces on course.                                            
-			$error_msg = sprintf( __( 'Remaining spaces of %d is insufficient.', 'lasntgadmin' ), $spaces );
-			wc_add_notice( $error_msg, 'error' );     
-			throw new SpacesException( $error_msg );
+				wc_add_notice( $error_msg, 'error' );
+				throw new Exception( esc_html( $error_msg ) );
+			}
 		}
 
+		/**
+		 * Ensure sufficient spaces available on course
+		 */
+		$spaces = $product->get_stock_quantity() - wc_get_held_stock_quantity( $product );
+		if ( $order_quantity > $spaces ) {
+			$order->update_status( 'wc-waiting-list' );
+			// translators: Remaining spaces on course.
+			$error_msg = sprintf( __( 'Remaining spaces of %d is insufficient.', 'lasntgadmin' ), $spaces );
+			wc_add_notice( $error_msg, 'error' );
+			throw new Exception( esc_html( $error_msg ) );
+		}
 	}
 
 	/**
@@ -293,12 +293,11 @@ class OrderUtils {
 	public static function filter_order_list( string $where, WP_Query $query ) {
 		if ( $query->is_admin && $query->get( 'post_type' ) === 'shop_order' ) {
 			$screen = get_current_screen();
-			if( $screen ) {
+			if ( $screen ) {
 				if ( 'edit-shop_order' === $screen->id && ! current_user_can( 'view_others_shop_orders' ) ) {
 					$where .= sprintf( " AND wp_posts.ID IN ( select post_id from wp_postmeta pm where pm.meta_key = '_customer_user' AND pm.meta_value = %d )", get_current_user_id() );
 				}
 			}
-
 		}
 
 		return $where;

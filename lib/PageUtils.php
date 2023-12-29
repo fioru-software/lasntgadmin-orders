@@ -150,21 +150,25 @@ class PageUtils {
 		// @todo Improve this hack.
 		if ( 'payment' === $tab ) {
 			$order = wc_get_order( $post->ID );
-			if ( ! $order->needs_payment() ) {
+			if ( in_array( $order->get_status(), [ 'completed' ] ) ) {
 				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
 			} else {
-				if( in_array( $order->get_status(), [ 'failed', 'wc-failed' ] ) ) {
-					printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( 'Order failed.', 'lasntgadmin' ) ) );
-					return;
-				} else {
-					try {
-						wc_reserve_stock_for_order( $post->ID );
-					} catch( ReserveStockException $e ) {
-						printf( "<div class='notice notice-error is-dismissible'><p>%s</p></div>", esc_html( __( 'Unfortunately the course is now full.', 'lasntgadmin' ) ) );
-					}
+				try {
+					wc_reserve_stock_for_order( $post->ID );
+				} catch ( ReserveStockException $e ) {
+					$order->update_status( 'wc-waiting-list' );
+					PaymentUtils::save_notices(
+						[
+							'error' => [
+								[ 'notice' => 'The course is now full.' ],
+							],
+						]
+					);
+					wp_redirect( get_admin_url( null, sprintf( 'post.php?post=%d&action=edit&tab=order', $post->ID ) ) );
+					exit();
 				}
 			}
-		}
+		}//end if
 
 		echo '<div class="wrap woocommerce">';
 		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
@@ -257,12 +261,14 @@ class PageUtils {
 		$order = wc_get_order( $post->ID );
 
 		echo "<div class='panel-wrap woocommerce' >";
-		if ( ! $order->needs_payment() ) {
+		if ( in_array( $order->get_status(), [ 'completed' ] ) ) {
 			self::render_order_paid( $order );
-		} else {
+		} elseif ( in_array( $order->get_status(), [ 'pending' ] ) ) {
 			self::render_payment_options( $order );
+		} else {
+			wp_redirect( get_admin_url( null, sprintf( 'post.php?post=%d&action=edit&tab=order', $post->ID ) ) );
+			exit();
 		}
-
 		echo '</div>';
 	}
 
