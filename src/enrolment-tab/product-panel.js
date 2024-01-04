@@ -6,7 +6,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
-import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces } from '../product-utils';
+import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces, getReservedStockQuantity } from '../product-utils';
 import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isPaidOrder, isPendingAttendeesStatus, isWaitingStatus } from '../order-utils';
 
 import { isNumber, isObject, isNil, isNull, isUndefined } from "lodash";
@@ -110,7 +110,9 @@ const ProductPanel = props => {
             findGroupQuotas( product.meta_data ) 
           );
           if( isNaN( quota ) || isNil( quota ) || quota === '' ) {
-            setSpaces( product.stock_quantity || product.quantity );
+            setSpaces(
+              calculateAvailableSpaces( product.stock_quantity || product.quantity, quota, getReservedStockQuantity( product ) )
+            );
             setGroupQuota(null);
           } else {
             setSpaces(null);
@@ -171,7 +173,8 @@ const ProductPanel = props => {
     if( ! isNil( remainingGroupQuota ) ) {
       const availableSpaces = calculateAvailableSpaces( 
         product.stock_quantity || product.quantity, 
-        remainingGroupQuota
+        remainingGroupQuota,
+        getReservedStockQuantity( product )
       );
       setSpaces( availableSpaces );
     }
@@ -185,7 +188,7 @@ const ProductPanel = props => {
 
     if( isNumber(spaces) && ! isPaidOrder( props.order ) ) {
 
-      if( spaces < 1 || product.stock_quantity < 1 ) {
+      if( spaces < 1 ) {
         props.setStatus("waiting-list");
         setNotice({
           status: "error",

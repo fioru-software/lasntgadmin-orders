@@ -66,7 +66,7 @@ class OrderUtils {
 		/**
 		 * Ensure sufficient spaces available on course
 		 */
-		$spaces = $product->get_stock_quantity() - wc_get_held_stock_quantity( $product );
+		$spaces = $product->get_stock_quantity() - wc_get_held_stock_quantity( $product, $order_id );
 		if ( $order_quantity > $spaces ) {
 			$order->update_status( 'wc-waiting-list' );
 			// translators: Remaining spaces on course.

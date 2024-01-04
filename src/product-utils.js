@@ -25,6 +25,10 @@ function findFirstProductMetaByKey( key, productMeta ) {
   return productMeta.find( item => item.key === key );
 }
 
+function getReservedStockQuantity( product ) {
+  return findFirstProductMetaByKey( 'reserved_stock_quantity', product.meta_data).value || 0;
+}
+
 function isCourseClosed( status ) {
   return isClosedStatus(status) || isCancelledStatus( status ) || isArchivedStatus(status);
 }
@@ -81,8 +85,9 @@ function findGroupQuota( groupId, quotas ) {
 /**
  * - Fetch all completed and on-hold orders for this group
  */
-function calculateAvailableSpaces( stockQuantity, groupQuota ) {
-  stockQuantity = parseInt(stockQuantity);
+function calculateAvailableSpaces( stockQuantity, groupQuota, reservedStock=0 ) {
+  reservedStock = parseInt( reservedStock );
+  stockQuantity = parseInt(stockQuantity)-reservedStock;
   groupQuota = parseInt(groupQuota);
   if( isNaN( stockQuantity ) ) {
     return 0;
@@ -116,13 +121,14 @@ function getUpdateProductRequest( productId, nonce, data ) {
 }
 
 export {
-  findProductById,
+  calculateAvailableSpaces,
+  findFirstProductMetaByKey,
   findGroupQuotas,
   findGroupQuota,
-  calculateAvailableSpaces,
+  findProductById,
+  getUpdateProductRequest,
+  getReservedStockQuantity,
   isCourseClosed,
   isGrantFunded,
-  isWaterGrantFunded,
-  findFirstProductMetaByKey,
-  getUpdateProductRequest
+  isWaterGrantFunded
 };
