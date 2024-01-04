@@ -2,7 +2,7 @@
 
 namespace Lasntg\Admin\Orders;
 
-use Lasntg\Admin\Orders\{ PluginUtils, OrderData };
+use Lasntg\Admin\Orders\{ OrderUtils, PluginUtils };
 use Lasntg\Admin\Group\GroupApi;
 use Lasntg\Admin\Products\{ ProductApi, ProductUtils };
 use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
@@ -19,6 +19,7 @@ use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 
 use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout, WC_Product_Simple;
 use WC, WC_Session_Handler, WP_Post, WC_Order;
+use Automattic\WooCommerce\Checkout\Helpers\ReserveStockException;
 
 use DateTimeImmutable, IntlDateFormatter;
 
@@ -149,10 +150,25 @@ class PageUtils {
 		// @todo Improve this hack.
 		if ( 'payment' === $tab ) {
 			$order = wc_get_order( $post->ID );
-			if ( ! $order->needs_payment() ) {
+			if ( in_array( $order->get_status(), [ 'completed' ] ) ) {
 				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
+			} else {
+				try {
+					wc_reserve_stock_for_order( $post->ID );
+				} catch ( ReserveStockException $e ) {
+					$order->update_status( 'wc-waiting-list' );
+					PaymentUtils::save_notices(
+						[
+							'error' => [
+								[ 'notice' => 'The course is now full.' ],
+							],
+						]
+					);
+					wp_redirect( get_admin_url( null, sprintf( 'post.php?post=%d&action=edit&tab=order', $post->ID ) ) );
+					exit();
+				}
 			}
-		}
+		}//end if
 
 		echo '<div class="wrap woocommerce">';
 		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
@@ -245,17 +261,15 @@ class PageUtils {
 		$order = wc_get_order( $post->ID );
 
 		echo "<div class='panel-wrap woocommerce' >";
-		if ( ! $order->needs_payment() ) {
+		if ( in_array( $order->get_status(), [ 'completed' ] ) ) {
 			self::render_order_paid( $order );
-		} else {
+		} elseif ( in_array( $order->get_status(), [ 'pending' ] ) ) {
 			self::render_payment_options( $order );
+		} else {
+			wp_redirect( get_admin_url( null, sprintf( 'post.php?post=%d&action=edit&tab=order', $post->ID ) ) );
+			exit();
 		}
-
 		echo '</div>';
-	}
-
-	private static function get_order_quantity( WC_Order $order ): int {
-		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
 	}
 
 	/**
@@ -342,7 +356,7 @@ class PageUtils {
             ><p>' . esc_html( __( 'Loading attendees...', 'lasntgadmin' ) ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
 			esc_attr( wp_create_nonce( 'wp_rest' ) ),
-			esc_attr( self::get_order_quantity( $order ) ),
+			esc_attr( OrderUtils::get_order_quantity( $order ) ),
 			esc_attr( json_encode( $attendee_additional_fields ) ),
 			esc_attr( sprintf( '%s', $order->get_status() ) ),
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),

@@ -5,7 +5,6 @@ namespace Lasntg\Admin\Orders;
 use Lasntg\Admin\Orders\{
 	PluginUtils,
 	OrderApi,
-	OrderData
 };
 use Lasntg\Admin\Attendees\AttendeeUtils;
 use Lasntg\Admin\Group\GroupUtils;
@@ -14,6 +13,9 @@ use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
 use WC_Abstract_Order, WP_Error;
 use DateTime;
+
+use Exception;
+use Lasntg\Admin\Products\{ QuotaUtils };
 
 /**
  * Order Utility Class
@@ -30,6 +32,67 @@ class OrderUtils {
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
 		add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
+		add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
+		add_action( 'woocommerce_order_status_failed', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
+		add_action( 'woocommerce_pre_payment_complete', [ self::class, 'can_order_be_placed' ], 10, 2 );
+	}
+
+	public static function can_order_be_placed( int $order_id ) {
+
+		$order    = wc_get_order( $order_id );
+		$product  = self::get_product( $order );
+		$group_id = $order->get_meta( 'groups-read' );
+
+		/**
+		 * Ensure sufficient group quota
+		 */
+		$order_quantity = self::get_order_quantity( $order );
+		$quota          = QuotaUtils::remaining_quota( $product->get_id(), $group_id );
+		if ( is_numeric( $quota ) ) {
+			$total_attendees = self::get_total_attendees_for_completed_orders_by_product_id_and_group_id(
+				$product->get_id(),
+				$group_id
+			);
+			$remaining_quota = $quota - $total_attendees;
+			if ( $remaining_quota < $order_quantity ) {
+				$order->update_status( 'wc-waiting-list' );
+				// translators: Remaining course quota for group.
+				$error_msg = sprintf( __( 'Remaining quota of %d is insufficient.', 'lasntgadmin' ), $remaining_quota );
+				wc_add_notice( $error_msg, 'error' );
+				throw new Exception( esc_html( $error_msg ) );
+			}
+		}
+
+		/**
+		 * Ensure sufficient spaces available on course
+		 */
+		$spaces = $product->get_stock_quantity() - wc_get_held_stock_quantity( $product, $order_id );
+		if ( $order_quantity > $spaces ) {
+			$order->update_status( 'wc-waiting-list' );
+			// translators: Remaining spaces on course.
+			$error_msg = sprintf( __( 'Remaining spaces of %d is insufficient.', 'lasntgadmin' ), $spaces );
+			wc_add_notice( $error_msg, 'error' );
+			throw new Exception( esc_html( $error_msg ) );
+		}
+	}
+
+	/**
+	 * @see PageUtils::output_admin_order_markup
+	 */
+	public static function release_reserved_stock( int $order_id, WC_Order $order ): void {
+		wc_release_stock_for_order( $order_id );
+	}
+
+	public static function remove_product_ids_from_attendees_meta( int $order_id, WC_Order $order ): void {
+		$order_attendee_ids = array_values(
+			array_map(
+				fn( $meta ) => (int) $meta->value,
+				$order->get_meta( 'attendee_ids', false )
+			)
+		);
+		foreach ( $order_attendee_ids as $attendee_id ) {
+			delete_post_meta( (int) $attendee_id, 'product_ids', self::get_product_id( $order ) );
+		}
 	}
 
 	private static function add_filters() {
@@ -44,11 +107,15 @@ class OrderUtils {
 		add_filter( 'rest_pre_insert_shop_order', [ self::class, 'ensure_unique_enrolment' ], 10, 2 );
 	}
 
+	public static function get_order_quantity( WC_Order $order ): int {
+		return array_reduce( $order->get_items(), fn( $carry, $item ) => $carry += $item->get_quantity(), 0 );
+	}
+
 	/**
 	 * Each order's meta data contains an array of attendee_ids, which we count and sum.
 	 */
 	public static function get_total_attendees_for_completed_orders_by_product_id_and_group_id( int $product_id, int $group_id = 0 ): int {
-		$completed_order_ids = self::get_order_ids_by_product_id( $product_id, $group_id, [ 'wc-completed', 'wc-on-hold' ] );
+		$completed_order_ids = self::get_order_ids_by_product_id( $product_id, $group_id, [ 'wc-completed', 'wc-on-hold', 'wc-processing' ] );
 		return array_reduce(
 			$completed_order_ids,
 			function ( $count, $order_id ) {
@@ -60,8 +127,6 @@ class OrderUtils {
 	}
 
 	/**
-	 * Caching the result for 10 seconds, so WordPress can't run the query multiple times per request.
-	 *
 	 * @param int   $product_id Required. A product id.
 	 * @param int   $group_id Optional.  A group id.
 	 * @param array $order_status Optional array of order statuses.
@@ -71,53 +136,48 @@ class OrderUtils {
 		global $wpdb;
 
 		$order_statuses = implode( "','", $order_status );
-		$transient_id   = md5( "$product_id$group_id$order_statuses" );
-		$order_ids      = get_transient( $transient_id );
 
-		if ( false === $order_ids ) {
-			$args   = [ $product_id ];
-			$select = "SELECT ID FROM {$wpdb->posts}";
-			$joins  = [
-				"JOIN wp_woocommerce_order_items ON wp_woocommerce_order_items.order_id = {$wpdb->posts}.ID",
-				'JOIN wp_woocommerce_order_itemmeta ON wp_woocommerce_order_items.order_item_id = wp_woocommerce_order_itemmeta.order_item_id',
-			];
-			$wheres = [
-				"WHERE {$wpdb->posts}.post_type = 'shop_order'",
-				"AND wp_woocommerce_order_items.order_item_type = 'line_item' AND wp_woocommerce_order_itemmeta.meta_key = '_product_id'",
-				'AND wp_woocommerce_order_itemmeta.meta_value = %d',
-			];
+		$args   = [ $product_id ];
+		$select = "SELECT ID FROM {$wpdb->posts}";
+		$joins  = [
+			"JOIN wp_woocommerce_order_items ON wp_woocommerce_order_items.order_id = {$wpdb->posts}.ID",
+			'JOIN wp_woocommerce_order_itemmeta ON wp_woocommerce_order_items.order_item_id = wp_woocommerce_order_itemmeta.order_item_id',
+		];
+		$wheres = [
+			"WHERE {$wpdb->posts}.post_type = 'shop_order'",
+			"AND wp_woocommerce_order_items.order_item_type = 'line_item' AND wp_woocommerce_order_itemmeta.meta_key = '_product_id'",
+			'AND wp_woocommerce_order_itemmeta.meta_value = %d',
+		];
 
-			if ( count( $order_status ) > 0 ) {
-				array_push(
-					$wheres,
-					"AND {$wpdb->posts}.post_status IN ( '$order_statuses' ) "
-				);
-			}
-
-			if ( $group_id > 0 ) {
-				array_push(
-					$joins,
-					"JOIN {$wpdb->postmeta} ON {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID"
-				);
-				array_push(
-					$wheres,
-					"AND {$wpdb->postmeta}.meta_key = 'groups-read' AND {$wpdb->postmeta}.meta_value = %d"
-				);
-				array_push(
-					$args,
-					$group_id
-				);
-			}
-
-			$join      = implode( ' ', $joins );
-			$where     = implode( ' ', $wheres );
-			$statement = $wpdb->prepare(
-				"$select $join $where", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				...$args
+		if ( count( $order_status ) > 0 ) {
+			array_push(
+				$wheres,
+				"AND {$wpdb->posts}.post_status IN ( '$order_statuses' ) "
 			);
-			$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared    
-			set_transient( $transient_id, $order_ids, MINUTE_IN_SECONDS / 6 );
-		}//end if
+		}
+
+		if ( $group_id > 0 ) {
+			array_push(
+				$joins,
+				"JOIN {$wpdb->postmeta} ON {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID"
+			);
+			array_push(
+				$wheres,
+				"AND {$wpdb->postmeta}.meta_key = 'groups-read' AND {$wpdb->postmeta}.meta_value = %d"
+			);
+			array_push(
+				$args,
+				$group_id
+			);
+		}
+
+		$join      = implode( ' ', $joins );
+		$where     = implode( ' ', $wheres );
+		$statement = $wpdb->prepare(
+			"$select $join $where", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			...$args
+		);
+		$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared    
 		return $order_ids;
 	}
 
@@ -170,18 +230,6 @@ class OrderUtils {
 			}//end if
 		}//end if
 		return $post;
-	}
-
-	public static function remove_product_ids_from_attendees_meta( int $order_id, WC_Order $order ): void {
-		$order_attendee_ids = array_values(
-			array_map(
-				fn( $meta ) => (int) $meta->value,
-				$order->get_meta( 'attendee_ids', false )
-			)
-		);
-		foreach ( $order_attendee_ids as $attendee_id ) {
-			delete_post_meta( (int) $attendee_id, 'product_ids', self::get_product_id( $order ) );
-		}
 	}
 
 	public static function autocomplete_order( $order_id ) {
@@ -245,9 +293,10 @@ class OrderUtils {
 	public static function filter_order_list( string $where, WP_Query $query ) {
 		if ( $query->is_admin && $query->get( 'post_type' ) === 'shop_order' ) {
 			$screen = get_current_screen();
-
-			if ( 'edit-shop_order' === $screen->id && ! current_user_can( 'view_others_shop_orders' ) ) {
-				$where .= sprintf( " AND wp_posts.ID IN ( select post_id from wp_postmeta pm where pm.meta_key = '_customer_user' AND pm.meta_value = %d )", get_current_user_id() );
+			if ( $screen ) {
+				if ( 'edit-shop_order' === $screen->id && ! current_user_can( 'view_others_shop_orders' ) ) {
+					$where .= sprintf( " AND wp_posts.ID IN ( select post_id from wp_postmeta pm where pm.meta_key = '_customer_user' AND pm.meta_value = %d )", get_current_user_id() );
+				}
 			}
 		}
 
