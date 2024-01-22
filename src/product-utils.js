@@ -26,7 +26,15 @@ function findFirstProductMetaByKey( key, productMeta ) {
 }
 
 function getReservedStockQuantity( product ) {
-  return findFirstProductMetaByKey( 'reserved_stock_quantity', product.meta_data).value || 0;
+  if( 'meta_data' in product ) {
+    const meta = findFirstProductMetaByKey( 'reserved_stock_quantity', product.meta_data);
+    if( meta ) {
+      if( 'value' in meta ) {
+        return meta.value
+      }
+    }
+  }
+  return 0;
 }
 
 function isCourseClosed( status ) {
