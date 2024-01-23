@@ -451,7 +451,10 @@ class OrderUtils {
 	}
 
 	public static function get_attendees( WC_Order $order ): array {
-		$attendee_ids = $order->get_meta( 'attendee_ids', true );
+		$attendee_ids = get_post_meta( 
+			$order->get_id(),
+			'attendee_ids'
+		);
 		if ( ! empty( $attendee_ids ) ) {
 			return AttendeeUtils::get_attendee_profiles(
 				get_posts(
