@@ -451,7 +451,7 @@ class OrderUtils {
 	}
 
 	public static function get_attendees( WC_Order $order ): array {
-		$attendee_ids = get_post_meta( 
+		$attendee_ids = get_post_meta(
 			$order->get_id(),
 			'attendee_ids'
 		);
