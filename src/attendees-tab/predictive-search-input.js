@@ -139,7 +139,7 @@ const PredictiveSearchInput = props => {
 
   return (
 		<>
-			<input className={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxLength={ props?.maxlength || 32 } minLength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ handleInput } />
+			<input className={ props.acfFieldName } name={ props.name } id={ props.id } type="text" ref={ textInput } maxLength={ props?.maxlength || 32 } minLength={ props?.minlength || 1 } defaultValue={ props?.defaultValue } placeholder={ props?.placeholder } required={ props?.required || false } pattern={ props?.pattern } disabled={ disabled } onInput={ handleInput } autocomplete="off" />
       { disabled && <input type="hidden" name={ props.name } defaultValue={ props?.defaultValue } /> }
 
 			{ showSearchResult() && <RadioControl options={ options } onChange={ handleSelect } />}
