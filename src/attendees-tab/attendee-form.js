@@ -294,7 +294,7 @@ const AttendeeForm = props => {
       <div className="form-wrap">
 
         <AttendeeFormContext.Provider value={ { isLoading } }>
-          <form className="panel-wrap woocommerce" onSubmit={ handleSubmit }>
+          <form className="panel-wrap woocommerce" onSubmit={ handleSubmit } autocomplete="off">
 
             <div id="order_data" className="panel woocommerce-order-data">
 

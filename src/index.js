@@ -5,11 +5,28 @@ import { OrderForm } from './enrolment-tab/order-form';
 import { AttendeeForm } from './attendees-tab/attendee-form';
 
 /**
+ * Warn user when navigating away from order
+ */
+window.addEventListener(
+  'beforeunload',
+  function(event) {
+    const href = document.activeElement.href;
+    if( href ) {
+      let result = /\/wp-admin\/post\.php\?post=\d+&action=edit&tab=\w+/.test(href);
+      if( ! result ) {
+        event.preventDefault();
+        event.returnValue = true;
+      }
+    }
+  }
+);
+
+/**
  * Render components
  */
 window.addEventListener(
   'load',
-  function (e) {
+  function(e) {
 
     const domElement = document.querySelector( '#lasntgadmin-orders-form' );
     if( domElement ) {
@@ -36,7 +53,7 @@ window.addEventListener(
 
 window.addEventListener(
   'load',
-  function (e) {
+  function(e) {
 
     const domElement = document.querySelector( '#lasntgadmin-orders-attendees-form' );
     if( domElement ) {
