@@ -118,7 +118,7 @@ const PredictiveSearchInput = props => {
   }
 
   function showSearchButton() {
-    return options.length == 0;
+    return options.length == 0 && ! disabled;
   }
 
   function isSearchButtonDisabled() {
