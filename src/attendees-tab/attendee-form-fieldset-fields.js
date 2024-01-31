@@ -28,7 +28,7 @@ const AttendeeFormFieldsetFields = props => {
 
   function isFieldDisabled( field, value ) {
     if( isCourseClosed( product.status ) || (
-      ! isNil( value ) && value !== '' && [ 'job_title', 'grade' ].includes( field.name )
+      ! isNil( value ) && value !== '' && [ 'department', 'job_title', 'grade' ].includes( field.name )
     )) {
       return true;
     }
