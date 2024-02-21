@@ -68,8 +68,13 @@ jQuery(document).ready(function ($) {
         method: 'POST',
         body: formData
       } );
-      setNotice('Reloading page...');
-      window.location.reload();
+      if( res.redirected ) {
+        setNotice('Redirecting...');
+        window.location = res.url;
+      } else {
+        setNotice('Reloading page...');
+        window.location.reload();
+      }
     } catch(e) {
       setNotice(e.message, 'error');
       removeSpinner();
