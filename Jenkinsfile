@@ -23,6 +23,10 @@ pipeline {
         }
     }
 
+	options {
+        disableConcurrentBuilds(abortPrevious: true)
+    }
+
     environment {
         PROJECT_NAME = "lasntgadmin-orders"
         REPO_NAME = "fioru-software/$PROJECT_NAME"
