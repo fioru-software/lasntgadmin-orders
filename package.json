@@ -17,15 +17,15 @@
 		"test:unit": "wp-scripts test-unit-js"
 	},
 	"devDependencies": {
-		"@faker-js/faker": "^8.0.2",
+		"@faker-js/faker": "^8.4.1",
 		"@testing-library/jest-dom": "^5.17.0",
-		"@testing-library/react": "^14.0.0",
-		"@wordpress/scripts": "^26.18.0"
+		"@testing-library/react": "^14.2.1",
+		"@wordpress/scripts": "^26.19.0"
 	},
 	"dependencies": {
-		"@wordpress/components": "^25.7.0",
-		"@wordpress/i18n": "^4.41.0",
+		"@wordpress/components": "^25.16.0",
+		"@wordpress/i18n": "^4.52.0",
 		"lodash": "^4.17.21",
-		"luxon": "^3.4.3"
+		"luxon": "^3.4.4"
 	}
 }

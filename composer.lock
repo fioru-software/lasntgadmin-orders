@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9bd7d6f2efa87b1e5a904a827e27964e",
+    "content-hash": "e05844edafc8312e60e8e9b001434f6c",
     "packages": [
         {
             "name": "composer/installers",
@@ -215,16 +215,16 @@
         },
         {
             "name": "fioru/lasntgadmin-attendees",
-            "version": "3.8.6",
+            "version": "3.8.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-attendees.git",
-                "reference": "68a5c0637ad3fe5c305caacbce5495727c655681"
+                "reference": "c58bde0f0ec974a6e8400d86ea59c7147e952474"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/68a5c0637ad3fe5c305caacbce5495727c655681",
-                "reference": "68a5c0637ad3fe5c305caacbce5495727c655681",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/c58bde0f0ec974a6e8400d86ea59c7147e952474",
+                "reference": "c58bde0f0ec974a6e8400d86ea59c7147e952474",
                 "shasum": ""
             },
             "require": {
@@ -286,10 +286,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.8.6",
+                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.8.7",
                 "issues": "https://github.com/fioru-software/lasntgadmin-attendees/issues"
             },
-            "time": "2024-02-22T11:55:54+00:00"
+            "time": "2024-02-22T15:06:44+00:00"
         },
         {
             "name": "fioru/lasntgadmin-dashboard",
