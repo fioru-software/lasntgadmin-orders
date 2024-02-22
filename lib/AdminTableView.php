@@ -9,8 +9,10 @@ use WP_Query;
 class AdminTableView {
 
 	public static function init() {
-		self::add_actions();
-		self::add_filters();
+		if ( is_admin() ) {
+			self::add_actions();
+			self::add_filters();
+		}
 	}
 
 	private static function add_actions() {
