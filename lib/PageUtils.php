@@ -46,6 +46,7 @@ class PageUtils {
 	}
 
 	private static function add_filters() {
+		add_filter( 'use_block_editor_for_post', [ self::class, 'remove_block_editor' ] );
 		add_filter( 'user_can_richedit', [ self::class, 'remove_tinymce' ], 50 );
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
 
@@ -61,6 +62,15 @@ class PageUtils {
 		);
 	}
 
+	public static function remove_block_editor() {
+		if ( function_exists( 'get_post_type' ) ) {
+			if ( 'shop_order' === get_post_type() ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static function remove_tinymce() {
 		if ( function_exists( 'get_post_type' ) ) {
 			if ( 'shop_order' === get_post_type() ) {
@@ -73,7 +83,7 @@ class PageUtils {
 	public static function remove_unused_scripts() {
 		if ( function_exists( 'get_post_type' ) ) {
 			if ( 'shop_order' === get_post_type() ) {
-				$handles = [ 'wp-mediaelement', 'thickbox', 'woocommerce-order-attribution-admin-js', 'wc-admin-order-meta-boxes', 'image-edit', 'marketplace-suggestions', 'shortcode', 'editor', 'quicktags' ];
+				$handles = [ 'wp-mediaelement', 'thickbox', 'woocommerce-order-attribution-admin-js', 'wc-admin-order-meta-boxes', 'image-edit', 'marketplace-suggestions', 'shortcode', 'quicktags' ];
 				foreach ( $handles as $handle ) {
 					wp_dequeue_script( $handle );
 					wp_deregister_script( $handle );
