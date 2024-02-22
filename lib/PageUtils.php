@@ -26,33 +26,28 @@ use DateTimeImmutable, IntlDateFormatter;
 class PageUtils {
 
 	public static function init() {
-		self::add_actions();
-		self::add_filters();
+		if ( is_admin() ) {
+			self::add_actions();
+			self::add_filters();
+		}
 	}
 
 	/**
 	 * Add WordPress and WooCommerce actions.
 	 */
 	private static function add_actions(): void {
-
-		/**
-		 * Custom add order page for admin site
-		 */
 		add_action( 'add_meta_boxes', [ self::class, 'remove_metaboxes' ], 40, 2 );
 		add_action( 'add_meta_boxes', [ self::class, 'add_metaboxes' ], 50, 2 );
 		add_action( 'admin_init', [ self::class, 'remove_title' ] );
-
+		add_action( 'admin_print_scripts', [ self::class, 'remove_unused_scripts' ] );
 		add_action( 'admin_notices', [ self::class, 'show_wc_notices' ] );
-
-		/**
-		 * Enqueue admin order component
-		 */
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ], 11 );
-
 		add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
 	}
 
 	private static function add_filters() {
+		add_filter( 'use_block_editor_for_post', [ self::class, 'remove_block_editor' ] );
+		add_filter( 'user_can_richedit', [ self::class, 'remove_tinymce' ], 50 );
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
 
 		/**
@@ -65,6 +60,36 @@ class PageUtils {
 				return $classes;
 			}
 		);
+	}
+
+	public static function remove_block_editor() {
+		if ( function_exists( 'get_post_type' ) ) {
+			if ( 'shop_order' === get_post_type() ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static function remove_tinymce() {
+		if ( function_exists( 'get_post_type' ) ) {
+			if ( 'shop_order' === get_post_type() ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static function remove_unused_scripts() {
+		if ( function_exists( 'get_post_type' ) ) {
+			if ( 'shop_order' === get_post_type() ) {
+				$handles = [ 'wp-mediaelement', 'thickbox', 'woocommerce-order-attribution-admin-js', 'wc-admin-order-meta-boxes', 'image-edit', 'marketplace-suggestions', 'shortcode', 'quicktags' ];
+				foreach ( $handles as $handle ) {
+					wp_dequeue_script( $handle );
+					wp_deregister_script( $handle );
+				}
+			}
+		}
 	}
 
 	/**

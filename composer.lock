@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d0b5c68a14e8c092e36561248c0d82f",
+    "content-hash": "9bd7d6f2efa87b1e5a904a827e27964e",
     "packages": [
         {
             "name": "composer/installers",
@@ -215,16 +215,16 @@
         },
         {
             "name": "fioru/lasntgadmin-attendees",
-            "version": "3.8.5",
+            "version": "3.8.6",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-attendees.git",
-                "reference": "343e745cd6c7c11021055f5f47de2c27da80ce3e"
+                "reference": "68a5c0637ad3fe5c305caacbce5495727c655681"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/343e745cd6c7c11021055f5f47de2c27da80ce3e",
-                "reference": "343e745cd6c7c11021055f5f47de2c27da80ce3e",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/68a5c0637ad3fe5c305caacbce5495727c655681",
+                "reference": "68a5c0637ad3fe5c305caacbce5495727c655681",
                 "shasum": ""
             },
             "require": {
@@ -246,7 +246,7 @@
                 "phpcompatibility/phpcompatibility-wp": "*",
                 "squizlabs/php_codesniffer": "^3.7",
                 "wp-coding-standards/wpcs": "dev-develop",
-                "yoast/phpunit-polyfills": "^1.0"
+                "yoast/phpunit-polyfills": "^1.1.0"
             },
             "type": "wordpress-plugin",
             "extra": {
@@ -286,10 +286,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.8.5",
+                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.8.6",
                 "issues": "https://github.com/fioru-software/lasntgadmin-attendees/issues"
             },
-            "time": "2024-02-21T09:23:24+00:00"
+            "time": "2024-02-22T11:55:54+00:00"
         },
         {
             "name": "fioru/lasntgadmin-dashboard",
@@ -372,16 +372,16 @@
         },
         {
             "name": "fioru/lasntgadmin-grant-funded-payment-gateway",
-            "version": "1.6.6",
+            "version": "1.6.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-grant-funded-payment-gateway.git",
-                "reference": "5cfa85d1bb82329279c29982920d330deb59a348"
+                "reference": "98a855281647094be5b9b1746ba12250575bb8be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-grant-funded-payment-gateway/zipball/5cfa85d1bb82329279c29982920d330deb59a348",
-                "reference": "5cfa85d1bb82329279c29982920d330deb59a348",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-grant-funded-payment-gateway/zipball/98a855281647094be5b9b1746ba12250575bb8be",
+                "reference": "98a855281647094be5b9b1746ba12250575bb8be",
                 "shasum": ""
             },
             "require": {
@@ -442,10 +442,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-grant-funded-payment-gateway/tree/1.6.6",
+                "source": "https://github.com/fioru-software/lasntgadmin-grant-funded-payment-gateway/tree/1.6.7",
                 "issues": "https://github.com/fioru-software/lasntgadmin-grant-funded-payment-gateway/issues"
             },
-            "time": "2024-02-19T13:11:53+00:00"
+            "time": "2024-02-22T09:19:01+00:00"
         },
         {
             "name": "fioru/lasntgadmin-groups",
@@ -547,16 +547,16 @@
         },
         {
             "name": "fioru/lasntgadmin-products",
-            "version": "5.12.13-rc2",
+            "version": "5.12.13",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-products.git",
-                "reference": "19a10a5e35f8bbdf9b46d5a1eea3a09239f7fe00"
+                "reference": "1bba0b041631f1d65a30e69265682283b90d6213"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/19a10a5e35f8bbdf9b46d5a1eea3a09239f7fe00",
-                "reference": "19a10a5e35f8bbdf9b46d5a1eea3a09239f7fe00",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/1bba0b041631f1d65a30e69265682283b90d6213",
+                "reference": "1bba0b041631f1d65a30e69265682283b90d6213",
                 "shasum": ""
             },
             "require": {
@@ -618,23 +618,23 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.12.13-rc2",
+                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.12.13",
                 "issues": "https://github.com/fioru-software/lasntgadmin-products/issues"
             },
-            "time": "2024-02-21T11:42:45+00:00"
+            "time": "2024-02-22T10:05:53+00:00"
         },
         {
             "name": "fioru/lasntgadmin-purchase-order-payment-gateway",
-            "version": "1.2.13",
+            "version": "1.2.14",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-purchase-order-payment-gateway.git",
-                "reference": "470ba3774b9b854fc94b3014bb73e475aa224c07"
+                "reference": "6b07414e7861e84e1663cb684f01b70792cb91ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-purchase-order-payment-gateway/zipball/470ba3774b9b854fc94b3014bb73e475aa224c07",
-                "reference": "470ba3774b9b854fc94b3014bb73e475aa224c07",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-purchase-order-payment-gateway/zipball/6b07414e7861e84e1663cb684f01b70792cb91ba",
+                "reference": "6b07414e7861e84e1663cb684f01b70792cb91ba",
                 "shasum": ""
             },
             "require": {
@@ -645,10 +645,10 @@
                 "installer-name": "woocommerce-gateway-purchase-order"
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-purchase-order-payment-gateway/tree/1.2.13",
+                "source": "https://github.com/fioru-software/lasntgadmin-purchase-order-payment-gateway/tree/1.2.14",
                 "issues": "https://github.com/fioru-software/lasntgadmin-purchase-order-payment-gateway/issues"
             },
-            "time": "2024-01-02T12:22:51+00:00"
+            "time": "2024-02-22T09:19:37+00:00"
         },
         {
             "name": "fioru/lasntgadmin-subscriptions",
@@ -2742,12 +2742,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "ce019e9ad711e31ee87c2c4c72e538b5240970c3"
+                "reference": "af14fdb282aa0e288bfe7eb3b57893484b68dc27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/ce019e9ad711e31ee87c2c4c72e538b5240970c3",
-                "reference": "ce019e9ad711e31ee87c2c4c72e538b5240970c3",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/af14fdb282aa0e288bfe7eb3b57893484b68dc27",
+                "reference": "af14fdb282aa0e288bfe7eb3b57893484b68dc27",
                 "shasum": ""
             },
             "require": {
@@ -2793,7 +2793,7 @@
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
                 "source": "https://github.com/nikic/PHP-Parser/tree/master"
             },
-            "time": "2024-01-14T09:02:54+00:00"
+            "time": "2024-02-21T20:13:45+00:00"
         },
         {
             "name": "overtrue/phplint",
