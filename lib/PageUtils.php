@@ -46,38 +46,31 @@ class PageUtils {
 	}
 
 	private static function add_filters() {
-		add_filter( 'use_block_editor_for_post', [ self::class, 'remove_block_editor' ] );
+		add_filter( 'use_block_editor_for_post', [ self::class, 'remove_block_editor' ], 50, 2 );
 		add_filter( 'user_can_richedit', [ self::class, 'remove_tinymce' ], 50 );
 		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
-
-		/**
-		 * @todo refactor globalpay
-		 */
-		add_filter(
-			'admin_body_class',
-			function ( $classes ) {
-				$classes .= ' woocommerce-order-pay ';
-				return $classes;
-			}
-		);
+		add_filter( 'admin_body_class', [ self::class, 'add_admin_body_class' ] );
 	}
 
-	public static function remove_block_editor() {
+	public static function add_admin_body_class( string $classes ) {
+		$classes .= ' woocommerce-order-pay ';
+		return $classes;
+	}
+
+	public static function remove_block_editor( bool $use_block_editor, WP_Post $post ) {
+		if ( 'shop_order' === $post->post_type ) {
+			return false;
+		}
+		return $use_block_editor;
+	}
+
+	public static function remove_tinymce( bool $wp_rich_edit ) {
 		if ( function_exists( 'get_post_type' ) ) {
 			if ( 'shop_order' === get_post_type() ) {
 				return false;
 			}
 		}
-		return true;
-	}
-
-	public static function remove_tinymce() {
-		if ( function_exists( 'get_post_type' ) ) {
-			if ( 'shop_order' === get_post_type() ) {
-				return false;
-			}
-		}
-		return true;
+		return $wp_rich_edit;
 	}
 
 	public static function remove_unused_scripts() {
