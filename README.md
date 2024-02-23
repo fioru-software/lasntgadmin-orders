@@ -96,3 +96,4 @@ git push -u origin 0.1.4
 - [WooCommerce Storefront Theme](https://woocommerce.com/documentation/themes/storefront/)
 - [WP Mail SMTP](https://wpmailsmtp.com/docs/)
 
+
