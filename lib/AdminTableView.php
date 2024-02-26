@@ -9,10 +9,8 @@ use WP_Query;
 class AdminTableView {
 
 	public static function init() {
-		if ( is_admin() ) {
-			self::add_actions();
-			self::add_filters();
-		}
+		self::add_actions();
+		self::add_filters();
 	}
 
 	private static function add_actions() {
@@ -20,21 +18,24 @@ class AdminTableView {
 	}
 
 	private static function add_filters() {
-		// WC uses priority 100.
-		add_filter( 'post_row_actions', [ self::class, 'modify_order_row_actions' ], 101, 2 );
-		add_filter( 'parse_query', [ self::class, 'handle_filter_query' ] );
+
 		add_filter( 'woocommerce_register_post_type_shop_order', [ self::class, 'register_post_type_shop_order' ] );
 
-		// Filter orders by product id.
-		add_filter( 'posts_clauses', [ self::class, 'handle_filter_clauses' ], 101, 2 );
+		if ( is_admin() ) {
+			// WC uses priority 100.
+			add_filter( 'post_row_actions', [ self::class, 'modify_order_row_actions' ], 101, 2 );
+			add_filter( 'parse_query', [ self::class, 'handle_filter_query' ] );
 
-		/**
-		 * RTC Managers need the Group plugin's Administer Groups permission, so that they can assign groups when creating users,
-		 * but this setting also allows them to see all shop orders. These two filters work together to filter shop orders by group
-		 * for RTC Managers.
-		 */
-		add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'apply_default_order_list_filter_by_group_membership' ], 10, 3 );
-		add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_order_list_for_regional_training_centre_managers' ], 10, 2 );
+			// Filter orders by product id.
+			add_filter( 'posts_clauses', [ self::class, 'handle_filter_clauses' ], 101, 2 );
+			/**
+			 * RTC Managers need the Group plugin's Administer Groups permission, so that they can assign groups when creating users,
+			 * but this setting also allows them to see all shop orders. These two filters work together to filter shop orders by group
+			 * for RTC Managers.
+			 */
+			add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'apply_default_order_list_filter_by_group_membership' ], 10, 3 );
+			add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_order_list_for_regional_training_centre_managers' ], 10, 2 );
+		}
 	}
 
 	/**

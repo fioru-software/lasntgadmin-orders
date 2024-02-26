@@ -29,13 +29,30 @@ class OrderUtils {
 
 	private static function add_actions() {
 		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
-		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
-		add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
-		add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
-		add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
-		add_action( 'woocommerce_order_status_failed', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
-		add_action( 'woocommerce_pre_payment_complete', [ self::class, 'can_order_be_placed' ], 10, 2 );
+		if ( is_admin() ) {
+			add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
+			add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
+			add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
+			add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
+			add_action( 'woocommerce_order_status_failed', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
+			add_action( 'woocommerce_pre_payment_complete', [ self::class, 'can_order_be_placed' ], 10, 2 );
+		}
 	}
+
+	private static function add_filters() {
+		add_filter( 'rest_pre_insert_shop_order', [ self::class, 'ensure_unique_enrolment' ], 10, 2 );
+		add_filter( 'woocommerce_register_shop_order_post_statuses', [ self::class, 'register_shop_order_post_statuses' ] );
+		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
+		if ( is_admin() ) {
+			add_filter( 'wc_order_statuses', [ self::class, 'order_statuses' ] );
+			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
+			add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
+			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
+			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
+			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
+		}
+	}
+
 
 	public static function can_order_be_placed( int $order_id ) {
 
@@ -93,18 +110,6 @@ class OrderUtils {
 		foreach ( $order_attendee_ids as $attendee_id ) {
 			delete_post_meta( (int) $attendee_id, 'product_ids', self::get_product_id( $order ) );
 		}
-	}
-
-	private static function add_filters() {
-		add_filter( 'wc_order_statuses', [ self::class, 'order_statuses' ] );
-		add_filter( 'woocommerce_register_shop_order_post_statuses', [ self::class, 'register_shop_order_post_statuses' ] );
-		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
-		add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
-		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
-		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
-		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
-		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
-		add_filter( 'rest_pre_insert_shop_order', [ self::class, 'ensure_unique_enrolment' ], 10, 2 );
 	}
 
 	public static function get_order_quantity( WC_Order $order ): int {
