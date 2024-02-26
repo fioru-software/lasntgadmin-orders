@@ -26,30 +26,32 @@ use DateTimeImmutable, IntlDateFormatter;
 class PageUtils {
 
 	public static function init() {
-		if ( is_admin() ) {
-			self::add_actions();
-			self::add_filters();
-		}
+		self::add_actions();
+		self::add_filters();
 	}
 
 	/**
 	 * Add WordPress and WooCommerce actions.
 	 */
 	private static function add_actions(): void {
-		add_action( 'add_meta_boxes', [ self::class, 'remove_metaboxes' ], 40, 2 );
-		add_action( 'add_meta_boxes', [ self::class, 'add_metaboxes' ], 50, 2 );
-		add_action( 'admin_init', [ self::class, 'remove_title' ] );
-		add_action( 'admin_print_scripts', [ self::class, 'remove_unused_scripts' ] );
-		add_action( 'admin_notices', [ self::class, 'show_wc_notices' ] );
-		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ], 11 );
-		add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
+		if ( is_admin() ) {
+			add_action( 'add_meta_boxes', [ self::class, 'remove_metaboxes' ], 40, 2 );
+			add_action( 'add_meta_boxes', [ self::class, 'add_metaboxes' ], 50, 2 );
+			add_action( 'admin_init', [ self::class, 'remove_title' ] );
+			add_action( 'admin_print_scripts', [ self::class, 'remove_unused_scripts' ] );
+			add_action( 'admin_notices', [ self::class, 'show_wc_notices' ] );
+			add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ], 11 );
+			add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
+		}
 	}
 
 	private static function add_filters() {
-		add_filter( 'use_block_editor_for_post', [ self::class, 'remove_block_editor' ], 50, 2 );
-		add_filter( 'user_can_richedit', [ self::class, 'remove_tinymce' ], 50 );
-		add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
-		add_filter( 'admin_body_class', [ self::class, 'add_admin_body_class' ] );
+		if ( is_admin() ) {
+			add_filter( 'use_block_editor_for_post', [ self::class, 'remove_block_editor' ], 50, 2 );
+			add_filter( 'user_can_richedit', [ self::class, 'remove_tinymce' ], 50 );
+			add_filter( 'wc_order_is_editable', [ self::class, 'is_order_editable' ], 10, 2 );
+			add_filter( 'admin_body_class', [ self::class, 'add_admin_body_class' ] );
+		}
 	}
 
 	public static function add_admin_body_class( string $classes ) {
