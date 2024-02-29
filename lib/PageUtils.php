@@ -41,8 +41,8 @@ class PageUtils {
 			add_action( 'admin_print_scripts', [ self::class, 'remove_unused_scripts' ] );
 			add_action( 'admin_notices', [ self::class, 'show_wc_notices' ] );
 			add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_components' ], 11 );
-			add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
 		}
+		add_action( 'woocommerce_after_pay_action', [ self::class, 'after_pay' ] );
 	}
 
 	private static function add_filters() {
