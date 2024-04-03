@@ -28,14 +28,16 @@ class OrderUtils {
 	}
 
 	private static function add_actions() {
+
 		add_action( 'rest_api_init', [ OrderApi::class, 'get_instance' ] );
+		add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 50, 2 );
+		add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
+		add_action( 'woocommerce_order_status_failed', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
+		add_action( 'woocommerce_pre_payment_complete', [ self::class, 'can_order_be_placed' ], 10, 2 );
+
 		if ( is_admin() ) {
 			add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'manage_shop_order_posts_custom_column' ] );
 			add_action( 'woocommerce_order_actions_end', [ self::class, 'disable_order_submit_button' ] );
-			add_action( 'woocommerce_order_status_cancelled', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
-			add_action( 'woocommerce_order_status_failed', [ self::class, 'release_reserved_stock' ], 10, 2 );
-			add_action( 'woocommerce_order_status_failed', [ self::class, 'remove_product_ids_from_attendees_meta' ], 10, 2 );
-			add_action( 'woocommerce_pre_payment_complete', [ self::class, 'can_order_be_placed' ], 10, 2 );
 		}
 	}
 
@@ -44,6 +46,7 @@ class OrderUtils {
 		add_filter( 'woocommerce_register_shop_order_post_statuses', [ self::class, 'register_shop_order_post_statuses' ] );
 		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
 		add_filter( 'wc_order_statuses', [ self::class, 'order_statuses' ] );
+
 		if ( is_admin() ) {
 			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
 			add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
