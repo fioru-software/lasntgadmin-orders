@@ -43,7 +43,7 @@ class PaymentUtils {
 			( WC_Payment_Gateways::instance() )->get_available_payment_gateways(),
 			function ( $gateway ) use ( $product ) {
 				if ( in_array( $gateway->id, self::SUPPORTED_GATEWAY_SLUGS ) ) {
-					if ( GrantFundedPluginUtils::get_camel_case_name() === $gateway->id ) {
+					if ( GrantFundedPluginUtils::get_snake_case_name() === $gateway->id ) {
 						return ProductUtils::is_funded( $product );
 					}
 					return true;
