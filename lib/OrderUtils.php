@@ -47,12 +47,13 @@ class OrderUtils {
 		add_filter( 'woocommerce_default_order_status', [ self::class, 'get_default_order_status' ] );
 		add_filter( 'wc_order_statuses', [ self::class, 'order_statuses' ] );
 
+		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
+		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
+		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
+		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
+
 		if ( is_admin() ) {
 			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
-			add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
-			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_funding_source' ], 10, 2 );
-			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_id' ], 10, 2 );
-			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
 		}
 	}
 
