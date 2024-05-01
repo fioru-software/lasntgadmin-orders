@@ -196,13 +196,6 @@ const OrderForm = props => {
 
         <div className="form-wrap">
 
-          { ! isDraftStatus( props.status ) && 
-            <div className="form-field form-row">
-              <label htmlFor="order_status">{ __( 'Status', 'lasntgadmin' ) }<span className="required"> *</span></label>
-              <StatusSelector id="order_status" name="order_status" user={ props?.user } order={ props?.order } status={ status } setStatus={ setStatus } apiPath={ props.orderApiPath} nonce={ props.nonce } />
-            </div>
-          }
-          
           <ProductPanel max={ 20 } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } orderApiPath={ props.orderApiPath } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
 
         </div>
