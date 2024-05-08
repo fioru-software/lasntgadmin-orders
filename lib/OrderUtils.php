@@ -252,15 +252,16 @@ class OrderUtils {
 
 	/**
 	 * Extends wc_get_orders to filter by funding source slug
+	 *
 	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_orders-and-WC_Order_Query#adding-custom-parameter-support
 	 */
 	public static function handle_filter_orders_by_funding_source( $query, $query_vars ) {
 		if ( ! empty( $query_vars['funding_source'] ) ) {
 			$query['meta_query'][] = array(
-				'key'   => 'funding_source',
-				'value' => esc_attr( $query_vars['funding_source'] ),
+				'key'     => 'funding_source',
+				'value'   => esc_attr( $query_vars['funding_source'] ),
 				'compare' => '=',
-				'type' => 'CHAR'
+				'type'    => 'CHAR',
 			);
 		}
 		return $query;
@@ -268,15 +269,16 @@ class OrderUtils {
 
 	/**
 	 * Extends wc_get_orders() to filter by local authority group
+	 *
 	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_orders-and-WC_Order_Query#adding-custom-parameter-support
 	 */
 	public static function handle_filter_orders_by_group_id( $query, $query_vars ) {
 		if ( ! empty( $query_vars['group_id'] ) ) {
 			$query['meta_query'][] = array(
-				'key'   => 'groups-read',
-				'value' => esc_attr( $query_vars['group_id'] ),
+				'key'     => 'groups-read',
+				'value'   => esc_attr( $query_vars['group_id'] ),
 				'compare' => '=',
-				'type' => 'NUMERIC'
+				'type'    => 'NUMERIC',
 			);
 		}
 		return $query;
@@ -284,15 +286,16 @@ class OrderUtils {
 
 	/**
 	 * Extends wc_get_orders() to filter by multiple group ids.
+	 *
 	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_orders-and-WC_Order_Query#adding-custom-parameter-support
 	 */
 	public static function handle_filter_orders_by_group_ids( $query, $query_vars ) {
 		if ( ! empty( $query_vars['group_ids'] ) ) {
 			$query['meta_query'][] = array(
-				'key'   => 'groups-read',
+				'key'     => 'groups-read',
 				'compare' => 'IN',
-				'type' => 'NUMERIC',
-				'value' => $query_vars['group_ids'],
+				'type'    => 'NUMERIC',
+				'value'   => $query_vars['group_ids'],
 			);
 		}
 		return $query;
@@ -300,15 +303,16 @@ class OrderUtils {
 
 	/**
 	 * Extends wc_get_orders() to filter by grant year
+	 *
 	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_orders-and-WC_Order_Query#adding-custom-parameter-support
 	 */
 	public static function handle_filter_orders_by_grant_year( $query, $query_vars ) {
 		if ( ! empty( $query_vars['grant_year'] ) ) {
 			$query['meta_query'][] = array(
-				'key'   => 'grant_year',
-				'value' => esc_attr( $query_vars['grant_year'] ),
+				'key'     => 'grant_year',
+				'value'   => esc_attr( $query_vars['grant_year'] ),
 				'compare' => '=',
-				'type' => 'NUMERIC'
+				'type'    => 'NUMERIC',
 			);
 		}
 		return $query;
