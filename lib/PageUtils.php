@@ -17,7 +17,7 @@ use Automattic\WooCommerce\Internal\Admin\Loader;
 
 use GlobalPayments\WooCommercePaymentGatewayProvider\Plugin;
 
-use WC_Order_Item_Product, WC_Payment_Gateways, WC_Admin_Notices, WC_Checkout, WC_Product_Simple;
+use WC_Order_Item_Product, WC_Payment_Gateways, WC_Checkout, WC_Product_Simple;
 use WC, WC_Session_Handler, WP_Post, WC_Order;
 use Automattic\WooCommerce\Checkout\Helpers\ReserveStockException;
 
@@ -93,10 +93,13 @@ class PageUtils {
 	 * @see self::show_notices()
 	 */
 	public static function after_pay( WC_Order $order ) {
-		if ( ! is_null( WC()->session ) ) {
-			$notices = wc_get_notices();
-			PaymentUtils::save_notices( $notices );
-			wc_clear_notices();
+		if ( isset( $_GET['key'] ) && isset( $_GET['pay_for_order'] ) && 'true' === $_GET['pay_for_order'] && ! is_null( WC()->session ) ) {
+			$order_key = sanitize_user( wp_unslash( $_GET['key'], true ) );
+			if ( $order->key_is_valid( $order_key ) ) {
+				$notices = wc_get_notices();
+				PaymentUtils::save_notices( $notices );
+				wc_clear_notices();
+			}
 		}
 	}
 
@@ -161,9 +164,6 @@ class PageUtils {
 	}
 
 	public static function output_admin_order_markup( WP_Post $post ): void {
-		WC_Admin_Notices::init();
-		WC_Admin_Notices::add_notices();
-		WC_Admin_Notices::output_custom_notices();
 
 		$tab = isset( $_GET['tab'] ) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
 
