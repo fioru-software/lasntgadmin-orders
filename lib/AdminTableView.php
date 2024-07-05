@@ -22,6 +22,8 @@ class AdminTableView {
 		add_filter( 'woocommerce_register_post_type_shop_order', [ self::class, 'register_post_type_shop_order' ] );
 
 		if ( is_admin() ) {
+			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'modify_columns' ], 15 );
+			add_filter( 'manage_shop_order_columns', [ self::class, 'modify_columns' ], 15 );
 			add_filter( 'bulk_actions-edit-shop_order', [ self::class, 'modify_order_bulk_actions' ], 101 );
 			// WC uses priority 100.
 			add_filter( 'post_row_actions', [ self::class, 'modify_order_row_actions' ], 101, 2 );
@@ -37,6 +39,11 @@ class AdminTableView {
 			add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'apply_default_order_list_filter_by_group_membership' ], 10, 3 );
 			add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_order_list_for_regional_training_centre_managers' ], 10, 2 );
 		}
+	}
+
+	public static function modify_columns( array $columns ): array {
+		unset( $columns['origin'] );
+		return $columns;
 	}
 
 	public static function modify_order_bulk_actions( array $actions ): array {
