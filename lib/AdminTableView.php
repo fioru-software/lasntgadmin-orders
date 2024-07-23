@@ -48,7 +48,9 @@ class AdminTableView {
 
 	public static function modify_order_bulk_actions( array $actions ): array {
 		if ( 'shop_order' === get_post_type() ) {
-			unset( $actions['trash'] );
+			if( ! wc_current_user_has_role('administrator' ) ) {
+				unset( $actions['trash'] );
+			}
 			unset( $actions['mark_processing'] );
 			unset( $actions['mark_on-hold'] );
 			unset( $actions['mark_completed'] );
