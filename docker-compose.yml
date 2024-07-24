@@ -18,6 +18,8 @@ services:
         - db
       volumes:
         - .:/usr/local/src
+        - ../lasntgadmin-groups:/var/www/html/wp-content/plugins/lasntgadmin-groups
+        - ../woocommerce-gateway-realex-redirect:/var/www/html/wp-content/woocommerce-gateway-realex-redirect
       ports:
         - "8080:80"
         - "9443:443"
