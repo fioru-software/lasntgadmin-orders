@@ -1,6 +1,6 @@
 {
     "name": "fioru/lasntgadmin-orders",
-    "version": "1.8.2",
+    "version": "1.8.3",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-orders"
@@ -24,10 +24,6 @@
       "all": [ "@lint", "@check", "@test", "@secure" ]
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url":  "git@github.com:fioru-software/lasntgadmin-itthinx-groups.git"
-        },
         {
             "type": "vcs",
             "url":  "git@github.com:fioru-software/lasntgadmin-grant-funded-payment-gateway.git"
@@ -79,7 +75,6 @@
         "fioru/lasntgadmin-users": "^3.3.7",
         "fioru/lasntgadmin-translate": "^1.2.6",
         "fioru/lasntgadmin-theme": "^1.0.0",
-        "fioru/lasntgadmin-itthinx-groups": "^2.20.1",
 		"fioru/lasntgadmin-purchase-order-payment-gateway": "^1.2.13"
     },
     "require-dev": {
