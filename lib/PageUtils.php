@@ -239,7 +239,7 @@ class PageUtils {
 
 	public static function render_payment_options( WC_Order $order ): void {
 		$product      = OrderUtils::get_product( $order );
-		$gateways     = PaymentUtils::get_supported_admin_payment_gateways( $product );
+		$gateways     = PaymentUtils::get_supported_admin_payment_gateways( $product, $order );
 		$checkout_url = $order->get_checkout_payment_url( true );
 		$order_key    = parse_str(
 			parse_url(

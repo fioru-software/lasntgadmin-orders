@@ -4,12 +4,14 @@ namespace Lasntg\Admin\Orders;
 
 use Lasntg\Admin\Orders\PluginUtils;
 use Lasntg\Admin\Products\ProductUtils;
+use Lasntg\Admin\Group\GroupUtils;
 
 use Lasntg\Admin\PaymentGateway\GrantFunded\{
 	PluginUtils as GrantFundedPluginUtils
 };
 
-use WC_Payment_Gateway, WC_Payment_Gateways, WC_Product;
+use WC_Payment_Gateway, WC_Payment_Gateways, WC_Product, WC_Order;
+use Groups_Admin_Post_Columns;
 
 class PaymentUtils {
 
@@ -38,13 +40,15 @@ class PaymentUtils {
 		return $payment_gateways[ $gateway_id ];
 	}
 
-	public static function get_supported_admin_payment_gateways( WC_Product $product ): array {
+	public static function get_supported_admin_payment_gateways( WC_Product $product, WC_Order $order ): array {
 		return array_filter(
 			( WC_Payment_Gateways::instance() )->get_available_payment_gateways(),
-			function ( $gateway ) use ( $product ) {
+			function ( $gateway ) use ( $product, $order ) {
 				if ( in_array( $gateway->id, self::SUPPORTED_GATEWAY_SLUGS ) ) {
 					if ( GrantFundedPluginUtils::get_snake_case_name() === $gateway->id ) {
-						return ProductUtils::is_funded( $product );
+						$group_id = $order->get_meta( Groups_Admin_Post_Columns::GROUPS_READ, true );
+						$group = GroupUtils::get_group_by_id( $group_id );
+						return ProductUtils::is_funded( $product ) && GroupUtils::is_local_authority( $group );
 					}
 					return true;
 				}
