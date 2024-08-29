@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c0a2803db728ee67b298b0fd6b5e86ef",
+    "content-hash": "e00a03a20c95f994ce79798d9b901eb0",
     "packages": [
         {
             "name": "composer/installers",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "12fb2dfe5e16183de69e784a7b84046c43d97e8e"
+                "reference": "fad14ce68dd95e341b7768a311320a2c956ca42e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/12fb2dfe5e16183de69e784a7b84046c43d97e8e",
-                "reference": "12fb2dfe5e16183de69e784a7b84046c43d97e8e",
+                "url": "https://api.github.com/repos/composer/installers/zipball/fad14ce68dd95e341b7768a311320a2c956ca42e",
+                "reference": "fad14ce68dd95e341b7768a311320a2c956ca42e",
                 "shasum": ""
             },
             "require": {
@@ -25,12 +25,12 @@
                 "php": "^7.2 || ^8.0"
             },
             "require-dev": {
-                "composer/composer": "^1.10.27 || ^2.7",
-                "composer/semver": "^1.7.2 || ^3.4.0",
-                "phpstan/phpstan": "^1.11",
-                "phpstan/phpstan-phpunit": "^1",
-                "symfony/phpunit-bridge": "^7.1.1",
-                "symfony/process": "^5 || ^6 || ^7"
+                "composer/composer": "^1.10.27 || ^2.7.8",
+                "composer/semver": "^1.7.2 || ^3.4.2",
+                "phpstan/phpstan": "^1.11.11",
+                "phpstan/phpstan-phpunit": "^1.4",
+                "phpunit/phpunit": "^8.5.39 || ^9.6.20",
+                "symfony/process": "^5 || ^6 || ^7.1.3"
             },
             "default-branch": true,
             "type": "composer-plugin",
@@ -135,7 +135,7 @@
             ],
             "support": {
                 "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/v2.3.0"
+                "source": "https://github.com/composer/installers/tree/main"
             },
             "funding": [
                 {
@@ -151,7 +151,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-06-24T20:46:46+00:00"
+            "time": "2024-08-23T14:47:58+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -216,16 +216,16 @@
         },
         {
             "name": "fioru/lasntgadmin-attendees",
-            "version": "3.8.16-rc1",
+            "version": "3.8.19",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-attendees.git",
-                "reference": "9032a33628e5f23ce1ae0c286e20417dc17a91b9"
+                "reference": "169d30d9b574b372968527cf5265a3cbf97e6bba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/9032a33628e5f23ce1ae0c286e20417dc17a91b9",
-                "reference": "9032a33628e5f23ce1ae0c286e20417dc17a91b9",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/169d30d9b574b372968527cf5265a3cbf97e6bba",
+                "reference": "169d30d9b574b372968527cf5265a3cbf97e6bba",
                 "shasum": ""
             },
             "require": {
@@ -233,7 +233,6 @@
                 "fioru/lasntgadmin-groups": "^1.5.10",
                 "fioru/lasntgadmin-orders": "^1.7.52",
                 "fioru/lasntgadmin-products": "^5.14.3",
-                "fioru/lasntgadmin-purchase-order-payment-gateway": "^1.2.14",
                 "phpoffice/phpspreadsheet": "^1.28",
                 "symfony/uid": "^5.4"
             },
@@ -287,22 +286,22 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.8.16-rc1"
+                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.8.19"
             },
-            "time": "2024-07-03T16:15:12+00:00"
+            "time": "2024-08-22T19:55:56+00:00"
         },
         {
             "name": "fioru/lasntgadmin-dashboard",
-            "version": "1.1.6-rc1",
+            "version": "1.1.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-dashboard.git",
-                "reference": "e25d9135c79f2345657b600de8c302d426215ed8"
+                "reference": "f1c87ad4f33eb44836f1e1155045b5ddf1db7709"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-dashboard/zipball/e25d9135c79f2345657b600de8c302d426215ed8",
-                "reference": "e25d9135c79f2345657b600de8c302d426215ed8",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-dashboard/zipball/f1c87ad4f33eb44836f1e1155045b5ddf1db7709",
+                "reference": "f1c87ad4f33eb44836f1e1155045b5ddf1db7709",
                 "shasum": ""
             },
             "require": {
@@ -365,29 +364,28 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-dashboard/tree/1.1.6-rc1"
+                "source": "https://github.com/fioru-software/lasntgadmin-dashboard/tree/1.1.7"
             },
-            "time": "2024-06-19T09:52:35+00:00"
+            "time": "2024-08-15T13:37:40+00:00"
         },
         {
             "name": "fioru/lasntgadmin-grant-funded-payment-gateway",
-            "version": "1.10.2",
+            "version": "1.10.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-grant-funded-payment-gateway.git",
-                "reference": "e899976af69ac5ac9cd7d6699efd7995914e1238"
+                "reference": "24c832ca265001fbd93d5606134e42224671a263"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-grant-funded-payment-gateway/zipball/e899976af69ac5ac9cd7d6699efd7995914e1238",
-                "reference": "e899976af69ac5ac9cd7d6699efd7995914e1238",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-grant-funded-payment-gateway/zipball/24c832ca265001fbd93d5606134e42224671a263",
+                "reference": "24c832ca265001fbd93d5606134e42224671a263",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "~2.0",
                 "fioru/lasntgadmin-attendees": "^3.8.0",
                 "fioru/lasntgadmin-groups": "^1.4",
-                "fioru/lasntgadmin-itthinx-groups": "^2.20.1",
                 "fioru/lasntgadmin-orders": "^1.7.48",
                 "fioru/lasntgadmin-products": "^5.12.0",
                 "phpoffice/phpspreadsheet": "^1.29"
@@ -442,22 +440,22 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-grant-funded-payment-gateway/tree/1.10.2"
+                "source": "https://github.com/fioru-software/lasntgadmin-grant-funded-payment-gateway/tree/1.10.7"
             },
-            "time": "2024-07-02T11:18:33+00:00"
+            "time": "2024-08-01T08:35:03+00:00"
         },
         {
             "name": "fioru/lasntgadmin-groups",
-            "version": "1.5.11",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-groups.git",
-                "reference": "4a11efc80dec0d5ac1b13e263b64236dc7d02592"
+                "reference": "8621e332cbf352abff3318dbc8f9169db63137ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-groups/zipball/4a11efc80dec0d5ac1b13e263b64236dc7d02592",
-                "reference": "4a11efc80dec0d5ac1b13e263b64236dc7d02592",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-groups/zipball/8621e332cbf352abff3318dbc8f9169db63137ee",
+                "reference": "8621e332cbf352abff3318dbc8f9169db63137ee",
                 "shasum": ""
             },
             "require": {
@@ -513,48 +511,22 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-groups/tree/1.5.11"
+                "source": "https://github.com/fioru-software/lasntgadmin-groups/tree/1.6.2"
             },
-            "time": "2024-05-10T15:41:57+00:00"
-        },
-        {
-            "name": "fioru/lasntgadmin-itthinx-groups",
-            "version": "2.20.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fioru-software/lasntgadmin-itthinx-groups.git",
-                "reference": "f2778b4c56f0f0b9e1c69c24b76016e89ebd4739"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-itthinx-groups/zipball/f2778b4c56f0f0b9e1c69c24b76016e89ebd4739",
-                "reference": "f2778b4c56f0f0b9e1c69c24b76016e89ebd4739",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "~2.0"
-            },
-            "type": "wordpress-plugin",
-            "extra": {
-                "installer-name": "groups"
-            },
-            "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-itthinx-groups/tree/2.20.1"
-            },
-            "time": "2024-02-19T12:45:00+00:00"
+            "time": "2024-08-06T10:28:55+00:00"
         },
         {
             "name": "fioru/lasntgadmin-products",
-            "version": "5.14.11-rc1",
+            "version": "5.14.13",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-products.git",
-                "reference": "7ae535e668794e839e1317c0da333e010a9a7dfa"
+                "reference": "18b1ec184f510a208ba588bab0993379ecc4f5b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/7ae535e668794e839e1317c0da333e010a9a7dfa",
-                "reference": "7ae535e668794e839e1317c0da333e010a9a7dfa",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-products/zipball/18b1ec184f510a208ba588bab0993379ecc4f5b2",
+                "reference": "18b1ec184f510a208ba588bab0993379ecc4f5b2",
                 "shasum": ""
             },
             "require": {
@@ -562,7 +534,6 @@
                 "fioru/lasntgadmin-attendees": "^3.7.11",
                 "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.8",
                 "fioru/lasntgadmin-groups": "^1.5.6",
-                "fioru/lasntgadmin-itthinx-groups": "^2.19.0",
                 "fioru/lasntgadmin-orders": "^1.7.29",
                 "fioru/lasntgadmin-users": "^3.0.2"
             },
@@ -616,22 +587,22 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.14.11-rc1"
+                "source": "https://github.com/fioru-software/lasntgadmin-products/tree/5.14.13"
             },
-            "time": "2024-07-04T11:53:57+00:00"
+            "time": "2024-08-15T09:46:01+00:00"
         },
         {
             "name": "fioru/lasntgadmin-purchase-order-payment-gateway",
-            "version": "1.2.14",
+            "version": "1.2.15",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-purchase-order-payment-gateway.git",
-                "reference": "6b07414e7861e84e1663cb684f01b70792cb91ba"
+                "reference": "c8fca7c038a1a64f914beac2f4e1ad7c20e82671"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-purchase-order-payment-gateway/zipball/6b07414e7861e84e1663cb684f01b70792cb91ba",
-                "reference": "6b07414e7861e84e1663cb684f01b70792cb91ba",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-purchase-order-payment-gateway/zipball/c8fca7c038a1a64f914beac2f4e1ad7c20e82671",
+                "reference": "c8fca7c038a1a64f914beac2f4e1ad7c20e82671",
                 "shasum": ""
             },
             "require": {
@@ -642,23 +613,23 @@
                 "installer-name": "woocommerce-gateway-purchase-order"
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-purchase-order-payment-gateway/tree/1.2.14",
+                "source": "https://github.com/fioru-software/lasntgadmin-purchase-order-payment-gateway/tree/1.2.15",
                 "issues": "https://github.com/fioru-software/lasntgadmin-purchase-order-payment-gateway/issues"
             },
-            "time": "2024-02-22T09:19:37+00:00"
+            "time": "2024-07-12T19:44:29+00:00"
         },
         {
             "name": "fioru/lasntgadmin-subscriptions",
-            "version": "2.1.20",
+            "version": "2.1.23",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-subscriptions.git",
-                "reference": "bb9e02c2b658ea3115fbb439c0ee937573af310d"
+                "reference": "1d779d573a40aace479fd7ed4400a19b45d6b3fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-subscriptions/zipball/bb9e02c2b658ea3115fbb439c0ee937573af310d",
-                "reference": "bb9e02c2b658ea3115fbb439c0ee937573af310d",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-subscriptions/zipball/1d779d573a40aace479fd7ed4400a19b45d6b3fc",
+                "reference": "1d779d573a40aace479fd7ed4400a19b45d6b3fc",
                 "shasum": ""
             },
             "require": {
@@ -720,26 +691,33 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-subscriptions/tree/2.1.20"
+                "source": "https://github.com/fioru-software/lasntgadmin-subscriptions/tree/2.1.23"
             },
-            "time": "2024-04-04T05:30:13+00:00"
+            "time": "2024-08-16T08:41:57+00:00"
         },
         {
             "name": "fioru/lasntgadmin-theme",
-            "version": "1.0.7",
+            "version": "1.0.9-rc1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-theme.git",
-                "reference": "776f091025ef04b383cee6bf20cea8136f2cfffc"
+                "reference": "b0ce8923e41aec3328e8dfa3553fb1339e0e2765"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-theme/zipball/776f091025ef04b383cee6bf20cea8136f2cfffc",
-                "reference": "776f091025ef04b383cee6bf20cea8136f2cfffc",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-theme/zipball/b0ce8923e41aec3328e8dfa3553fb1339e0e2765",
+                "reference": "b0ce8923e41aec3328e8dfa3553fb1339e0e2765",
                 "shasum": ""
             },
             "require": {
-                "composer/installers": "~2.0"
+                "composer/installers": "~2.0",
+                "fioru/lasntgadmin-attendees": "^3.8.17",
+                "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.10.6",
+                "fioru/lasntgadmin-groups": "^1.6.0",
+                "fioru/lasntgadmin-orders": "^1.8.4",
+                "fioru/lasntgadmin-products": "^5.14.12",
+                "fioru/lasntgadmin-translate": "^1.2.9",
+                "fioru/lasntgadmin-users": "^3.4.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
@@ -791,23 +769,23 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-theme/tree/1.0.7",
+                "source": "https://github.com/fioru-software/lasntgadmin-theme/tree/1.0.9-rc1",
                 "issues": "https://github.com/fioru-software/lasntgadmin-theme/issues"
             },
-            "time": "2024-02-08T10:48:15+00:00"
+            "time": "2024-08-14T08:36:11+00:00"
         },
         {
             "name": "fioru/lasntgadmin-translate",
-            "version": "1.2.8",
+            "version": "1.2.12",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-translate.git",
-                "reference": "2d0d58e53622e3d11dd6eb0325dc474f24692d9d"
+                "reference": "842e03563965eddc11c0716ccf0bc0dbec276558"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-translate/zipball/2d0d58e53622e3d11dd6eb0325dc474f24692d9d",
-                "reference": "2d0d58e53622e3d11dd6eb0325dc474f24692d9d",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-translate/zipball/842e03563965eddc11c0716ccf0bc0dbec276558",
+                "reference": "842e03563965eddc11c0716ccf0bc0dbec276558",
                 "shasum": ""
             },
             "require": {
@@ -823,7 +801,7 @@
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-                "enlightn/security-checker": "dev-main",
+                "enlightn/security-checker": "^1.11.0",
                 "fakerphp/faker": "^1.19",
                 "mockery/mockery": "^1.5",
                 "overtrue/phplint": "^3.0",
@@ -871,22 +849,22 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-translate/tree/1.2.8"
+                "source": "https://github.com/fioru-software/lasntgadmin-translate/tree/1.2.12"
             },
-            "time": "2023-09-20T08:23:46+00:00"
+            "time": "2024-07-24T06:49:59+00:00"
         },
         {
             "name": "fioru/lasntgadmin-users",
-            "version": "3.3.9",
+            "version": "3.4.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-users.git",
-                "reference": "c71c26de081113b10c50792528d397d99eaa54bc"
+                "reference": "1760185945bc235ca15bedb8d46b80f482bf615e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-users/zipball/c71c26de081113b10c50792528d397d99eaa54bc",
-                "reference": "c71c26de081113b10c50792528d397d99eaa54bc",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-users/zipball/1760185945bc235ca15bedb8d46b80f482bf615e",
+                "reference": "1760185945bc235ca15bedb8d46b80f482bf615e",
                 "shasum": ""
             },
             "require": {
@@ -946,9 +924,9 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-users/tree/3.3.9"
+                "source": "https://github.com/fioru-software/lasntgadmin-users/tree/3.4.1"
             },
-            "time": "2024-02-21T09:19:24+00:00"
+            "time": "2024-08-22T09:14:50+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -1684,12 +1662,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/uid.git",
-                "reference": "3e85f7b4d7e04313b88232cd5c27e5ff2ae93218"
+                "reference": "886c1742a710ceee6e2306169981db6b643a6dd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/uid/zipball/3e85f7b4d7e04313b88232cd5c27e5ff2ae93218",
-                "reference": "3e85f7b4d7e04313b88232cd5c27e5ff2ae93218",
+                "url": "https://api.github.com/repos/symfony/uid/zipball/886c1742a710ceee6e2306169981db6b643a6dd4",
+                "reference": "886c1742a710ceee6e2306169981db6b643a6dd4",
                 "shasum": ""
             },
             "require": {
@@ -1750,7 +1728,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T14:33:22+00:00"
+            "time": "2024-07-31T15:51:49+00:00"
         }
     ],
     "packages-dev": [
@@ -2034,18 +2012,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "1ee81e5fc8613ba1ad0b095f40e17c119dd4cc93"
+                "reference": "d281ed313b989f213357e3be1a179f02196ac99b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/1ee81e5fc8613ba1ad0b095f40e17c119dd4cc93",
-                "reference": "1ee81e5fc8613ba1ad0b095f40e17c119dd4cc93",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/d281ed313b989f213357e3be1a179f02196ac99b",
+                "reference": "d281ed313b989f213357e3be1a179f02196ac99b",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/promises": "^1.5.3 || ^2.0.1",
-                "guzzlehttp/psr7": "^1.9.1 || ^2.5.1",
+                "guzzlehttp/promises": "^1.5.3 || ^2.0.3",
+                "guzzlehttp/psr7": "^2.7.0",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.2 || ^3.0"
@@ -2058,7 +2036,7 @@
                 "ext-curl": "*",
                 "guzzle/client-integration-tests": "3.0.2",
                 "php-http/message-factory": "^1.1",
-                "phpunit/phpunit": "^8.5.36 || ^9.6.15",
+                "phpunit/phpunit": "^8.5.39 || ^9.6.20",
                 "psr/log": "^1.1 || ^2.0 || ^3.0"
             },
             "suggest": {
@@ -2066,6 +2044,7 @@
                 "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -2136,7 +2115,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.9"
+                "source": "https://github.com/guzzle/guzzle/tree/7.9.2"
             },
             "funding": [
                 {
@@ -2152,7 +2131,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-31T19:57:34+00:00"
+            "time": "2024-07-24T11:22:20+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -2160,12 +2139,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "ab801747cbf7d394d4d435c34364704f9bf048e6"
+                "reference": "6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/ab801747cbf7d394d4d435c34364704f9bf048e6",
-                "reference": "ab801747cbf7d394d4d435c34364704f9bf048e6",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8",
+                "reference": "6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8",
                 "shasum": ""
             },
             "require": {
@@ -2173,7 +2152,7 @@
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.8.2",
-                "phpunit/phpunit": "^8.5.36 || ^9.6.15"
+                "phpunit/phpunit": "^8.5.39 || ^9.6.20"
             },
             "default-branch": true,
             "type": "library",
@@ -2220,7 +2199,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/2.0"
+                "source": "https://github.com/guzzle/promises/tree/2.0.3"
             },
             "funding": [
                 {
@@ -2236,20 +2215,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-31T10:06:07+00:00"
+            "time": "2024-07-18T10:29:17+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.6.x-dev",
+            "version": "2.7.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "a243f80a1ca7fe8ceed4deee17f12c1930efe662"
+                "reference": "a70f5c95fb43bc83f07c9c948baa0dc1829bf201"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/a243f80a1ca7fe8ceed4deee17f12c1930efe662",
-                "reference": "a243f80a1ca7fe8ceed4deee17f12c1930efe662",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/a70f5c95fb43bc83f07c9c948baa0dc1829bf201",
+                "reference": "a70f5c95fb43bc83f07c9c948baa0dc1829bf201",
                 "shasum": ""
             },
             "require": {
@@ -2264,8 +2243,8 @@
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.8.2",
-                "http-interop/http-factory-tests": "^0.9",
-                "phpunit/phpunit": "^8.5.36 || ^9.6.15"
+                "http-interop/http-factory-tests": "0.9.0",
+                "phpunit/phpunit": "^8.5.39 || ^9.6.20"
             },
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
@@ -2337,7 +2316,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.6"
+                "source": "https://github.com/guzzle/psr7/tree/2.7.0"
             },
             "funding": [
                 {
@@ -2353,7 +2332,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-31T10:09:24+00:00"
+            "time": "2024-07-18T11:15:46+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -2361,12 +2340,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hamcrest/hamcrest-php.git",
-                "reference": "696163addf28bb4e01455254e055a9a75e0ba6c4"
+                "reference": "dd03e528e461e059e21cdd2ce50fdb842efe5a91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/696163addf28bb4e01455254e055a9a75e0ba6c4",
-                "reference": "696163addf28bb4e01455254e055a9a75e0ba6c4",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/dd03e528e461e059e21cdd2ce50fdb842efe5a91",
+                "reference": "dd03e528e461e059e21cdd2ce50fdb842efe5a91",
                 "shasum": ""
             },
             "require": {
@@ -2378,8 +2357,8 @@
                 "kodova/hamcrest-php": "*"
             },
             "require-dev": {
-                "phpunit/php-file-iterator": "^1.4 || ^2.0",
-                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0 || ^8.0"
+                "phpunit/php-file-iterator": "^1.4 || ^2.0 || ^3.0",
+                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0 || ^8.0 || ^9.0"
             },
             "default-branch": true,
             "type": "library",
@@ -2405,7 +2384,7 @@
                 "issues": "https://github.com/hamcrest/hamcrest-php/issues",
                 "source": "https://github.com/hamcrest/hamcrest-php/tree/master"
             },
-            "time": "2023-12-14T11:00:58+00:00"
+            "time": "2024-07-08T08:13:58+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -3055,12 +3034,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "6dcc44351983b9dbddf9012a3533804768ca4bbb"
+                "reference": "de3789a59ee046291bb196c03862c871a692dc75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/6dcc44351983b9dbddf9012a3533804768ca4bbb",
-                "reference": "6dcc44351983b9dbddf9012a3533804768ca4bbb",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/de3789a59ee046291bb196c03862c871a692dc75",
+                "reference": "de3789a59ee046291bb196c03862c871a692dc75",
                 "shasum": ""
             },
             "require": {
@@ -3126,7 +3105,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-04-24T13:22:43+00:00"
+            "time": "2024-07-23T06:25:32+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -3134,12 +3113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "4a305210f0dd5e6eeba775c4ffbeaefa19a37229"
+                "reference": "cc4244b4e6ab34f3e8db83e3987dcb65138450ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/4a305210f0dd5e6eeba775c4ffbeaefa19a37229",
-                "reference": "4a305210f0dd5e6eeba775c4ffbeaefa19a37229",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/cc4244b4e6ab34f3e8db83e3987dcb65138450ff",
+                "reference": "cc4244b4e6ab34f3e8db83e3987dcb65138450ff",
                 "shasum": ""
             },
             "require": {
@@ -3215,7 +3194,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-06-09T12:33:11+00:00"
+            "time": "2024-08-23T23:59:03+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3223,28 +3202,28 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "39d628812d8d83344a6c1b07799e3700d830d355"
+                "reference": "85402a822d1ecf1db1096959413d35e1c37cf1a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/39d628812d8d83344a6c1b07799e3700d830d355",
-                "reference": "39d628812d8d83344a6c1b07799e3700d830d355",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/85402a822d1ecf1db1096959413d35e1c37cf1a5",
+                "reference": "85402a822d1ecf1db1096959413d35e1c37cf1a5",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-                "nikic/php-parser": "^4.18 || ^5.0",
+                "nikic/php-parser": "^4.19.1 || ^5.1.0",
                 "php": ">=7.3",
-                "phpunit/php-file-iterator": "^3.0.3",
-                "phpunit/php-text-template": "^2.0.2",
-                "sebastian/code-unit-reverse-lookup": "^2.0.2",
-                "sebastian/complexity": "^2.0",
-                "sebastian/environment": "^5.1.2",
-                "sebastian/lines-of-code": "^1.0.3",
-                "sebastian/version": "^3.0.1",
-                "theseer/tokenizer": "^1.2.0"
+                "phpunit/php-file-iterator": "^3.0.6",
+                "phpunit/php-text-template": "^2.0.4",
+                "sebastian/code-unit-reverse-lookup": "^2.0.3",
+                "sebastian/complexity": "^2.0.3",
+                "sebastian/environment": "^5.1.5",
+                "sebastian/lines-of-code": "^1.0.4",
+                "sebastian/version": "^3.0.2",
+                "theseer/tokenizer": "^1.2.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.6"
@@ -3256,7 +3235,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "9.2-dev"
+                    "dev-main": "9.2.x-dev"
                 }
             },
             "autoload": {
@@ -3285,7 +3264,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.32"
             },
             "funding": [
                 {
@@ -3293,7 +3272,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-06-29T07:23:05+00:00"
+            "time": "2024-08-22T04:23:01+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3542,41 +3521,41 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "d229f5800280c68f1c5fc28b132bc64ff5ed3dd4"
+                "reference": "5ddc953c1d292bc54f12f5e810abddb156d50ff3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d229f5800280c68f1c5fc28b132bc64ff5ed3dd4",
-                "reference": "d229f5800280c68f1c5fc28b132bc64ff5ed3dd4",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/5ddc953c1d292bc54f12f5e810abddb156d50ff3",
+                "reference": "5ddc953c1d292bc54f12f5e810abddb156d50ff3",
                 "shasum": ""
             },
             "require": {
-                "doctrine/instantiator": "^1.3.1 || ^2",
+                "doctrine/instantiator": "^1.5.0 || ^2",
                 "ext-dom": "*",
                 "ext-json": "*",
                 "ext-libxml": "*",
                 "ext-mbstring": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "myclabs/deep-copy": "^1.10.1",
-                "phar-io/manifest": "^2.0.3",
-                "phar-io/version": "^3.0.2",
+                "myclabs/deep-copy": "^1.12.0",
+                "phar-io/manifest": "^2.0.4",
+                "phar-io/version": "^3.2.1",
                 "php": ">=7.3",
-                "phpunit/php-code-coverage": "^9.2.28",
-                "phpunit/php-file-iterator": "^3.0.5",
+                "phpunit/php-code-coverage": "^9.2.32",
+                "phpunit/php-file-iterator": "^3.0.6",
                 "phpunit/php-invoker": "^3.1.1",
-                "phpunit/php-text-template": "^2.0.3",
-                "phpunit/php-timer": "^5.0.2",
-                "sebastian/cli-parser": "^1.0.1",
-                "sebastian/code-unit": "^1.0.6",
+                "phpunit/php-text-template": "^2.0.4",
+                "phpunit/php-timer": "^5.0.3",
+                "sebastian/cli-parser": "^1.0.2",
+                "sebastian/code-unit": "^1.0.8",
                 "sebastian/comparator": "^4.0.8",
-                "sebastian/diff": "^4.0.3",
-                "sebastian/environment": "^5.1.3",
-                "sebastian/exporter": "^4.0.5",
-                "sebastian/global-state": "^5.0.1",
-                "sebastian/object-enumerator": "^4.0.3",
-                "sebastian/resource-operations": "^3.0.3",
-                "sebastian/type": "^3.2",
+                "sebastian/diff": "^4.0.6",
+                "sebastian/environment": "^5.1.5",
+                "sebastian/exporter": "^4.0.6",
+                "sebastian/global-state": "^5.0.7",
+                "sebastian/object-enumerator": "^4.0.4",
+                "sebastian/resource-operations": "^3.0.4",
+                "sebastian/type": "^3.2.1",
                 "sebastian/version": "^3.0.2"
             },
             "suggest": {
@@ -3637,7 +3616,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-03T05:19:53+00:00"
+            "time": "2024-08-28T12:50:49+00:00"
         },
         {
             "name": "psr/container",
@@ -4707,12 +4686,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "e24508814f243ebece90a193a6e77b1f86f73849"
+                "reference": "41a426cac70d410183189bc31c63f474f6f53548"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/e24508814f243ebece90a193a6e77b1f86f73849",
-                "reference": "e24508814f243ebece90a193a6e77b1f86f73849",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/41a426cac70d410183189bc31c63f474f6f53548",
+                "reference": "41a426cac70d410183189bc31c63f474f6f53548",
                 "shasum": ""
             },
             "require": {
@@ -4780,7 +4759,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-07-02T07:22:32+00:00"
+            "time": "2024-08-17T17:43:40+00:00"
         },
         {
             "name": "symfony/console",
@@ -4788,12 +4767,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "6473d441a913cb997123b59ff2dbe3d1cf9e11ba"
+                "reference": "e86f8554de667c16dde8aeb89a3990cfde924df9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/6473d441a913cb997123b59ff2dbe3d1cf9e11ba",
-                "reference": "6473d441a913cb997123b59ff2dbe3d1cf9e11ba",
+                "url": "https://api.github.com/repos/symfony/console/zipball/e86f8554de667c16dde8aeb89a3990cfde924df9",
+                "reference": "e86f8554de667c16dde8aeb89a3990cfde924df9",
                 "shasum": ""
             },
             "require": {
@@ -4879,7 +4858,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-06-28T07:48:55+00:00"
+            "time": "2024-08-13T16:31:56+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -4954,12 +4933,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "f51cff4687547641c7d8180d74932ab40b2205ce"
+                "reference": "ae25a9145a900764158d439653d5630191155ca0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/f51cff4687547641c7d8180d74932ab40b2205ce",
-                "reference": "f51cff4687547641c7d8180d74932ab40b2205ce",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/ae25a9145a900764158d439653d5630191155ca0",
+                "reference": "ae25a9145a900764158d439653d5630191155ca0",
                 "shasum": ""
             },
             "require": {
@@ -5009,7 +4988,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T14:33:22+00:00"
+            "time": "2024-08-13T14:03:51+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -5608,12 +5587,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "76d8b2bdea77c3e3d304d6449a2775b419f992cd"
+                "reference": "8be1d484951ff5ca995eaf8edcbcb8b9a5888450"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/76d8b2bdea77c3e3d304d6449a2775b419f992cd",
-                "reference": "76d8b2bdea77c3e3d304d6449a2775b419f992cd",
+                "url": "https://api.github.com/repos/symfony/string/zipball/8be1d484951ff5ca995eaf8edcbcb8b9a5888450",
+                "reference": "8be1d484951ff5ca995eaf8edcbcb8b9a5888450",
                 "shasum": ""
             },
             "require": {
@@ -5686,7 +5665,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-01T16:36:50+00:00"
+            "time": "2024-08-01T10:24:28+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -5694,12 +5673,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "81cad0ceab3d61fe14fe941ff18a230ac9c80f83"
+                "reference": "62f96e1cfd4cf518882a36bfedcf1fe4093c1299"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/81cad0ceab3d61fe14fe941ff18a230ac9c80f83",
-                "reference": "81cad0ceab3d61fe14fe941ff18a230ac9c80f83",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/62f96e1cfd4cf518882a36bfedcf1fe4093c1299",
+                "reference": "62f96e1cfd4cf518882a36bfedcf1fe4093c1299",
                 "shasum": ""
             },
             "require": {
@@ -5761,7 +5740,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T14:33:22+00:00"
+            "time": "2024-08-11T17:40:32+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -5819,12 +5798,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
-                "reference": "d77b0204f49e4b4a2bbac791e3bbfbfe603edf06"
+                "reference": "7f766304b0654cee7c1dfa8e548f65fce197e05c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/d77b0204f49e4b4a2bbac791e3bbfbfe603edf06",
-                "reference": "d77b0204f49e4b4a2bbac791e3bbfbfe603edf06",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/7f766304b0654cee7c1dfa8e548f65fce197e05c",
+                "reference": "7f766304b0654cee7c1dfa8e548f65fce197e05c",
                 "shasum": ""
             },
             "require": {
@@ -5878,7 +5857,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-06-14T09:24:28+00:00"
+            "time": "2024-08-28T05:05:46+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",
@@ -5886,12 +5865,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Yoast/PHPUnit-Polyfills.git",
-                "reference": "3abb63e25e01331806547754bc01a90dd77c01e2"
+                "reference": "05495b934d2ae9a3b1c54b766ed479343a29f6b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/3abb63e25e01331806547754bc01a90dd77c01e2",
-                "reference": "3abb63e25e01331806547754bc01a90dd77c01e2",
+                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/05495b934d2ae9a3b1c54b766ed479343a29f6b1",
+                "reference": "05495b934d2ae9a3b1c54b766ed479343a29f6b1",
                 "shasum": ""
             },
             "require": {
@@ -5941,7 +5920,7 @@
                 "security": "https://github.com/Yoast/PHPUnit-Polyfills/security/policy",
                 "source": "https://github.com/Yoast/PHPUnit-Polyfills"
             },
-            "time": "2024-04-15T06:53:25+00:00"
+            "time": "2024-07-15T17:38:35+00:00"
         }
     ],
     "aliases": [],
