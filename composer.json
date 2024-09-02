@@ -68,8 +68,8 @@
     "require": {
         "composer/installers": "~2.0",
         "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.5.0",
-        "fioru/lasntgadmin-attendees": "^3.8.0",
-        "fioru/lasntgadmin-products": "^5.12.1",
+        "fioru/lasntgadmin-attendees": "^3.8.20",
+        "fioru/lasntgadmin-products": "^5.14.14",
         "fioru/lasntgadmin-groups": "^1.5.5",
         "fioru/lasntgadmin-subscriptions": "^2.1.11",
         "fioru/lasntgadmin-users": "^3.3.7",

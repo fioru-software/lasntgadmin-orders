@@ -18,10 +18,9 @@ services:
         - db
       volumes:
         - .:/usr/local/src
-        - /var/www/html
       ports:
         - "8080:80"
-        - "9443:443"
+        - "8443:443"
 
     db:
       image: mariadb:10.3
