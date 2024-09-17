@@ -87,12 +87,12 @@ const OrderForm = props => {
           value: formData.get('order_group')
         }
       ],
-      //line_items: [
-      //  {
-      //    product_id: parseInt( formData.get('product') ),
-      //    quantity: parseInt( formData.get('quantity') )
-      //  }
-      //]
+      line_items: [
+        {
+          product_id: parseInt( formData.get('product') ),
+          quantity: parseInt( formData.get('quantity') )
+        }
+      ]
     };
     if( ! isExistingOrder( props?.order ) ) {
       body.line_items = [
@@ -103,11 +103,6 @@ const OrderForm = props => {
       ];
     }
 
-    /**
-     * When editing an existing order
-     * @todo refactor
-     */
-    /*
     if( isExistingOrder(props?.order) ) {
       const lineItem = getLineItemByProductId( body.line_items[0].product_id, props.order);
       body.line_items = [
@@ -123,7 +118,6 @@ const OrderForm = props => {
         }
       ];
     }
-    */
 
     return body;
 
