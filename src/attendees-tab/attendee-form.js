@@ -4,7 +4,7 @@ import { Notice, Spinner } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-import { isNil, delay, range } from 'lodash';
+import { isNil, delay, range, isNull } from 'lodash';
 
 import { AttendeeFormFieldsets } from './attendee-form-fieldsets';
 

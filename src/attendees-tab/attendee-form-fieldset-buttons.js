@@ -208,24 +208,26 @@ const AttendeeFormFieldsetButtons = props => {
    */
   async function decrementOrderQuantity() {
 
+    const updatedQuantity = quantity - 1;
+
     setNotice({
       status: 'info',
       message: __( 'Decrementing order quantity...', 'lasntgadmin' )
     });
 
-    props.setOrderQuantity( quantity-1 );
+    props.setOrderQuantity( updatedQuantity );
 
     const decrementOrderQuantityRequest = getUpdateOrderRequest(
       order.id,
       nonce,
       {
-        total: order.total - product.price,
+        total: order.total - ( updatedQuantity * product.price ),
         line_items: Array.isArray( order?.line_items ) ? order?.line_items.map( item => {
           return {
             id: item.id,
-            quantity: item.quantity - 1,
-            total: `${item.total - product.price}`,
-            subtotal: `${item.subtotal - product.price}`
+            quantity: updatedQuantity,
+            total: `${ updatedQuantity * product.price}`,
+            subtotal: `${ updatedQuantity * product.price}`
           };
         }) : [],
       }
