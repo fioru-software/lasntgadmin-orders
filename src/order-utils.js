@@ -56,8 +56,20 @@ function isGrantPaid( paymentMethod ) {
   return paymentMethod === 'lasntgadmin_grant_funded_payment_gateway';
 }
 
-function isPaidStatus( status ) {
-  return ['on-hold', 'completed'].includes( status );
+function isCompletedStatus( status ) {
+  return ['completed'].includes( status );
+}
+
+function isCompletedOrder( order ) {
+  return isCompletedStatus( order.status );
+}
+
+function isCancelledOrder( order ) {
+  return isCancelledStatus( order.status );
+}
+
+function isCancelledStatus( status ) {
+  return status === 'cancelled';
 }
 
 /**
@@ -85,9 +97,6 @@ function isExistingOrder( order ) {
   return order.line_items.find( item => isNumber(item?.product_id) );
 }
 
-function isPaidOrder( order ) {
-  return isPaidStatus( order.status );
-}
 
 function isWaitingOrder( order ) {
   return isWaitingStatus( order.status );
@@ -107,6 +116,14 @@ function isPendingPaymentStatus( status ) {
 
 function getPendingPaymentStatus() {
   return 'pending';
+}
+
+function getPrefixedPendingPaymentStatus() {
+  return 'wc-' + getPendingPaymentStatus();
+}
+
+function getPrefixedOrderStatus( status ) {
+  return 'wc-' + status;
 }
 
 function isDraftOrder( order ) {
@@ -185,6 +202,8 @@ export {
   getWaitingStatus,
   getDraftStatus,
   getPendingAttendeesStatus,
+  getPrefixedPendingPaymentStatus,
+  getPrefixedOrderStatus,
   findOrderMetaByKey,
   filterOrderMetaByKey,
   filterItemFromOrderMeta,
@@ -194,11 +213,13 @@ export {
   isWaitingStatus, 
   isPendingPaymentStatus,
   isDraftOrder,
-  isPaidStatus,
+  isCompletedStatus,
+  isCancelledStatus,
   isGrantPaid,
   isPurchaseOrderPaid,
   isAttendeeIdInOrderMeta,
   isItemInOrderMeta,
-  isPaidOrder,
+  isCompletedOrder,
+  isCancelledOrder,
   isDraftStatus
 };

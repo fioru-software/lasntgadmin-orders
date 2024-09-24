@@ -4,7 +4,7 @@ import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-import { isNil } from "lodash";
+import { isNil, isEmpty } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
@@ -33,7 +33,7 @@ const OrderForm = props => {
    * Change button text
    */
   useEffect( () => {
-    if( ! isNil( status ) ) {
+    if( ! isNil( status ) && ! isEmpty( status ) ) {
       if( isWaitingStatus( status ) ) {
         setButtonText( __( 'Add enrolment to waiting list', 'lasntgadmin' ));
       } else {

@@ -7,7 +7,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
 import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces, getReservedStockQuantity } from '../product-utils';
-import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isPaidOrder, isPendingAttendeesStatus, isWaitingStatus, getDraftStatus, getWaitingStatus } from '../order-utils';
+import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isWaitingOrder, isDraftOrder, isCompletedOrder, isCancelledOrder, isPendingAttendeesStatus, isWaitingStatus, getDraftStatus, getWaitingStatus } from '../order-utils';
 
 import { isNumber, isObject, isNil, isNull, isUndefined } from "lodash";
 
@@ -66,21 +66,18 @@ const ProductPanel = props => {
    */
   useEffect( () => {
     if( isNumber( quantity ) && isNumber( spaces ) ) {
-      if ( ! isPaidOrder( props.order ) ) {
+
+      if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
         if( quantity > spaces ) {
           props.setStatus( getWaitingStatus() );
         } else {
           if( isWaitingStatus( props.order.status ) ) {
-            console.log('status change set', getDraftStatus() );
             props.setStatus( getDraftStatus() );
           } else {
             props.setStatus(props.order.status);
           }
         }
-      } else { 
-        /**
-         * user reduced quantity < spaces, auto switching to original order status
-         */
+      } else {
         props.setStatus(props.order.status);
       }
     }
@@ -102,12 +99,12 @@ const ProductPanel = props => {
         setTotal( product.price*lineItem.quantity );
         setPriceInfoVisible(true);
 
-        if( isPaidOrder( props.order) ) {
+        if( isCompletedOrder( props.order) || isCancelledOrder( props.order ) ) {
           setQuantityInputDisabled(true);
         }
       } 
 
-      if( ! isPaidOrder( props.order ) ) {
+      if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
 
         if( isGroupSelected(groupId) && ! isNil(product) && ! isNil(productId) ) {
           const quota = findGroupQuota( 
@@ -191,24 +188,26 @@ const ProductPanel = props => {
    */
   useEffect( () => {
 
-    if( isNumber(spaces) && ! isPaidOrder( props.order ) ) {
-
-      if( spaces < 1 ) {
-        props.setStatus("waiting-list");
-        setNotice({
-          status: "error",
-          message: __( 'No spaces available', 'lasntgadmin' )
-        });
-      } else {
-        //props.setStatus(props.order.status);
-        setNotice({
-          status: parseInt(spaces) > 0 ? "info" : "warning",
-          message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
-        });
+    if( isNumber(spaces) ) {
+      if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
+        if( spaces < 1 ) {
+          setNotice({
+            status: "error",
+            message: __( 'No spaces available', 'lasntgadmin' )
+          });
+        } else {
+          if( spaces < quantity ) {
+          props.setStatus("waiting-list");
+          }
+          setNotice({
+            status: parseInt(spaces) > 0 ? "info" : "warning",
+            message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
+          });
+        }
+        setPriceInfoVisible(true);
+        setLoading(false);
+        props.setSubmitButtonDisabled(false);
       }
-      setPriceInfoVisible(true);
-      setLoading(false);
-      props.setSubmitButtonDisabled(false);
     }
   }, [ spaces ]);
 
