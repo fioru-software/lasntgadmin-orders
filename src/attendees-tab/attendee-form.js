@@ -273,7 +273,7 @@ const AttendeeForm = props => {
         message: __( 'Updated order. Redirecting...', 'lasntgadmin' )
       });
 
-      document.location.assign( isWaitingOrder( order) ? `/wp-admin/edit.php?post_type=shop_order` : `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
+      document.location.assign( `/wp-admin/post.php?post=${ orderId }&action=edit&tab=payment` );
 
     } catch (e) {
       console.error(e);

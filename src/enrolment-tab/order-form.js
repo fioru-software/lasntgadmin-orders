@@ -124,19 +124,10 @@ const OrderForm = props => {
         } 
       );
       
-      // if the order is being moved from waiting-list to pending 
-      if ( isWaitingStatus( props.order.status ) && isPendingPaymentStatus( status ) ) {
-        setNotice({
-          status: 'success',
-          message: __( 'Updated enrolment. Client will be notified.', 'lasntgadmin' )
-        });
-        setIsLoading(false);
-      } else {
-        setNotice({
-          status: 'success',
-          message: __( 'Updated enrolment. Redirecting to attendees tab...', 'lasntgadmin' )
-        });
-      }
+      setNotice({
+        status: 'success',
+        message: __( 'Updated enrolment. Redirecting...', 'lasntgadmin' )
+      });
 
       switch( data.status ) {
 
