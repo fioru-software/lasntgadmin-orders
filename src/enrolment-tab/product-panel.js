@@ -7,7 +7,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
 import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces, getReservedStockQuantity } from '../product-utils';
-import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isPaidOrder, isPendingAttendeesStatus, isWaitingStatus } from '../order-utils';
+import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isPaidOrder, isPendingAttendeesStatus, isWaitingStatus, getDraftStatus, getWaitingStatus } from '../order-utils';
 
 import { isNumber, isObject, isNil, isNull, isUndefined } from "lodash";
 
@@ -68,9 +68,14 @@ const ProductPanel = props => {
     if( isNumber( quantity ) && isNumber( spaces ) ) {
       if ( ! isPaidOrder( props.order ) ) {
         if( quantity > spaces ) {
-          props.setStatus("waiting-list");
+          props.setStatus( getWaitingStatus() );
         } else {
-          props.setStatus(props.order.status);
+          if( isWaitingStatus( props.order.status ) ) {
+            console.log('status change set', getDraftStatus() );
+            props.setStatus( getDraftStatus() );
+          } else {
+            props.setStatus(props.order.status);
+          }
         }
       } else { 
         /**
@@ -195,7 +200,7 @@ const ProductPanel = props => {
           message: __( 'No spaces available', 'lasntgadmin' )
         });
       } else {
-        props.setStatus(props.order.status);
+        //props.setStatus(props.order.status);
         setNotice({
           status: parseInt(spaces) > 0 ? "info" : "warning",
           message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )

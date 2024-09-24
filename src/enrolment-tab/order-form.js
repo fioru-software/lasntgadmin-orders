@@ -28,34 +28,20 @@ const OrderForm = props => {
   const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create enrolment");
-  const oldStatus = props.order.status;
-
-  useEffect( () => {
-  }, [ props?.order ]);
-
-  /**
-   * Set initial button text
-   */
-  useEffect( () => {
-    if( ! isNil( props?.status ) ) {
-      setStatus(props.status);
-      if( ! isDraftStatus( props.status ) ) {
-        setButtonText( __( 'Update enrolment', 'lasntgadmin' ));
-      }
-    }
-  }, [props?.status]);
 
   /**
    * Change button text
    */
   useEffect( () => {
-    if( isWaitingStatus( status ) ) {
-      setButtonText( __( 'Add enrolment to waiting list', 'lasntgadmin' ));
-    } else {
-      if( isDraftStatus( props?.status ) ) {
-        setButtonText( __( 'Create enrolment', 'lasntgadmin' ) );
+    if( ! isNil( status ) ) {
+      if( isWaitingStatus( status ) ) {
+        setButtonText( __( 'Add enrolment to waiting list', 'lasntgadmin' ));
       } else {
-        setButtonText( __( 'Update enrolment', 'lasntgadmin' ) );
+        if( isDraftStatus( status ) ) {
+          setButtonText( __( 'Create enrolment', 'lasntgadmin' ) );
+        } else {
+          setButtonText( __( 'Update enrolment', 'lasntgadmin' ) );
+        }
       }
     }
   }, [ status ]);
@@ -64,12 +50,9 @@ const OrderForm = props => {
     return ['attendees', 'waiting-list'].includes( props.order.status ) && props?.user.ID === props.order.customer_id;
   }
 
-  function determineStatus() {
-    if( isDraftStatus( status ) ) {
+  function determineOrderStatusOnSubmit() {
+    if( status === getDraftStatus() ) {
       return getPendingAttendeesStatus();
-    }
-    if( isWaitingStatus( status ) ) {
-      return getWaitingStatus();
     }
     return status;
   }
@@ -80,7 +63,7 @@ const OrderForm = props => {
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
-      status: determineStatus(),
+      status: determineOrderStatusOnSubmit(),
       meta_data: [
         {
           key: 'groups-read',
@@ -140,13 +123,9 @@ const OrderForm = props => {
           data
         } 
       );
-      setNotice({
-        status: 'success',
-        message: __( 'Updated enrolment. Redirecting to attendees tab...', 'lasntgadmin' )
-      });
       
       // if the order is being moved from waiting-list to pending 
-      if ( isWaitingStatus( oldStatus ) && isPendingPaymentStatus( status ) ) {
+      if ( isWaitingStatus( props.order.status ) && isPendingPaymentStatus( status ) ) {
         setNotice({
           status: 'success',
           message: __( 'Updated enrolment. Client will be notified.', 'lasntgadmin' )
@@ -155,11 +134,11 @@ const OrderForm = props => {
       } else {
         setNotice({
           status: 'success',
-          message: __( 'Updated enrolment. Redirecting...', 'lastngadmin' )
+          message: __( 'Updated enrolment. Redirecting to attendees tab...', 'lasntgadmin' )
         });
       }
 
-      switch( order.status ) {
+      switch( data.status ) {
 
         case getWaitingStatus():
           document.location.assign(`/wp-admin/edit.php?post_type=shop_order`);
