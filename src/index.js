@@ -39,7 +39,9 @@ window.addEventListener(
         status: domElement.dataset.status,
         order: JSON.parse(domElement.dataset.order),
         productId: domElement.dataset.productId,
-        user: JSON.parse(domElement.dataset.user)
+        user: JSON.parse(domElement.dataset.user),
+        reservedStock: domElement.dataset.reservedStock,
+        currency: domElement.dataset.currency
       });
       if ( createRoot ) {
         createRoot( domElement ).render( uiElement );

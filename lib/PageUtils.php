@@ -2,7 +2,7 @@
 
 namespace Lasntg\Admin\Orders;
 
-use Lasntg\Admin\Orders\{ OrderUtils, PluginUtils };
+use Lasntg\Admin\Orders\{ OrderUtils, PluginUtils, ReservedStockUtils };
 use Lasntg\Admin\Group\GroupApi;
 use Lasntg\Admin\Products\{ ProductApi, ProductUtils };
 use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
@@ -163,32 +163,42 @@ class PageUtils {
 		}
 	}
 
+	/**
+	 * For duplicate reserves, the reservation expiry time will only be updated.
+	 *
+	 * @see woocommerce/src/Checkout/Helpers/ReserveStock.php
+	 * @see woocommerce/includes/wc-stock-functions.php
+	 */
+	private static function reserve_stock_for_order( WC_Order $order ): void {
+		try {
+			wc_reserve_stock_for_order( $order->get_id() );
+		} catch ( ReserveStockException $e ) {
+			$order->update_status( 'wc-waiting-list' );
+			PaymentUtils::save_notices(
+				[
+					'error' => [
+						[ 'notice' => 'The course is now full.' ],
+					],
+				]
+			);
+			wp_redirect( get_admin_url( null, sprintf( 'post.php?post=%d&action=edit&tab=order', $order->get_id() ) ) );
+			exit();
+		}
+	}
+
 	public static function output_admin_order_markup( WP_Post $post ): void {
 
 		$tab = isset( $_GET['tab'] ) ? wp_kses( wp_unslash( $_GET['tab'] ), 'post' ) : 'order';
 
-		// @todo Improve this hack.
 		if ( 'payment' === $tab ) {
 			$order = wc_get_order( $post->ID );
-			if ( in_array( $order->get_status(), [ 'completed' ] ) ) {
+			if ( 'completed' === $order->get_status() ) {
 				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
-			} else {
-				try {
-					wc_reserve_stock_for_order( $post->ID );
-				} catch ( ReserveStockException $e ) {
-					$order->update_status( 'wc-waiting-list' );
-					PaymentUtils::save_notices(
-						[
-							'error' => [
-								[ 'notice' => 'The course is now full.' ],
-							],
-						]
-					);
-					wp_redirect( get_admin_url( null, sprintf( 'post.php?post=%d&action=edit&tab=order', $post->ID ) ) );
-					exit();
-				}
 			}
-		}//end if
+			// For reasons yet unknown reserved stock only shows up for orders with status = pending payment.
+			// I assume it is because pending attendees is a custom order status created by us.
+			self::reserve_stock_for_order( $order );
+		}
 
 		echo '<div class="wrap woocommerce">';
 		echo wp_kses( self::order_menu( $post, $tab ), 'post' );
@@ -314,6 +324,7 @@ class PageUtils {
                 data-order="%s"
                 data-product-id="%d"
                 data-user="%s"
+				data-reserved-stock="%d"
                 data-currency="%s"
             ><p>' . __( 'Loading order...', 'lasntgadmin' ) . '</p></div>',
 			esc_attr( PluginUtils::get_kebab_case_name() ),
@@ -326,6 +337,7 @@ class PageUtils {
 			esc_attr( json_encode( OrderUtils::get_order_data( $post->ID ) ) ),
 			esc_attr( $product_id ),
 			esc_attr( json_encode( $user ) ),
+			esc_attr( ReservedStockUtils::get_stock_reserved_for_order( $order ) ),
 			esc_attr( get_woocommerce_currency() )
 		);
 	}

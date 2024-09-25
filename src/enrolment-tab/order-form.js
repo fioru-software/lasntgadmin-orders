@@ -19,6 +19,7 @@ import { isPendingPaymentStatus, isDraftStatus, isWaitingStatus, isExistingOrder
  * @param { object } order
  * @param { number } productId
  * @param { object } user
+ * @param { number } reservedStock
  * @param { string } currency
  */
 const OrderForm = props => {
@@ -69,14 +70,9 @@ const OrderForm = props => {
           key: 'groups-read',
           value: formData.get('order_group')
         }
-      ],
-      line_items: [
-        {
-          product_id: parseInt( formData.get('product') ),
-          quantity: parseInt( formData.get('quantity') )
-        }
       ]
     };
+
     if( ! isExistingOrder( props?.order ) ) {
       body.line_items = [
         {
@@ -87,17 +83,14 @@ const OrderForm = props => {
     }
 
     if( isExistingOrder(props?.order) ) {
-      const lineItem = getLineItemByProductId( body.line_items[0].product_id, props.order);
+      //const lineItem = getLineItemByProductId( formData.get('product'), props.order);
+      const lineItem = props.order.line_items[0];
       body.line_items = [
         {
-          ...body.line_items[0],
-          ...{
-            id: lineItem.id,
-            order_id: lineItem.order_id,
-            price: parseInt( formData.get('price') ),
-            subtotal: `${formData.get('subtotal')}`,
-            total: `${formData.get('total')}`
-          }
+          id: lineItem.id,
+          order_id: lineItem.order_id,
+          product_id: lineItem.product_id,
+          quantity: parseInt( formData.get('quantity') )
         }
       ];
     }
@@ -170,7 +163,7 @@ const OrderForm = props => {
 
         <div className="form-wrap">
 
-          <ProductPanel max={ 20 } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } orderApiPath={ props.orderApiPath } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
+          <ProductPanel max={ 20 } reservedStock={ props.reservedStock } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } orderApiPath={ props.orderApiPath } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
 
         </div>
 

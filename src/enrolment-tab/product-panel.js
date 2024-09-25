@@ -68,7 +68,7 @@ const ProductPanel = props => {
     if( isNumber( quantity ) && isNumber( spaces ) ) {
 
       if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
-        if( quantity > spaces ) {
+        if( quantity > spaces && quantity > props.reservedStock ) {
           props.setStatus( getWaitingStatus() );
         } else {
           if( isWaitingStatus( props.order.status ) ) {
@@ -189,21 +189,32 @@ const ProductPanel = props => {
   useEffect( () => {
 
     if( isNumber(spaces) ) {
+
       if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
+
+        let msg = '';
+
         if( spaces < 1 ) {
-          setNotice({
-            status: "error",
-            message: __( 'No spaces available', 'lasntgadmin' )
-          });
+          msg += __('No spaces available. ', 'lasntgadmin' );
+
         } else {
-          if( spaces < quantity ) {
-          props.setStatus("waiting-list");
+
+          if( spaces < quantity && props.reservedStock < quantity ) {
+            props.setStatus("waiting-list");
           }
-          setNotice({
-            status: parseInt(spaces) > 0 ? "info" : "warning",
-            message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
-          });
+
+          msg += sprintf( _n( '%s space available. ', '%s spaces available. ', spaces, 'lasntgadmin' ), spaces );
         }
+
+        if( props.reservedStock > 0 ) {
+          msg += sprintf( _n( '%s space is temporarily reserved for this order. ', '%s spaces are temporarily reserved for this order. ', parseInt( props.reservedStock ), 'lasntgadmin' ), props.reservedStock );
+        }
+
+        setNotice({
+          status: spaces > 0 ? "info" : props.reservedStock > 0 ? "warning" : "error",
+          message: msg
+        });
+
         setPriceInfoVisible(true);
         setLoading(false);
         props.setSubmitButtonDisabled(false);
