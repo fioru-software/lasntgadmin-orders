@@ -14,8 +14,10 @@ import {
   filterOrderMetaByKey, 
   filterAttendeeIdFromOrderMeta,
   filterItemFromOrderMeta,
-  isPaidOrder,
-  isPaidStatus, 
+  isCompletedOrder,
+  isCompletedStatus, 
+  isCancelledOrder,
+  isCancelledStatus,
   isGrantPaid, 
   isPurchaseOrderPaid, 
   isAttendeeIdInOrderMeta
@@ -246,7 +248,7 @@ const AttendeeFormFieldsetButtons = props => {
 
   async function incrementProductStock() {
 
-    if( isPaidOrder( order ) ) {
+    if( isCompletedOrder( order ) ) {
 
       setNotice({
         status: 'info',

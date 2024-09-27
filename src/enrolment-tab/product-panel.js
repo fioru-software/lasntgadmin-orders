@@ -7,7 +7,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { ProductSelector } from './product-selector';
 import { GroupSelector } from './group-selector';
 import { findProductById, findGroupQuotas, findGroupQuota, calculateAvailableSpaces, getReservedStockQuantity } from '../product-utils';
-import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isPaidOrder, isPendingAttendeesStatus, isWaitingStatus } from '../order-utils';
+import { getLineItemByProductId, findOrderMetaByKey, isExistingOrder, isWaitingOrder, isDraftOrder, isCompletedOrder, isCancelledOrder, isPendingAttendeesStatus, isWaitingStatus, getDraftStatus, getWaitingStatus } from '../order-utils';
 
 import { isNumber, isObject, isNil, isNull, isUndefined } from "lodash";
 
@@ -66,16 +66,18 @@ const ProductPanel = props => {
    */
   useEffect( () => {
     if( isNumber( quantity ) && isNumber( spaces ) ) {
-      if ( ! isPaidOrder( props.order ) ) {
-        if( quantity > spaces ) {
-          props.setStatus("waiting-list");
+
+      if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
+        if( quantity > spaces && quantity > props.reservedStock ) {
+          props.setStatus( getWaitingStatus() );
         } else {
-          props.setStatus(props.order.status);
+          if( isWaitingStatus( props.order.status ) ) {
+            props.setStatus( getDraftStatus() );
+          } else {
+            props.setStatus(props.order.status);
+          }
         }
-      } else { 
-        /**
-         * user reduced quantity < spaces, auto switching to original order status
-         */
+      } else {
         props.setStatus(props.order.status);
       }
     }
@@ -97,12 +99,12 @@ const ProductPanel = props => {
         setTotal( product.price*lineItem.quantity );
         setPriceInfoVisible(true);
 
-        if( isPaidOrder( props.order) ) {
+        if( isCompletedOrder( props.order) || isCancelledOrder( props.order ) ) {
           setQuantityInputDisabled(true);
         }
       } 
 
-      if( ! isPaidOrder( props.order ) ) {
+      if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
 
         if( isGroupSelected(groupId) && ! isNil(product) && ! isNil(productId) ) {
           const quota = findGroupQuota( 
@@ -186,24 +188,37 @@ const ProductPanel = props => {
    */
   useEffect( () => {
 
-    if( isNumber(spaces) && ! isPaidOrder( props.order ) ) {
+    if( isNumber(spaces) ) {
 
-      if( spaces < 1 ) {
-        props.setStatus("waiting-list");
+      if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
+
+        let msg = '';
+
+        if( spaces < 1 ) {
+          msg += __('No spaces available. ', 'lasntgadmin' );
+
+        } else {
+
+          if( spaces < quantity && props.reservedStock < quantity ) {
+            props.setStatus("waiting-list");
+          }
+
+          msg += sprintf( _n( '%s space available. ', '%s spaces available. ', spaces, 'lasntgadmin' ), spaces );
+        }
+
+        if( props.reservedStock > 0 ) {
+          msg += sprintf( _n( '%s space is temporarily reserved for this order. ', '%s spaces are temporarily reserved for this order. ', parseInt( props.reservedStock ), 'lasntgadmin' ), props.reservedStock );
+        }
+
         setNotice({
-          status: "error",
-          message: __( 'No spaces available', 'lasntgadmin' )
+          status: spaces > 0 ? "info" : props.reservedStock > 0 ? "warning" : "error",
+          message: msg
         });
-      } else {
-        props.setStatus(props.order.status);
-        setNotice({
-          status: parseInt(spaces) > 0 ? "info" : "warning",
-          message: sprintf( _n( '%s space available.', '%s spaces available.', spaces, 'lasntgadmin' ), spaces )
-        });
+
+        setPriceInfoVisible(true);
+        setLoading(false);
+        props.setSubmitButtonDisabled(false);
       }
-      setPriceInfoVisible(true);
-      setLoading(false);
-      props.setSubmitButtonDisabled(false);
     }
   }, [ spaces ]);
 

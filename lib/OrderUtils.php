@@ -11,7 +11,7 @@ use Lasntg\Admin\Group\GroupUtils;
 
 use Groups_Post_Access, Groups_Group, Groups_Access_Meta_Boxes;
 use WooCommerce, WC_Order, WC_Meta_Box_Order_Data, WP_REST_Request, WP_Query, WC_Product;
-use WC_Abstract_Order, WP_Error;
+use WC_Abstract_Order, WP_Error, WC_Order_Item_Product;
 use DateTime;
 
 use Exception;
@@ -52,10 +52,19 @@ class OrderUtils {
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_group_ids' ], 10, 2 );
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ self::class, 'handle_filter_orders_by_grant_year' ], 10, 2 );
 		add_filter( 'posts_where', [ self::class, 'filter_order_list' ], 10, 2 );
+		add_filter( 'woocommerce_prevent_adjust_line_item_product_stock', [ self::class, 'prevent_adjusting_product_stock_when_order_line_items_are_updated' ], 10, 3 );
 
 		if ( is_admin() ) {
 			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'manage_edit_shop_order_columns' ] );
 		}
+	}
+
+	/**
+	 *
+	 * @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/includes/admin/wc-admin-functions.php#L240
+	 */
+	public static function prevent_adjusting_product_stock_when_order_line_items_are_updated( bool $prevent, WC_Order_Item_Product $item, int $item_quantity ) {
+		return true;
 	}
 
 

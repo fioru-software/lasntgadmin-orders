@@ -4,7 +4,7 @@ import { Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-import { isNil } from "lodash";
+import { isNil, isEmpty } from "lodash";
 
 import { ProductPanel } from './product-panel';
 import { StatusSelector } from './status-selector';
@@ -19,6 +19,7 @@ import { isPendingPaymentStatus, isDraftStatus, isWaitingStatus, isExistingOrder
  * @param { object } order
  * @param { number } productId
  * @param { object } user
+ * @param { number } reservedStock
  * @param { string } currency
  */
 const OrderForm = props => {
@@ -28,34 +29,20 @@ const OrderForm = props => {
   const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(true);
   const [ status, setStatus ] = useState("");
   const [ buttonText, setButtonText ] = useState("Create enrolment");
-  const oldStatus = props.order.status;
-
-  useEffect( () => {
-  }, [ props?.order ]);
-
-  /**
-   * Set initial button text
-   */
-  useEffect( () => {
-    if( ! isNil( props?.status ) ) {
-      setStatus(props.status);
-      if( ! isDraftStatus( props.status ) ) {
-        setButtonText( __( 'Update enrolment', 'lasntgadmin' ));
-      }
-    }
-  }, [props?.status]);
 
   /**
    * Change button text
    */
   useEffect( () => {
-    if( isWaitingStatus( status ) ) {
-      setButtonText( __( 'Add enrolment to waiting list', 'lasntgadmin' ));
-    } else {
-      if( isDraftStatus( props?.status ) ) {
-        setButtonText( __( 'Create enrolment', 'lasntgadmin' ) );
+    if( ! isNil( status ) && ! isEmpty( status ) ) {
+      if( isWaitingStatus( status ) ) {
+        setButtonText( __( 'Add enrolment to waiting list', 'lasntgadmin' ));
       } else {
-        setButtonText( __( 'Update enrolment', 'lasntgadmin' ) );
+        if( isDraftStatus( status ) ) {
+          setButtonText( __( 'Create enrolment', 'lasntgadmin' ) );
+        } else {
+          setButtonText( __( 'Update enrolment', 'lasntgadmin' ) );
+        }
       }
     }
   }, [ status ]);
@@ -64,12 +51,9 @@ const OrderForm = props => {
     return ['attendees', 'waiting-list'].includes( props.order.status ) && props?.user.ID === props.order.customer_id;
   }
 
-  function determineStatus() {
-    if( isDraftStatus( status ) ) {
+  function determineOrderStatusOnSubmit() {
+    if( status === getDraftStatus() ) {
       return getPendingAttendeesStatus();
-    }
-    if( isWaitingStatus( status ) ) {
-      return getWaitingStatus();
     }
     return status;
   }
@@ -80,20 +64,15 @@ const OrderForm = props => {
       shipping: {},
       currency: formData.get('currency'),
       customer_id: formData.get('customer_id'),
-      status: determineStatus(),
+      status: determineOrderStatusOnSubmit(),
       meta_data: [
         {
           key: 'groups-read',
           value: formData.get('order_group')
         }
-      ],
-      line_items: [
-        {
-          product_id: parseInt( formData.get('product') ),
-          quantity: parseInt( formData.get('quantity') )
-        }
       ]
     };
+
     if( ! isExistingOrder( props?.order ) ) {
       body.line_items = [
         {
@@ -104,17 +83,14 @@ const OrderForm = props => {
     }
 
     if( isExistingOrder(props?.order) ) {
-      const lineItem = getLineItemByProductId( body.line_items[0].product_id, props.order);
+      //const lineItem = getLineItemByProductId( formData.get('product'), props.order);
+      const lineItem = props.order.line_items[0];
       body.line_items = [
         {
-          ...body.line_items[0],
-          ...{
-            id: lineItem.id,
-            order_id: lineItem.order_id,
-            price: parseInt( formData.get('price') ),
-            subtotal: `${formData.get('subtotal')}`,
-            total: `${formData.get('total')}`
-          }
+          id: lineItem.id,
+          order_id: lineItem.order_id,
+          product_id: lineItem.product_id,
+          quantity: parseInt( formData.get('quantity') )
         }
       ];
     }
@@ -140,26 +116,13 @@ const OrderForm = props => {
           data
         } 
       );
+      
       setNotice({
         status: 'success',
-        message: __( 'Updated enrolment. Redirecting to attendees tab...', 'lasntgadmin' )
+        message: __( 'Updated enrolment. Redirecting...', 'lasntgadmin' )
       });
-      
-      // if the order is being moved from waiting-list to pending 
-      if ( isWaitingStatus( oldStatus ) && isPendingPaymentStatus( status ) ) {
-        setNotice({
-          status: 'success',
-          message: __( 'Updated enrolment. Client will be notified.', 'lasntgadmin' )
-        });
-        setIsLoading(false);
-      } else {
-        setNotice({
-          status: 'success',
-          message: __( 'Updated enrolment. Redirecting...', 'lastngadmin' )
-        });
-      }
 
-      switch( order.status ) {
+      switch( data.status ) {
 
         case getWaitingStatus():
           document.location.assign(`/wp-admin/edit.php?post_type=shop_order`);
@@ -200,7 +163,7 @@ const OrderForm = props => {
 
         <div className="form-wrap">
 
-          <ProductPanel max={ 20 } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } orderApiPath={ props.orderApiPath } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
+          <ProductPanel max={ 20 } reservedStock={ props.reservedStock } productId={ props?.order?.line_items[0]?.product_id || props.productId } nonce={ props.nonce } setSubmitButtonDisabled={ setSubmitButtonDisabled } orderApiPath={ props.orderApiPath } groupApiPath={ props.groupApiPath } productApiPath={ props.productApiPath } order={ props.order } setStatus={ setStatus } user={ props?.user } status={ status }/>
 
         </div>
 

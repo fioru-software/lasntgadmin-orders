@@ -47,7 +47,7 @@ class PaymentUtils {
 				if ( in_array( $gateway->id, self::SUPPORTED_GATEWAY_SLUGS ) ) {
 					if ( GrantFundedPluginUtils::get_snake_case_name() === $gateway->id ) {
 						$group_id = $order->get_meta( Groups_Admin_Post_Columns::GROUPS_READ, true );
-						$group = GroupUtils::get_group_by_id( $group_id );
+						$group    = GroupUtils::get_group_by_id( $group_id );
 						return ProductUtils::is_funded( $product ) && GroupUtils::is_local_authority( $group );
 					}
 					return true;
