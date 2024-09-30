@@ -195,9 +195,11 @@ class PageUtils {
 			if ( 'completed' === $order->get_status() ) {
 				printf( "<div class='notice notice-success is-dismissible'><p>%s</p></div>", esc_html( __( 'Payment complete.', 'lasntgadmin' ) ) );
 			}
-			// For reasons yet unknown reserved stock only shows up for orders with status = pending payment.
-			// I assume it is because pending attendees is a custom order status created by us.
-			self::reserve_stock_for_order( $order );
+			if ( 'pending' === $order->get_status() ) {
+				// For reasons yet unknown reserved stock only shows up for orders with status = pending payment.
+				// I assume it is because pending attendees is a custom order status created by us.
+				self::reserve_stock_for_order( $order );
+			}
 		}
 
 		echo '<div class="wrap woocommerce">';
