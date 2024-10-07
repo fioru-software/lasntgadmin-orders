@@ -4,18 +4,39 @@ import { createRoot, createElement, render } from '@wordpress/element';
 import { OrderForm } from './enrolment-tab/order-form';
 import { AttendeeForm } from './attendees-tab/attendee-form';
 
+window.shouldBeforeUnloadEventFire = true;
+window.fetchInProgress = false;
+
 /**
- * Warn user when navigating away from order
+ * Prevent navigating away from order while fetch in progress.
+ */
+window.addEventListener(
+  'click', 
+  function( e ) {
+    window.shouldBeforeUnloadEventFire = true;
+    if( window.fetchInProgress ) {
+      e.preventDefault();
+      alert("Please wait until the process has completed.");
+    }
+  }
+);
+
+/**
+ * Warn when navigating away from an order when no fetch in progress.
+ * Okay to navigate within order tabs.
  */
 window.addEventListener(
   'beforeunload',
   function(event) {
-    const href = document.activeElement.href;
-    if( href ) {
-      let result = /\/wp-admin\/post\.php\?post=\d+&action=edit&tab=\w+/.test(href);
-      if( ! result ) {
-        event.preventDefault();
-        event.returnValue = true;
+    if( window.shouldBeforeUnloadEventFire === true && window.fetchInProgress === false ) {
+      window.shouldBeforeUnloadEventFire = false;
+      const href = document.activeElement.href;
+      if( href ) {
+        let result = /\/wp-admin\/post\.php\?post=\d+&action=edit&tab=\w+/.test(href);
+        if( ! result ) {
+          event.preventDefault();
+          event.returnValue = true;
+        }
       }
     }
   }
