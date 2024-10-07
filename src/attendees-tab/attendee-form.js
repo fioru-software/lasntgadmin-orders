@@ -115,6 +115,7 @@ const AttendeeForm = props => {
    */
   async function handleSubmit(e) {
     e.preventDefault();
+    window.fetchInProgress = true;
 
     let formData = new FormData(e.target);
 
@@ -277,6 +278,7 @@ const AttendeeForm = props => {
 
     } catch (e) {
       console.error(e);
+      window.fetchInProgress = false;
       setNotice({
         status: 'error',
         message: e.message
