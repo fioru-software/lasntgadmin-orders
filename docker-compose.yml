@@ -18,6 +18,7 @@ services:
         - db
       volumes:
         - .:/usr/local/src
+        - ../lasntgadmin-purchase-order-payment-gateway:/var/www/html/wp-content/plugins/woocommerce-gateway-purchase-order
       ports:
         - "8080:80"
         - "9443:443"

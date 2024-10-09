@@ -1,4 +1,8 @@
 
+/**
+ * Intercepts post form on admin order's payment tab.
+ * Handles processing payment and updating PO number.
+ */
 jQuery(document).ready(function ($) {
 
   let hidden = [];
@@ -41,6 +45,36 @@ jQuery(document).ready(function ($) {
     enableSubmit();
   }
 
+  async function processPayment( action, formData ) {
+      const res = await fetch( action, {
+        method: 'POST',
+        body: formData
+      } );
+      if( res.redirected ) {
+        setNotice('Redirecting...');
+        window.location = res.url;
+      } else {
+        setNotice('Reloading page...');
+        window.location.reload();
+      }
+  }
+
+  async function updatePurchaseOrder( formData ) {
+    const action = formData.get('purchase_order_action');
+    formData.set('_wpnonce', formData.get('wp_rest'));
+    const res = await fetch( action, {
+      method: 'POST',
+      body: formData
+    } );
+    if( res.ok ) {
+      const json = await res.json();
+      setNotice('Updated PO number.', 'success');
+      removeSpinner();
+      enableInputs();
+    }
+    //window.location.reload();
+  }
+
   /**
    * Form submit
    *
@@ -55,25 +89,21 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
 
     try {
-      setNotice('Processing payment...');
       showSpinner();
       const formData = new FormData( e.target );
+
       disableInputs();
 
       // readd removed elements
       addRemovedHiddenInputs();
 
       const action = $('div#order_data').data('action');
-      const res = await fetch( action, {
-        method: 'POST',
-        body: formData
-      } );
-      if( res.redirected ) {
-        setNotice('Redirecting...');
-        window.location = res.url;
+      if( action ) {
+        setNotice('Processing payment...');
+        await processPayment( action, formData );
       } else {
-        setNotice('Reloading page...');
-        window.location.reload();
+        setNotice('Updating purchase order...');
+        await updatePurchaseOrder( formData );
       }
     } catch(e) {
       setNotice(e.message, 'error');
