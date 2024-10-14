@@ -8,6 +8,7 @@ use Lasntg\Admin\Products\{ ProductApi, ProductUtils };
 use Lasntg\Admin\Attendees\{ AttendeeActionsFilters, AttendeeUtils };
 use Lasntg\Admin\PaymentGateway\GrantFunded\FundingSourceUtils;
 use Lasntg\Admin\PaymentGateway\GrantFunded\PluginUtils as GrantFundedPaymentGatewayUtils;
+use Lasntg\Admin\PaymentGateway\PurchaseOrder\{ PurchaseOrderUtils, PurchaseOrderApi };
 
 use Groups_Access_Meta_Boxes;
 
