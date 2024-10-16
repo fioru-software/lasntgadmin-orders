@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { ProductContext, OrderContext, AttendeeContext, AttendeesContext, AttendeeFormContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
-import { isNil } from 'lodash';
+import { isNil, isNull } from 'lodash';
 
 import { 
   getRemoveAttendeeFromShopOrderRequest,
@@ -37,6 +37,12 @@ import {
   isOrderIdInAttendeeMeta, 
   getUpdateAttendeeRequest  
 } from './attendee-utils';
+
+import {
+  getUpdateEnrolmentLogRequest, 
+  getCanceledEnrolmentStatus,
+  getRemovedEnrolmentStatus
+} from './enrolment-log-utils';
 
 
 /**
@@ -278,22 +284,71 @@ const AttendeeFormFieldsetButtons = props => {
   }
 
   /**
-   * When resetting an attendee for an order 
-   * - the product_id and order_id needs to be removed from the attendee being removed
-   * - the attendee_id needs to be removed from the order
-   * - order quantity is left untouched
+   * When resetting an attendee for an order the following happens.
+   * @deprecated The product_id and order_id is removed from the attendee's metadata.
+   * @deprecated The attendee_id is removed from the order metadata.
+   * Order quantity is left untouched.
+   *
+   * When resetting a saved attendee enrolment a cancellation reason must be provided and
+   * the enrolment status must be set to canceled.
+   * @see https://github.com/fioru-software/lasntgadmin-enrolment-log
    */
   async function handleResetAttendee( e ) {
     e.preventDefault();
+
     try {
 
-      setLoading(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
 
       /**
-       * When existing attendee
+       * When saved attendee
        */
       if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) ) {
+
+        // Enrolment log entry
+        const logEntry = {
+          post_id: attendee.enrolment_log.post_id,
+          order_id: attendee.enrolment_log.order_id,
+          attendee_id: attendee.enrolment_log.attendee_id,
+          course_id: attendee.enrolment_log.course_id,
+          status: getRemovedEnrolmentStatus(), // canceled status
+          comment: ''
+        };
+        
+        // Prompt for cancellation reason
+        if( isCompletedOrder( order ) ) {
+          logEntry.status = getCanceledEnrolmentStatus();
+          logEntry.comment = prompt("Please provide a reason for the cancellation?");
+          if( isNull( logEntry.comment ) || '' === logEntry.comment ) {
+            setNotice({
+              status: 'error',
+              message: __( 'A reason is required when resetting an attendee.', 'lasntgadmin' )
+            });
+            return;
+          }
+        }
+
+        setLoading(true);
+
+        setNotice({
+          status: 'info',
+          message: __( 'Updating enrolment log.', 'lasntgadmin' )
+        });
+
+        // Update enrolment log
+        const updateEnrolmentLogRes = await apiFetch(
+          getUpdateEnrolmentLogRequest(
+            nonce,
+            logEntry
+          )
+        );
+
+        setNotice({
+          status: 'info',
+          message: __( 'Updating metadata.', 'lasntgadmin' )
+        });
+
+        // Update metadata
         await removeAttendeeFromOrder();
         await removeOrderFromAttendee();
         await removeProductFromAttendee();
@@ -319,11 +374,14 @@ const AttendeeFormFieldsetButtons = props => {
   }
 
   /**
-   * When removing an attendee for an order 
-   * - the product_id and order_id needs to be removed from the attendee being removed
-   * - the attendee_id needs to be removed from the order
-   * - order quantity is decremented
-   * @todo recover from a failing request by reverting or retrying
+   * When removing an attendee for an order the following happens.
+   * @deprecated The product_id and order_id s removed from the attendee's metadata.
+   * @deprecated The attendee_id is removed from the order metadata.
+   * Order quantity is decremented
+   *
+   * When removing a saved attendee enrolment a cancellation reason must be provided and
+   * the enrolment status must be set to canceled.
+   * @see https://github.com/fioru-software/lasntgadmin-enrolment-log
    */
   async function handleRemoveAttendee( e ) {
 
@@ -331,7 +389,6 @@ const AttendeeFormFieldsetButtons = props => {
 
     try {
 
-      setLoading(true);
       props.setFormNotice(null);
 
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
@@ -342,13 +399,63 @@ const AttendeeFormFieldsetButtons = props => {
        *  - Props set via PHP in lib/PageUtils.php
        */
       if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) ) {
+
+        // Enrolment log entry
+        const logEntry = {
+          post_id: attendee.enrolment_log.post_id,
+          order_id: attendee.enrolment_log.order_id,
+          attendee_id: attendee.enrolment_log.attendee_id,
+          course_id: attendee.enrolment_log.course_id,
+          status: getRemovedEnrolmentStatus(),
+          comment: ''
+        };
+
+        // Prompt for cancellation reason
+        if( isCompletedOrder( order ) ) {
+          logEntry.status = getCanceledEnrolmentStatus();
+          logEntry.comment = prompt("Please provide a reason for the cancellation?");
+          if( isNull( logEntry.comment ) || '' === logEntry.comment ) {
+            setNotice({
+              status: 'error',
+              message: __( 'A reason is required to remove an attendee.', 'lasntgadmin' )
+            });
+            return;
+          }
+        }
+        setLoading(true);
+
+        setNotice({
+          status: 'info',
+          message: __( 'Updating enrolment log.', 'lasntgadmin' )
+        });
+
+        // Update enrolment log.
+        const updateEnrolmentLogRes = await apiFetch(
+          getUpdateEnrolmentLogRequest(
+            nonce,
+            logEntry
+          )
+        );
+
+        setNotice({
+          status: 'info',
+          message: __( 'Updating metadata.', 'lasntgadmin' )
+        });
+
+        // Meta data
         await removeAttendeeFromOrder();
         await removeOrderFromAttendee();
         await removeProductFromAttendee();
+
       }
 
-      await decrementOrderQuantity();
-      await incrementProductStock();
+      setNotice({
+        status: 'info',
+        message: __( 'Updating order quantity and course spaces.', 'lasntgadmin' )
+      });
+
+      await decrementOrderQuantity(); // NB
+      await incrementProductStock(); // NB
 
       setNotice({
         status: 'info',

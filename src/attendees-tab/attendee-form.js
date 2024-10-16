@@ -8,10 +8,13 @@ import { isNil, delay, range, isNull } from 'lodash';
 
 import { AttendeeFormFieldsets } from './attendee-form-fieldsets';
 
+
 import { isCourseClosed } from '../product-utils';
 import { isWaitingOrder, isCompletedOrder, isCancelledOrder, getUpdateShopOrderRequest, getPrefixedPendingPaymentStatus, getPrefixedOrderStatus } from '../order-utils';
 
 import { ProductContext, OrderContext, AcfFieldsContext, AttendeesContext, AttendeeFormContext } from './attendee-context';
+
+import { wpBatchReq } from '../fetch-utils';
 
 import { 
   extractValidAttendeesFromResponse,
@@ -25,6 +28,12 @@ import {
   createAttendeeBatchRequest,
   addIdToValidAttendees
 } from "./attendee-utils";
+
+import {
+  getPendingEnrolmentStatus,
+  createEnrolmentLogBatchRequestBody,
+  createEnrolmentLogBatchRequest
+} from "./enrolment-log-utils";
 
 /**
  * @param { number } quantity
@@ -106,8 +115,9 @@ const AttendeeForm = props => {
   /**
    * Sends multiple REST requests.
    * - create/update attendee acf fields
-   * - update order meta with attendee_id
-   * - update attendee meta with product_ids, order_ids and groups-read
+   * - update order meta with attendee_id @deprecated
+   * - add enrolment log with order_id, attendee_id, product_id, comment, status
+   * - update attendee meta with product_ids, order_ids and groups-read @deprecated product_ids and order_ids
    * - update order status
    *
    * @requires ACF Field group settings for additional groups: when post_type = 'post' and rest_api = true;
@@ -115,7 +125,7 @@ const AttendeeForm = props => {
    */
   async function handleSubmit(e) {
     e.preventDefault();
-    window.fetchInProgress = true;
+    window.fetchInProgress = true; 
 
     let formData = new FormData(e.target);
 
@@ -133,20 +143,10 @@ const AttendeeForm = props => {
 
     for( let index=0; index<quantity; index++ ) {
 
-      // acf fields only
+      // attendee acf fields only
       const attendeeAcfFieldsReqBody = createAttendeeAcfFieldsBatchRequestBody( index, formData );
       const attendeeAcfFieldsBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeAcfFieldsReqBody, orderId )
       attendeeAcfFieldsBatchReqs.push( attendeeAcfFieldsBatchReq );
-
-      // meta fields only
-      const attendeeMetaFieldsReqBody = createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId );
-      const attendeeMetaFieldsBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeMetaFieldsReqBody, orderId )
-      attendeeMetaFieldsBatchReqs.push(  attendeeMetaFieldsBatchReq );
-
-      // acf + meta fields
-      const attendeeBatchReqBody = createAttendeeBatchRequestBody( attendeeAcfFieldsReqBody, attendeeMetaFieldsReqBody);
-      const attendeeBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeBatchReqBody, orderId )
-      attendeeBatchReqs.push(  attendeeBatchReq );
 
     }
 
@@ -157,22 +157,18 @@ const AttendeeForm = props => {
 
       setNotice({
         status: 'info',
-        message: __( 'Updating attendee details.', 'lasntgadmin' )
+        message: __( 'Updating attendee details...', 'lasntgadmin' )
       });
 
       apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 
       /**
-       * Updating attendee details
+       * Batch updating attendee acf field details only.
        */
       const attendeeAcfFieldsBatchRes = await apiFetch(
-        {
-          path: `/batch/v1`,
-          method: 'POST',
-          data: {
-            requests: attendeeAcfFieldsBatchReqs
-          }
-        }
+        wpBatchReq(
+          attendeeAcfFieldsBatchReqs
+        )
       );
 
       const validAttendeeIds = extractAttendeeIdsFromResponse( attendeeAcfFieldsBatchRes.responses );
@@ -182,13 +178,13 @@ const AttendeeForm = props => {
       const invalidAttendees = extractInvalidAttendeesFromResponse( attendeeAcfFieldsBatchRes.responses );
 
       if( validAttendees.length ) {
-        const attendeeReqBodies = attendeeBatchReqs.map( req => req.body );
-        const updatedAttendeeReqBodies = addIdToValidAttendees( attendeeReqBodies, validAttendees );
-        setAttendees( updatedAttendeeReqBodies );
+        const attendeeAcfFieldsReqBodies = attendeeAcfFieldsBatchReqs.map( req => req.body );
+        const updatedAttendeeAcfFieldsReqBodies = addIdToValidAttendees( attendeeAcfFieldsReqBodies, validAttendees );
+        setAttendees( updatedAttendeeAcfFieldsReqBodies );
       }
 
       /**
-       * Employee number is not unique 
+       * Employee number is not unique
        */
       attendeeAcfFieldsBatchRes.responses.forEach( res => {
         if( Object.hasOwn( res, 'body') && Object.hasOwn( res.body, 'message') ) {
@@ -198,22 +194,46 @@ const AttendeeForm = props => {
 
       setNotice({
         status: 'info',
-        message: __( 'Adding attendees to order.', 'lasntgadmin' )
+        message: __( 'Adding attendees to enrolment log...', 'lasntgadmin' )
+      });
+
+      let attendeeEnrolmentLogBatchReqs = [];
+      for( const attendeeId of validAttendeeIds ) {
+        const attendeeEnrolmentLogReqBody = createEnrolmentLogBatchRequestBody( attendeeId, productId, orderId, groupId, getPendingEnrolmentStatus(), '' );
+        const attendeeEnrolmentLogBatchReq = createEnrolmentLogBatchRequest( nonce, attendeeEnrolmentLogReqBody );
+        attendeeEnrolmentLogBatchReqs.push( attendeeEnrolmentLogBatchReq );
+      }
+
+      /**
+       * Adding attendees to enrolment log.
+       * The enrolment log is the new source of truth for linking orders, attendees and products.
+       */
+      const attendeeEnrolmentLogBatchRes = await apiFetch(
+        wpBatchReq(
+          attendeeEnrolmentLogBatchReqs
+        )
+      );
+      // @todo check attendeeEnrolmentLogBatchRes.responses
+
+      setNotice({
+        status: 'info',
+        message: __( 'Adding attendees to order...', 'lasntgadmin' )
       });
 
       /**
-       * Attendee is already enrolled in this course
+       * Add attendee ids to order meta data.
+       * @deprecated
        */
       const orderAttendeeIdsUpdateRes = await apiFetch(
         getUpdateShopOrderRequest( orderId, nonce, {
           meta: {
-            attendee_ids: [ ... new Set(validAttendeeIds) ]
+            attendee_ids: validAttendeeIds
           }
         })
       );
 
       /**
-       * Valid attendees are less than order order quantity
+       * Valid attendees are less than order order quantity.
        */
       if( parseInt( quantity ) !== validAttendees.length ) {
         throw new Error( `Missing attendee ${ validAttendees.length }/${ quantity }` );
@@ -225,38 +245,38 @@ const AttendeeForm = props => {
        */
       setNotice({
         status: 'info',
-        message: __( 'Updating attendee meta.', 'lasntgadmin' )
+        message: __( 'Updating attendee meta...', 'lasntgadmin' )
       });
 
       formData = new FormData(e.target);
       attendeeMetaFieldsBatchReqs = [];
 
       for( let index=0; index<quantity; index++ ) {
-        // meta fields only
+        /**
+         * attendee meta fields only (order_ids, product_ids, groups-read)
+         * @deprecated order_ids and product_ids
+         */
         const attendeeMetaFieldsReqBody = createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId );
         const attendeeMetaFieldsBatchReq = createAttendeeBatchRequest( nonce, index, formData, attendeeMetaFieldsReqBody, orderId )
         attendeeMetaFieldsBatchReqs.push(  attendeeMetaFieldsBatchReq );
       }
 
       /**
-       * Updating attendee meta 
+       * Updating attendee meta
        *  - order_ids
        *  - product_ids
-       *  - groups-read 
+       *  - groups-read
+       *  @deprecated
        */
       const attendeeMetaFieldsBatchRes = await apiFetch(
-        {
-          path: `/batch/v1`,
-          method: 'POST',
-          data: {
-            requests: attendeeMetaFieldsBatchReqs
-          }
-        }
+        wpBatchReq(
+          attendeeMetaFieldsBatchReqs
+        )
       );
 
       setNotice({
         status: 'info',
-        message: __( 'Updating order status.', 'lasntgadmin' )
+        message: __( 'Updating order status...', 'lasntgadmin' )
       });
 
       const orderRes = await apiFetch(

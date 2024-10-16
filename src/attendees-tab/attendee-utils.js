@@ -77,6 +77,7 @@ function isProductIdInAttendeeMeta( productId, attendeeMeta ) {
 }
 
 /**
+ * @todo remove order_ids and product_ids metadata
  * @return {Array}
  */
 function filterProductIdFromAttendeeMeta( productId, attendeeMeta) {
@@ -90,8 +91,8 @@ function filterProductIdFromAttendeeMeta( productId, attendeeMeta) {
   return [];
 }
 
-function addIdToValidAttendees( attendeeReqBodies, validAttendees ) {
-  return attendeeReqBodies.map( body => { 
+function addIdToValidAttendees( attendeeAcfReqBodies, validAttendees ) {
+  return attendeeAcfReqBodies.map( body => { 
     // if valid attendee (means attendee was created) then add id, so we can rerender attendees
     const attendee = validAttendees.find( ( validAttendee, index ) => validAttendee.acf.employee_number === body.acf.employee_number );
     if( !isUndefined( attendee ) ) {
@@ -232,6 +233,9 @@ function createAttendeeAcfFieldsBatchRequestBody( index, formData ) {
   return body;
 }
 
+/**
+ * @todo remove order_ids and product_ids metadata
+ */
 function createAttendeeMetaFieldsBatchRequestBody( index, formData, groupId, orderId, productId ) {
   const body = {
     meta: {
@@ -296,7 +300,9 @@ function extractInvalidAttendeesFromResponse( attendeeResponses ) {
 }
 
 function extractAttendeeIdsFromResponse( attendeeResponses ) {
-  return attendeeResponses.map( res => Object.hasOwn(res.body, 'id' ) ? parseInt( res.body.id ) : null ).filter(Boolean);
+  return [ 
+    ... new Set (attendeeResponses.map( res => Object.hasOwn(res.body, 'id' ) ? parseInt( res.body.id ) : null ).filter(Boolean)
+  ) ];
 }
 
 /**

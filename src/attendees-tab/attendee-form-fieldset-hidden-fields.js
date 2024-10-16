@@ -17,6 +17,8 @@ const HiddenFields = props => {
 
   return (
     <>
+      { attendee?.enrolment_log && <input type="hidden" name={ `attendees[${index}]['enrolment_log']['post_id']` } value={ attendee.enrolment_log.post_id } /> }
+
       { ( attendee?.ID || attendee?.id ) && <input type="hidden" name={ `attendees[${index}]['id']` } value={ attendee?.ID || attendee?.id } /> }
 
       { ( attendee?.post_status || attendee?.status ) && <input type="hidden" name={ `attendees[${index}]['status']` } value={ attendee?.post_status || attendee?.status } /> }
@@ -24,8 +26,6 @@ const HiddenFields = props => {
       { attendeeMetaExists( 'order_ids', attendee ) && attendee?.meta['order_ids'].map( orderId => <input key={ orderId } type="hidden" name={ `attendees[${index}]['meta']['order_ids']` } value={ orderId } /> ) }
 
       { attendeeMetaExists( 'product_ids', attendee ) && attendee?.meta['product_ids'].map( productId => <input key={ productId } type="hidden" name={ `attendees[${index}]['meta']['product_ids']` } value={ productId } /> ) }
-
-      { <input type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } />}
 
       { attendeeMetaExists( 'groups-read', attendee ) && attendee?.meta['groups-read'].map( groupId => <input key={ groupId } type="hidden" name={ `attendees[${index}]['meta']['groups-read']` } value={ groupId } /> ) }
 

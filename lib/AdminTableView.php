@@ -7,6 +7,9 @@ use Lasntg\Admin\Group\GroupUtils;
 
 use WP_Query;
 
+/**
+ * Table showing list of orders.
+ */
 class AdminTableView {
 
 	public static function init() {
