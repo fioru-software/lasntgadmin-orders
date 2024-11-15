@@ -44,27 +44,21 @@ class AdminTableView {
 		}
 	}
 
-	public static function render_product_column(string $column, int $post_id): void
-	{
+	public static function render_product_column( string $column, int $post_id ): void {
 		if ( 'email' === $column ) {
-			try {
-				$order = wc_get_order( $post_id );
-				$user      = $order->get_user();
-				echo $user->user_email;
+			$order = wc_get_order( $post_id );
+			$user  = $order->get_user();
+			if ( $user ) {
+				echo esc_attr( $user->user_email );
 			}
-			catch(Exception $e){
-
-			}
-			
 		}
 	}
-	public static function add_email_column(array $columns): array
-	{
+	public static function add_email_column( array $columns ): array {
 		$inserted = [
-			'email' => 'Email'
+			'email' => 'Email',
 		];
-		$before = array_splice( $columns, 0, count($columns) - 5 );
-		$columns = $before + $inserted + $columns;
+		$before   = array_splice( $columns, 0, count( $columns ) - 5 );
+		$columns  = $before + $inserted + $columns;
 		return $columns;
 	}
 	public static function modify_columns( array $columns ): array {
