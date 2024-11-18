@@ -2,6 +2,7 @@
 
 namespace Lasntg\Admin\Orders;
 
+use Exception;
 use Lasntg\Admin\Group\GroupUtils;
 
 use WP_Query;
@@ -15,6 +16,7 @@ class AdminTableView {
 
 	private static function add_actions() {
 		add_action( 'rest_api_init', [ self::class, 'register_meta' ] );
+		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'render_product_column' ], 10, 2 );
 	}
 
 	private static function add_filters() {
@@ -23,6 +25,7 @@ class AdminTableView {
 
 		if ( is_admin() ) {
 			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'modify_columns' ], 15 );
+			add_filter( 'manage_edit-shop_order_columns', [ self::class, 'add_email_column' ], 15 );
 			add_filter( 'manage_shop_order_columns', [ self::class, 'modify_columns' ], 15 );
 			add_filter( 'bulk_actions-edit-shop_order', [ self::class, 'modify_order_bulk_actions' ], 101 );
 			// WC uses priority 100.
@@ -41,6 +44,23 @@ class AdminTableView {
 		}
 	}
 
+	public static function render_product_column( string $column, int $post_id ): void {
+		if ( 'email' === $column ) {
+			$order = wc_get_order( $post_id );
+			$user  = $order->get_user();
+			if ( $user ) {
+				echo esc_attr( $user->user_email );
+			}
+		}
+	}
+	public static function add_email_column( array $columns ): array {
+		$inserted = [
+			'email' => 'Email',
+		];
+		$before   = array_splice( $columns, 0, count( $columns ) - 5 );
+		$columns  = $before + $inserted + $columns;
+		return $columns;
+	}
 	public static function modify_columns( array $columns ): array {
 		unset( $columns['origin'] );
 		return $columns;
