@@ -31,6 +31,7 @@ import {
 
 import {
   getPendingEnrolmentStatus,
+  getPublishedEnrolmentStatus,
   createEnrolmentLogBatchRequestBody,
   createEnrolmentLogBatchRequest
 } from "./enrolment-log-utils";
@@ -125,7 +126,7 @@ const AttendeeForm = props => {
    */
   async function handleSubmit(e) {
     e.preventDefault();
-    window.fetchInProgress = true; 
+    window.fetchInProgress = true;
 
     let formData = new FormData(e.target);
 
@@ -199,7 +200,11 @@ const AttendeeForm = props => {
 
       let attendeeEnrolmentLogBatchReqs = [];
       for( const attendeeId of validAttendeeIds ) {
-        const attendeeEnrolmentLogReqBody = createEnrolmentLogBatchRequestBody( attendeeId, productId, orderId, groupId, getPendingEnrolmentStatus(), '' );
+        const attendeeEnrolmentLogReqBody = createEnrolmentLogBatchRequestBody(
+          attendeeId, productId, orderId, groupId, 
+          isCompletedOrder( order ) ? getPublishedEnrolmentStatus() : getPendingEnrolmentStatus(), 
+          ''
+        );
         const attendeeEnrolmentLogBatchReq = createEnrolmentLogBatchRequest( nonce, attendeeEnrolmentLogReqBody );
         attendeeEnrolmentLogBatchReqs.push( attendeeEnrolmentLogBatchReq );
       }
