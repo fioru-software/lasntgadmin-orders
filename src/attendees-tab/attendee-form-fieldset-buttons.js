@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { ProductContext, OrderContext, AttendeeContext, AttendeesContext, AttendeeFormContext } from './attendee-context';
 import { isCourseClosed } from '../product-utils';
 import apiFetch from '@wordpress/api-fetch';
-import { isNil, isNull } from 'lodash';
+import { isNil, isNull, isEmpty } from 'lodash';
 
 import { 
   getRemoveAttendeeFromShopOrderRequest,
@@ -295,6 +295,8 @@ const AttendeeFormFieldsetButtons = props => {
    */
   async function handleResetAttendee( e ) {
     e.preventDefault();
+    setResetable(false);
+    setRemovable(false);
 
     try {
 
@@ -303,7 +305,7 @@ const AttendeeFormFieldsetButtons = props => {
       /**
        * When saved attendee
        */
-      if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) ) {
+      if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) && ! isEmpty( attendee.enrolment_log ) ) {
 
         // Enrolment log entry
         const logEntry = {
@@ -343,16 +345,17 @@ const AttendeeFormFieldsetButtons = props => {
           )
         );
 
-        setNotice({
-          status: 'info',
-          message: __( 'Updating metadata.', 'lasntgadmin' )
-        });
-
-        // Update metadata
-        await removeAttendeeFromOrder();
-        await removeOrderFromAttendee();
-        await removeProductFromAttendee();
       }
+
+      setNotice({
+        status: 'info',
+        message: __( 'Updating metadata.', 'lasntgadmin' )
+      });
+
+      // Update metadata
+      await removeAttendeeFromOrder();
+      await removeOrderFromAttendee();
+      await removeProductFromAttendee();
 
       props.setAttendee(null);
 
@@ -362,6 +365,7 @@ const AttendeeFormFieldsetButtons = props => {
       });
 
       setLoading(false);
+      setRemovable(true);
 
     } catch (e) {
       console.error(e);
@@ -370,6 +374,8 @@ const AttendeeFormFieldsetButtons = props => {
         message: e.message
       });
       setLoading(false);
+      setRemovable(true);
+      setResetable(true);
     }
   }
 
@@ -386,6 +392,8 @@ const AttendeeFormFieldsetButtons = props => {
   async function handleRemoveAttendee( e ) {
 
     e.preventDefault();
+    setResetable( false );
+    setRemovable( false );
 
     try {
 
@@ -398,7 +406,7 @@ const AttendeeFormFieldsetButtons = props => {
        *  - The page reloaded or just loaded. 
        *  - Props set via PHP in lib/PageUtils.php
        */
-      if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) ) {
+      if( ! isNil( attendee ) && isAttendeeLoadedViaProps( attendee ) && ! isEmpty( attendee.enrolment_log ) ) {
 
         // Enrolment log entry
         const logEntry = {
@@ -437,17 +445,17 @@ const AttendeeFormFieldsetButtons = props => {
           )
         );
 
-        setNotice({
-          status: 'info',
-          message: __( 'Updating metadata.', 'lasntgadmin' )
-        });
-
-        // Meta data
-        await removeAttendeeFromOrder();
-        await removeOrderFromAttendee();
-        await removeProductFromAttendee();
-
       }
+
+      setNotice({
+        status: 'info',
+        message: __( 'Updating metadata.', 'lasntgadmin' )
+      });
+
+      // Meta data
+      await removeAttendeeFromOrder();
+      await removeOrderFromAttendee();
+      await removeProductFromAttendee();
 
       setNotice({
         status: 'info',
@@ -488,6 +496,8 @@ const AttendeeFormFieldsetButtons = props => {
         message: e.message
       });
       setLoading(false);
+      setResetable( true );
+      setRemovable( true );
     }
   }
 
