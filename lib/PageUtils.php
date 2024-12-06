@@ -22,7 +22,12 @@ use WC_Order_Item_Product, WC_Payment_Gateways, WC_Checkout, WC_Product_Simple;
 use WC, WC_Session_Handler, WP_Post, WC_Order;
 use Automattic\WooCommerce\Checkout\Helpers\ReserveStockException;
 
+use Lasntg\Admin\EnrolmentLog\DbApi as EnrolmentLogDbApi;
+use Lasntg\Admin\EnrolmentLog\{ LogQuery, NotFoundException };
+
 use DateTimeImmutable, IntlDateFormatter;
+
+use Exception;
 
 class PageUtils {
 
@@ -374,7 +379,26 @@ class PageUtils {
 			$attendee_additional_fields     = array_merge( $attendee_additional_fields, $water_grant_fields );
 		}
 
+		// @todo Use enrolment log. Not meta.
 		$attendees = array_reverse( AttendeeUtils::get_attendee_profiles_by_order_id( $post->ID ) );
+
+		// Add enrolment log to attendee object.
+		$attendees = array_map(
+			function ( $attendee ) use ( $order, $product ) {
+				$query              = new LogQuery();
+				$query->attendee_id = $attendee->ID;
+				$query->order_id    = $order->get_id();
+				$query->course_id   = $product->get_id();
+				$query->status      = [ EnrolmentLogDbApi::ACTIVE_ENROLMENT_STATUS, EnrolmentLogDbApi::PENDING_ENROLMENT_STATUS ];
+				try {
+						$attendee->enrolment_log = EnrolmentLogDbApi::find_entry( $query );
+				} catch ( NotFoundException $e ) {
+					$attendee->enrolment_log = [];
+				}
+				return $attendee;
+			},
+			$attendees
+		);
 
 		printf(
 			'<div

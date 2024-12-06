@@ -7,6 +7,9 @@ use Lasntg\Admin\Group\GroupUtils;
 
 use WP_Query;
 
+/**
+ * Table showing list of orders.
+ */
 class AdminTableView {
 
 	public static function init() {
@@ -161,10 +164,15 @@ class AdminTableView {
 
 	public static function modify_order_row_actions( $actions, $post ) {
 		if ( 'shop_order' === $post->post_type ) {
-			$actions['attendees'] = sprintf(
+			$actions['attendees']      = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( sprintf( 'edit.php?post_type=attendee&order_id=%d', $post->ID ) ) ),
 				esc_html( __( 'Attendees', 'lasntgadmin' ) )
+			);
+			$actions['enrolment_logs'] = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( admin_url( sprintf( 'edit.php?post_type=enrolment_log&order_id=%d', $post->ID ) ) ),
+				esc_html( __( 'Enrolment Logs', 'lasntgadmin' ) )
 			);
 		}
 
