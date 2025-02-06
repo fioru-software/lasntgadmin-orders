@@ -35,34 +35,62 @@ const ProductSelector = props => {
     }
   }, [props?.productId]);
 
-  useEffect( () => {
-    async function runFetch() {
-      try {
-        setIsLoading(true);
-        setProductId("");
-        apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-        const result = await apiFetch( {
-          path: `${props.apiPath}`,
-          method: 'GET'
-        } );
-        if( ! result.length ) {
-          props.setNotice({
-            status: 'error',
-            message: __( 'No courses are available.', 'lasntgadmin' )
-          });
-        }
-        props.onFetch(result);
-      } catch (e) {
+  async function fetchProducts() {
+    try {
+      setIsLoading(true);
+      setProductId("");
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+      const result = await apiFetch( {
+        path: `${props.apiPath}`,
+        method: 'GET'
+      } );
+      if( ! result.length ) {
         props.setNotice({
           status: 'error',
-          message: e.message
+          message: __( 'No courses are available.', 'lasntgadmin' )
         });
-        console.error(e);
       }
-      setIsLoading(false);
+      props.onFetch(result);
+    } catch (e) {
+      props.setNotice({
+        status: 'error',
+        message: e.message
+      });
+      console.error(e);
     }
-    runFetch();
-  }, []);
+    setIsLoading(false);
+  }
+
+  async function fetchProduct( productId ) {
+    try {
+      setIsLoading(true);
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+      const result = await apiFetch( {
+        path: `${props.apiPath}/product/${productId}`,
+        method: 'GET'
+      } );
+      if( ! result ) {
+        props.setNotice({
+          status: 'error',
+          message: __( 'Course does not exist.', 'lasntgadmin' )
+        });
+      }
+      props.onFetch(result);
+    } catch (e) {
+      props.setNotice({
+        status: 'error',
+        message: e.message
+      });
+      console.error(e);
+    }
+    setIsLoading(false);
+  }
+
+  useEffect( () => {
+    if( ! isNil( props.productId ) ) {
+      fetchProduct( props.productId );
+    }
+  }, [ props.productId ] );
 
   return (
     <>
