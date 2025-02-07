@@ -48,10 +48,10 @@ class AdminTableView {
 		}
 	}
 
-	public  static function enqueue_stylesheet( string $hook ) {
-		if( is_admin() && function_exists( 'get_current_screen' ) ) {
+	public static function enqueue_stylesheet( string $hook ) {
+		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
-			if( 'edit-shop_order' === $screen->id && 'edit.php' === $hook ) {
+			if ( 'edit-shop_order' === $screen->id && 'edit.php' === $hook ) {
 				$name = sprintf( '%s-table-view', PluginUtils::get_kebab_case_name() );
 				wp_enqueue_style(
 					$name,
