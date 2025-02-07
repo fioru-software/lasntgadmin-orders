@@ -109,14 +109,14 @@ const OrderForm = props => {
       setIsLoading(true);
       setSubmitButtonDisabled(true);
       apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
-      const order = await apiFetch( 
+      const order = await apiFetch(
         {
           path: isExistingOrder( props.order ) ? `/wc/v3/orders/${ props.order.id }` : `/wc/v3/orders`,
           method,
           data
-        } 
+        }
       );
-      
+
       setNotice({
         status: 'success',
         message: __( 'Updated enrolment. Redirecting...', 'lasntgadmin' )

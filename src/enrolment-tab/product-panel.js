@@ -157,17 +157,19 @@ const ProductPanel = props => {
         path: `${props.productApiPath}/product/group-quota?product_id=${ productId }&group_id=${ groupId }`,
         method: 'GET'
       });
-      setGroupQuota( result );
+
       /**
        * Since we're doing a REST call to determine the remaining quota, we want groupQuota to trigger a change event
-       * even when the quota value is the same. 
+       * even when the quota value is the same.
        *
        * @see https://react.dev/reference/react/useState#ive-updated-the-state-but-the-screen-doesnt-update
        */
-      //setGroupQuota({
-      //  ...groupQuota,
-      //  value: result
-      //});
+      if( result === "" ) {
+        setGroupQuota( new String("") );
+      } else {
+        setGroupQuota( new Number(result) );
+      }
+
     } catch (e) {
       setNotice({
         status: 'error',
@@ -183,19 +185,14 @@ const ProductPanel = props => {
    */
   useEffect( () => {
 
-    console.log('group quota');
-    console.log(groupQuota);
-    console.log('group selected?');
-    console.log(isGroupSelected(groupId));
     if( isGroupSelected(groupId) && ! isNil(product) && ! isNil( productId ) ) {
-      if( ! isNil( groupQuota ) ) {
-        console.log('calculating remaining quota');
+      if( ( typeof groupQuota.valueOf() ) === 'number' ) {
         calculateRemainingQuota( productId, groupId );
       } else {
-        //setSpaces(null);
-        console.log('calculating available spaces for no group quota');
         setSpaces(
-          calculateAvailableSpaces( product.stock_quantity || product.quantity, "", getReservedStockQuantity( product ) )
+          new Number(
+            calculateAvailableSpaces( product.stock_quantity || product.quantity, groupQuota.valueOf(), getReservedStockQuantity( product ) )
+          )
         );
       }
     }
