@@ -20,6 +20,7 @@ class AdminTableView {
 	private static function add_actions() {
 		add_action( 'rest_api_init', [ self::class, 'register_meta' ] );
 		add_action( 'manage_shop_order_posts_custom_column', [ self::class, 'render_product_column' ], 10, 2 );
+		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_stylesheet' ], 11 );
 	}
 
 	private static function add_filters() {
@@ -44,6 +45,19 @@ class AdminTableView {
 			 */
 			add_filter( 'groups_post_access_posts_where_apply', [ self::class, 'apply_default_order_list_filter_by_group_membership' ], 10, 3 );
 			add_filter( 'groups_post_access_posts_where', [ self::class, 'filter_order_list_for_regional_training_centre_managers' ], 10, 2 );
+		}
+	}
+
+	public static function enqueue_stylesheet( string $hook ) {
+		if ( is_admin() && function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+			if ( 'edit-shop_order' === $screen->id && 'edit.php' === $hook ) {
+				$name = sprintf( '%s-table-view', PluginUtils::get_kebab_case_name() );
+				wp_enqueue_style(
+					$name,
+					plugins_url( sprintf( '%s/assets/css/lasntgadmin-orders-table-view.css', PluginUtils::get_kebab_case_name() ) ),
+				);
+			}
 		}
 	}
 

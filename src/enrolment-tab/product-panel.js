@@ -39,18 +39,26 @@ const ProductPanel = props => {
    *
    * @see handleProductSelect()
    * @see handlePreselectedProduct()
+   * @deprecated
    */
+    /*
   useEffect( () => {
     if( ! isNil(productId) && products?.length > 0 ) {
       const product = findProductById( productId, products );
       reset();
       setProduct( product );
-
     }
   }, [ productId ]);
+    */
+
+  useEffect( () => {
+    if( ! isNil( props.productId ) ) {
+      setProductId( parseInt( props.productId ) );
+    }
+  }, [ props.productId ]);
 
   /**
-   * @listens product 
+   * @listens product
    */
   useEffect( () => {
     if( ! isNil( product ) ) {
@@ -84,7 +92,7 @@ const ProductPanel = props => {
   }, [ quantity ]);
 
   /**
-   * @listens groupId 
+   * @listens groupId
    * @fires quantity
    * @fires spaces
    * @fires groupQuota
@@ -102,38 +110,74 @@ const ProductPanel = props => {
         if( isCompletedOrder( props.order) || isCancelledOrder( props.order ) ) {
           setQuantityInputDisabled(true);
         }
-      } 
+      }
 
       if( ! isCompletedOrder( props.order ) && ! isCancelledOrder( props.order ) ) {
 
         if( isGroupSelected(groupId) && ! isNil(product) && ! isNil(productId) ) {
-          const quota = findGroupQuota( 
-            groupId, 
-            findGroupQuotas( product.meta_data ) 
-          );
-          if( isNaN( quota ) || isNil( quota ) || quota === '' ) {
-            setSpaces(
-              calculateAvailableSpaces( product.stock_quantity || product.quantity, quota, getReservedStockQuantity( product ) )
-            );
-            setGroupQuota(null);
-          } else {
-            setSpaces(null);
-            /**
-             * Since we're doing a REST call to determine the remaining quota, we want groupQuota to trigger a change event
-             * even when the quota value is the same. 
-             *
-             * @see https://react.dev/reference/react/useState#ive-updated-the-state-but-the-screen-doesnt-update
-             */
-            setGroupQuota({
-              ...groupQuota,
-              value: quota
-            });
-          }
+
+          fetchProductGroupQuota( productId, groupId );
+
+//          const quota = findGroupQuota(
+//            groupId, 
+//            findGroupQuotas( product.meta_data )
+//          );
+//
+//          if( isNaN( quota ) || isNil( quota ) || quota === '' ) {
+//            setSpaces(
+//              calculateAvailableSpaces( product.stock_quantity || product.quantity, quota, getReservedStockQuantity( product ) )
+//            );
+//            setGroupQuota(null);
+//          } else {
+//            setSpaces(null);
+//            /**
+//             * Since we're doing a REST call to determine the remaining quota, we want groupQuota to trigger a change event
+//             * even when the quota value is the same. 
+//             *
+//             * @see https://react.dev/reference/react/useState#ive-updated-the-state-but-the-screen-doesnt-update
+//             */
+//            setGroupQuota({
+//              ...groupQuota,
+//              value: quota
+//            });
+//          }
         }
       }
 
     }
   }, [ groupId ]);
+
+  async function fetchProductGroupQuota( productId, groupId ) {
+    setNotice(null);
+    setLoading(true);
+    props.setSubmitButtonDisabled(true);
+    try {
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );
+      const result = await apiFetch( {
+        path: `${props.productApiPath}/product/group-quota?product_id=${ productId }&group_id=${ groupId }`,
+        method: 'GET'
+      });
+
+      /**
+       * Since we're doing a REST call to determine the remaining quota, we want groupQuota to trigger a change event
+       * even when the quota value is the same.
+       *
+       * @see https://react.dev/reference/react/useState#ive-updated-the-state-but-the-screen-doesnt-update
+       */
+      if( result === "" ) {
+        setGroupQuota( new String("") );
+      } else {
+        setGroupQuota( new Number(result) );
+      }
+
+    } catch (e) {
+      setNotice({
+        status: 'error',
+        message: e.message
+      });
+      console.error(e);
+    }    
+  };
 
   /**
    * @listens groupQuota
@@ -141,31 +185,39 @@ const ProductPanel = props => {
    */
   useEffect( () => {
 
-    if( ! isNil( groupQuota ) && isGroupSelected(groupId) && ! isNil(product) && ! isNil( productId ) ) {
-
-      async function calculateRemainingQuota( productId, groupId ) {    
-        setNotice(null);
-        setLoading(true);
-        setRemainingGroupQuota(null);
-        props.setSubmitButtonDisabled(true);
-        try {    
-          apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );    
-          const totalAttendees = await apiFetch( {    
-            path: `${props.orderApiPath}/total_attendees?product_id=${ productId }&group_id=${ groupId }`,    
-            method: 'GET'    
-          });    
-          setRemainingGroupQuota( groupQuota.value - totalAttendees );
-        } catch (e) {    
-          setNotice({    
-            status: 'error',    
-            message: e.message    
-          });    
-          console.error(e);    
-        }    
-      };
-      calculateRemainingQuota( productId, groupId );
+    if( isGroupSelected(groupId) && ! isNil(product) && ! isNil( productId ) ) {
+      if( ( typeof groupQuota.valueOf() ) === 'number' ) {
+        calculateRemainingQuota( productId, groupId );
+      } else {
+        setSpaces(
+          new Number(
+            calculateAvailableSpaces( product.stock_quantity || product.quantity, groupQuota.valueOf(), getReservedStockQuantity( product ) )
+          )
+        );
+      }
     }
   }, [ groupQuota ] );
+
+  async function calculateRemainingQuota( productId, groupId ) {    
+    setNotice(null);
+    setLoading(true);
+    setRemainingGroupQuota(null);
+    props.setSubmitButtonDisabled(true);
+    try {    
+      apiFetch.use( apiFetch.createNonceMiddleware( props.nonce ) );    
+      const totalAttendees = await apiFetch( {    
+        path: `${props.orderApiPath}/total_attendees?product_id=${ productId }&group_id=${ groupId }`,    
+        method: 'GET'    
+      });    
+      setRemainingGroupQuota( new Number( groupQuota - totalAttendees ) );
+    } catch (e) {    
+      setNotice({    
+        status: 'error',    
+        message: e.message    
+      });    
+      console.error(e);    
+    }    
+  };
 
   /**
    * @listens remainingGroupQuota
@@ -173,12 +225,12 @@ const ProductPanel = props => {
    */
   useEffect( () => {
     if( ! isNil( remainingGroupQuota ) ) {
-      const availableSpaces = calculateAvailableSpaces( 
+      const availableSpaces = calculateAvailableSpaces(
         product.stock_quantity || product.quantity, 
         remainingGroupQuota,
         getReservedStockQuantity( product )
       );
-      setSpaces( availableSpaces );
+      setSpaces( new Number(availableSpaces) );
     }
   }, [ remainingGroupQuota ]);
 
@@ -290,6 +342,10 @@ const ProductPanel = props => {
     }
   }
 
+  /**
+   * @deprecated
+   */
+  /*
   function handleFetchedProducts( products ) {
 
     setProducts(products);
@@ -304,7 +360,21 @@ const ProductPanel = props => {
     } else {
       setProductDropdownDisabled(false);
     }
-    
+  }
+  */
+
+  function handleFetchedProduct( product ) {
+    setProduct(product);
+    setProducts([product]); // legacy 
+    const orderMeta = findOrderMetaByKey( 'groups-read', props.order.meta_data );
+    handlePreselectedGroup( orderMeta?.value );
+
+    if( isExistingOrder( props.order ) ) {
+      handleFetchedGroups();
+      setProductDropdownDisabled(true);
+    } else {
+      setProductDropdownDisabled(false);
+    }
   }
 
   return (
@@ -312,14 +382,14 @@ const ProductPanel = props => {
         { notice && <Notice status={ notice.status } isDismissable={ true } onDismiss={ () => setNotice(null) } >{ notice.message }</Notice> }
         <div className="form-field form-row">
           <label htmlFor="product">{ __( 'Course', 'lasntgadmin' ) }<span className="required"> *</span></label>
-          <ProductSelector id="product" name="product" disabled={ isProductDropdownDisabled } groupId={ groupId } productId={ productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProducts } products={ products } />
+          <ProductSelector id="product" name="product" disabled={ isProductDropdownDisabled } groupId={ groupId } productId={ props.productId } apiPath={ props.productApiPath} nonce={ props.nonce } setNotice={ setNotice } onChange={ handleProductSelect } onFetch={ handleFetchedProduct } products={ products } />
         </div>
         { props?.lineItem?.id && <input type="hidden" name="line_item_id" value={ props.lineItem.id } /> }
 
         { product && 
           <div className="form-field form-row">
             <label htmlFor="order_group">{ __( 'Group', 'lasntgadmin' ) }<span className="required"> *</span></label>
-            <GroupSelector productId={ productId } disabled={ isGroupDropdownDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
+            <GroupSelector productId={ props.productId } disabled={ isGroupDropdownDisabled } groupId={ groupId } id="order_group" name="order_group" apiPath={ props.groupApiPath } nonce={ props.nonce } onChange={ handleGroupSelect } onFetch={ handleFetchedGroups } />
           </div> 
         }
 
