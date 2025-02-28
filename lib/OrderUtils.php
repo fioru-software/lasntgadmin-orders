@@ -196,7 +196,7 @@ class OrderUtils {
 			"$select $join $where", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			...$args
 		);
-		$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared    
+		$order_ids = $wpdb->get_col( $statement ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return $order_ids;
 	}
 
@@ -522,6 +522,7 @@ class OrderUtils {
 	public static function get_visible_orders(): array {
 		return wc_get_orders(
 			[
+				'limit' => -1,
 				'meta_query' => [
 					[
 						'key'     => 'groups-read',
