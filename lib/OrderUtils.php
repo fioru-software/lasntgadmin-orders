@@ -503,6 +503,7 @@ class OrderUtils {
 			return AttendeeUtils::get_attendee_profiles(
 				get_posts(
 					[
+						'posts_per_page'         => -1,
 						'post_type'           => 'attendee',
 						'include'             => $attendee_ids,
 						'ignore_sticky_posts' => true,
