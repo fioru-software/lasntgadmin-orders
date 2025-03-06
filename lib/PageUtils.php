@@ -84,7 +84,7 @@ class PageUtils {
 	public static function remove_unused_scripts() {
 		if ( function_exists( 'get_post_type' ) ) {
 			if ( 'shop_order' === get_post_type() ) {
-				$handles = [ 'wp-mediaelement', 'thickbox', 'woocommerce-order-attribution-admin-js', 'wc-admin-order-meta-boxes', 'image-edit', 'marketplace-suggestions', 'shortcode', 'quicktags' ];
+				$handles = [ 'wp-mediaelement', 'thickbox', 'woocommerce-order-attribution-admin-js', 'wc-admin-order-meta-boxes', 'image-edit', 'marketplace-suggestions', 'shortcode', 'quicktags', 'media-audiovideo', 'mce-view', 'media-editor' ];
 				foreach ( $handles as $handle ) {
 					wp_dequeue_script( $handle );
 					wp_deregister_script( $handle );
