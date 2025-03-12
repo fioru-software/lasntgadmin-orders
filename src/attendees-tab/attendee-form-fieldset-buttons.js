@@ -109,7 +109,7 @@ const AttendeeFormFieldsetButtons = props => {
    */
   async function removeProductFromAttendee() {
 
-    if( isProductIdInAttendeeMeta( product.id, attendee.meta ) ) {
+    if( attendeeId && isProductIdInAttendeeMeta( product.id, attendee.meta ) ) {
 
       setNotice({
         status: 'info',
@@ -145,33 +145,36 @@ const AttendeeFormFieldsetButtons = props => {
    * @throws Error
    */
   async function removeOrderFromAttendee() {
-    if( isOrderIdInAttendeeMeta( order.id, attendee.meta ) ) {
 
-      setNotice({
-        status: 'info',
-        message: __( 'Removing order from attendee meta...', 'lasntgadmin' )
-      });
 
-      const removeOrderFromAttendeeRequest = getUpdateAttendeeRequest(
-        order.id,
-        attendeeId,
-        nonce,
-        {
-          meta: {
-            order_ids: filterOrderIdFromAttendeeMeta( order.id, attendee.meta )
+      if( attendeeId && isOrderIdInAttendeeMeta( order.id, attendee.meta ) ) {
+
+        setNotice({
+          status: 'info',
+          message: __( 'Removing order from attendee meta...', 'lasntgadmin' )
+        });
+
+        const removeOrderFromAttendeeRequest = getUpdateAttendeeRequest(
+          order.id,
+          attendeeId,
+          nonce,
+          {
+            meta: {
+              order_ids: filterOrderIdFromAttendeeMeta( order.id, attendee.meta )
+            }
           }
-        }
-      );
+        );
 
-      const removeOrderFromAttendeeResponse = await apiFetch(
-        removeOrderFromAttendeeRequest
-      );
+        const removeOrderFromAttendeeResponse = await apiFetch(
+          removeOrderFromAttendeeRequest
+        );
 
-      setNotice({
-        status: 'success',
-        message: __( 'Removed order from attendee meta.', 'lasntgadmin' )
-      });
-    }
+        setNotice({
+          status: 'success',
+          message: __( 'Removed order from attendee meta.', 'lasntgadmin' )
+        });
+      }
+
   }
 
   /**

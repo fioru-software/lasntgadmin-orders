@@ -1,6 +1,6 @@
 {
     "name": "fioru/lasntgadmin-orders",
-    "version": "1.11.7",
+    "version": "1.11.8-rc1",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-orders"
@@ -63,18 +63,22 @@
         {
             "type": "vcs",
             "url":  "git@github.com:fioru-software/lasntgadmin-purchase-order-payment-gateway.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@github.com:fioru-software/lasntgadmin-enrolment-log.git"
         }
     ],
     "require": {
         "composer/installers": "~2.0",
-        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.5.0",
-        "fioru/lasntgadmin-attendees": "^3.8.20",
-        "fioru/lasntgadmin-products": "^5.14.14",
-        "fioru/lasntgadmin-groups": "^1.5.5",
-        "fioru/lasntgadmin-subscriptions": "^2.1.11",
+        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.11.5",
+        "fioru/lasntgadmin-attendees": "^3.9.5",
+        "fioru/lasntgadmin-products": "^5.15.6",
+        "fioru/lasntgadmin-groups": "^1.6.3",
+        "fioru/lasntgadmin-subscriptions": "^2.1.28",
         "fioru/lasntgadmin-users": "^3.3.7",
-        "fioru/lasntgadmin-translate": "^1.2.6",
-        "fioru/lasntgadmin-theme": "^1.0.0",
+        "fioru/lasntgadmin-translate": "^1.2.13",
+        "fioru/lasntgadmin-theme": "^1.0.8",
 		"fioru/lasntgadmin-purchase-order-payment-gateway": "^1.2.13"
     },
     "require-dev": {
