@@ -213,16 +213,34 @@ class PageUtils {
 
 		switch ( $tab ) {
 			case 'attendees':
+				/**
+				 * The attendees function should return a string instead of outputting it.
+				 * Then the phpcs ignore can be removed.
+				 *
+				 * @todo
+				 */
 				echo self::attendees( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			case 'payment':
+				/**
+				 * The payment function should return a string instead of outputting it.
+				 * Then the phpcs ignore can be removed.
+				 *
+				 * @todo
+				 */
 				echo self::payment( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			default:
+				/**
+				 * The order_form function should return a string instead of outputting it.
+				 * Then the phpcs ignore can be removed.
+				 *
+				 * @todo
+				 */
 				echo self::order_form( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		}
+		}//end switch
 
 		echo '</div>';
 	}
