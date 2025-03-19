@@ -213,15 +213,15 @@ class PageUtils {
 
 		switch ( $tab ) {
 			case 'attendees':
-				echo wp_kses( self::attendees( $post ), 'post' );
+				echo self::attendees( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			case 'payment':
-				echo wp_kses( self::payment( $post ), 'post' );
+				echo self::payment( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			default:
-				echo wp_kses( self::order_form( $post ), 'post' );
+				echo self::order_form( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		echo '</div>';
